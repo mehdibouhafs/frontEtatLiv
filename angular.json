@@ -24,9 +24,27 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "src/authCssJs/animate.css",
+              "src/authCssJs/main.css",
+              "src/authCssJs/util.css",
+              "src/authCssJs/hamburgers.min.css",
+              "node_modules/font-awesome/css/font-awesome.css",
+              "src/authCssJs/select2.min.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/secure-ls/dist/secure-ls.js",
+              "node_modules/jquery/dist/jquery.js",
+              "node_modules/bootstrap/dist/js/bootstrap.js",
+              "src/authCssJs/main.js",
+              "src/authCssJs/popper.js",
+              "src/authCssJs/select2.min.js",
+              "src/authCssJs/tilt.jquery.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -89,6 +107,9 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
+              "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -120,6 +141,7 @@
           }
         }
       }
-    }},
+    }
+  },
   "defaultProject": "frontEtat"
 }

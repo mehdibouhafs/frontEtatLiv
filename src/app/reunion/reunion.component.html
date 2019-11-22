@@ -1,0 +1,222 @@
+<nav class="navbar navbar-inverse" style="background-color: #337ab7;color: white">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <div  href="munisys.jpg" style="background-color: white;margin-left: -15px;margin-right: 70px;">
+        <img style="border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 150px;
+background-color: white" src="assets/logo.png" alt="Munisys">
+      </div>
+      <p></p>
+    </div>
+    <ul class="nav navbar-nav">
+      <li ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
+      <li><a style="color: white" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
+      <li style="background-color: #5ed0b0" ><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i> Reunions </a></li>
+    </ul>
+    <!--<button class="btn btn-danger navbar-btn">Button</button>-->
+    <ul class="nav navbar-nav pull-right">
+      <li><a style="color: white" ><i class="fa fa-user-circle-o" aria-hidden="true"> {{userInSession}}</i> </a></li>
+      <li ><a style="color: white" (click)="logout()">  <i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4"></div>
+
+    <div class="col-md-4"></div>
+    <div class="btn btn-primary btn-xs pull-right" (click)="showReunion(template2)"><button> Créer une réunion </button></div>
+  </div>
+
+</div>
+
+
+<mat-form-field>
+  <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+</mat-form-field>
+
+
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- Position Column -->
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="datePlannification"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Plannifier  </th>
+    <td mat-cell *matCellDef="let element"> {{element.datePlannification | date:'dd/MM/yyyy HH:mm'}} </td>
+  </ng-container>
+
+
+  <ng-container matColumnDef="employer">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> collaborateur </th>
+    <td mat-cell *matCellDef="let element"> {{element.employer.name}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="sujet">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Sujet </th>
+    <td mat-cell *matCellDef="let element"> {{element.sujet}} </td>
+  </ng-container>
+
+
+
+  <ng-container matColumnDef="option"  >
+    <th mat-header-cell *matHeaderCellDef >   </th>
+    <td mat-cell *matCellDef="let element" > <a style="cursor:pointer;margin-left: 20px;font-size: 20px"  (click)="deleteRenunion(element,template)"><i class="fa fa-trash fa-3" aria-hidden="true"></i>
+    </a>  <a style="  cursor:pointer;margin-left: 20px;font-size: 20px"  (click)="selectReunion(element,template)"><i class="fa fa-pencil-square-o fa-3" aria-hidden="true"></i>
+    </a> </td>
+  </ng-container>
+
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+
+</table>
+<mat-paginator [pageSizeOptions]="[10, 20, 30, 50]"></mat-paginator>
+<!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>-->
+
+<!--<button (click)="openModal()">open the modal</button>-->
+
+
+<!--<button type="button" class="btn btn-primary" (click)="openModal(template)">Create template modal</button>-->
+
+
+
+<ng-template #template>
+  <div class="modal-header">
+
+
+    <div><i class="fa fa-calendar fa-lg"></i> Détail de la reunion :
+      <strong>{{currentReunion.id}}</strong>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">X</span>
+      </button>
+    </div>
+
+  </div>
+
+
+  <div class="modal-body">
+
+    <div class="row">
+
+      <div class="form-group col-sm-6">
+
+        <label for="datePlannification"><i class="fa fa-life-ring fa-lg"></i> Date prochaine réunion :</label>
+
+
+        <input id="datePlannification" name="dateFinProjet"  type="date" class="form-control input-sm" [ngModel]="currentReunion.datePlannification| date:'yyyy-MM-dd'" (ngModelChange)="currentReunion.datePlannification= $event"
+               [value]="currentReunion.datePlannification | date:'yyyy-MM-dd'"  >
+
+      </div>
+
+      <div class="form-group col-sm-6">
+
+        <label for="employer"><i class="fa fa-user-circle fa-lg"></i> Collaborateur:</label>
+        <select id="employer" class="browser-default custom-select" name="newEmployerId" [(ngModel)]="currentReunion.employer" disabled>
+          <option selected>Sélectionner un collaborateur </option>
+          <option *ngFor="let employe of employees"
+                  [value]="employe">{{employe.name}}</option>
+        </select>
+
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="form-group col-sm-6">
+
+        <label for="sujet1"><i class="fa fa-user-circle fa-lg"></i> Sujet :</label>
+        <textarea id="sujet1" class="form-control input-sm" name="sujet1" [(ngModel)]="currentReunion.sujet"  rows="3" ngModel required></textarea>
+
+      </div>
+    </div>
+
+
+
+
+
+
+    </div>
+
+
+
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-info btn-xs pull-right" (click)="updateRenunion()" >Modifier</button>
+  </div>
+
+
+</ng-template>
+  <ng-template #template2>
+    <div class="modal-header">
+
+      <p class="heading"> <i class="fa fa-calendar fa-lg"></i> Créer une reunion :
+
+      </p>
+
+
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <form #f="ngForm" (ngSubmit)="creerReunion(f.value)">
+    <div class="modal-body">
+
+      <div class="row">
+
+        <div class="form-group col-sm-6">
+
+          <label for="datePlannification2"><i class="fa fa-life-ring fa-lg"></i> Date prochaine réunion :</label>
+
+          <input id="datePlannification2" class="form-control inputsm" type="datetime-local"
+                 name="datePlannification2" ngModel required>
+
+        </div>
+
+        <div class="form-group col-sm-6">
+
+          <label for="newEmployerId"><i class="fa fa-user-circle fa-lg"></i> Collaborateur:</label>
+          <select style="margin-left: 10px" id="newEmployerId" class="browser-default custom-select" name="collaborateur" ngModel  required>
+            <option selected>Sélectionner un collaborateur </option>
+            <option *ngFor="let employe of employees"
+                    [value]="employe.id">{{employe.name}}</option>
+          </select>
+
+        </div>
+      </div>
+
+        <div class="row">
+          <div class="form-group col-sm-6">
+
+            <label for="sujet"><i class="fa fa-user-circle fa-lg"></i> Sujet :</label>
+            <textarea id="sujet" class="form-control input-sm" name="sujet"  placeholder="Ecrire le sujet.." rows="3" ngModel required></textarea>
+
+          </div>
+        </div>
+
+
+
+
+
+
+    </div>
+
+
+
+
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-info btn-xs pull-right"  [disabled]="!f.valid">Créer</button>
+
+    </div>
+    </form>
+
+  </ng-template>
+
+
