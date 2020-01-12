@@ -24,6 +24,7 @@
     "@angular/router": "~8.2.5",
     "@auth0/angular-jwt": "^3.0.0",
     "@ng-bootstrap/ng-bootstrap": "^5.1.1",
+    "@ng-select/ng-select": "^3.7.0",
     "angular-font-awesome": "^3.1.2",
     "angular2-jwt": "^0.2.3",
     "bootstrap": "^3.4.1",

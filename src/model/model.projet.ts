@@ -117,5 +117,20 @@ export class Projet {
 
   public infoProjet : string;
 
+  public priorite :string;
+
+  public decloturedByUser :boolean;
+
+  public  datePvReceptionProvisoire: Date;
+
+  public  datePvReceptionDefinitive:Date;
+
+  public retarder :string;
+
+  public  conditionFacturation :string;
+  public  montantResteAReceptionnner:number;
+
+
+
 
 }

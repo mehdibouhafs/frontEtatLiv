@@ -30,6 +30,7 @@ import {NgxSpinnerService} from 'ngx-spinner';
 import {CurrencyPipe} from '@angular/common';
 import {AuthenticationService} from '../services/authentification.service';
 import {User} from '../../model/model.user';
+import {host} from "../services/host";
 
 
 @Component({
@@ -62,6 +63,20 @@ export class EtatProjetComponent implements OnInit {
   employees : Array<Employer>;
   employeesAvantVente : Array<Employer>;
 
+  clients : Array<String>;
+
+  selectedClient :any;
+
+  selectedClientTmp:any;
+
+  commercials: Array<String>;
+
+  selectedCommercial : any;
+
+  chefProjets : Array<String>;
+
+  selectedChefProjet : any;
+
   newContentComment : string;
   newDatePlannifier : Date;
   newEmployerId : any;
@@ -76,7 +91,13 @@ export class EtatProjetComponent implements OnInit {
 
   nested2ModalRef : BsModalRef;
 
-  displayedColumns: string[] = ['option','client','bu','codeProjet','projet','age',  'commercial', 'chefProjet','montantCmd','restAlivrer','livrerNonFacture','livreFacturePayer','montantPayer'];
+  nested3ModalRef : BsModalRef;
+
+  nested4ModalRef : BsModalRef;
+
+  actionModal : string;
+
+  displayedColumns: string[] = ['option','client','bu','codeProjet','projet','age',  'commercial', 'chefProjet','montantCmd','restAlivrer','livrerNonFacture','livreFacturePayer','montantStock'];
   public dataSource: MatTableDataSource<Projet>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -138,33 +159,103 @@ export class EtatProjetComponent implements OnInit {
 
   RIGHT_ARROW = 39;
   LEFT_ARROW = 37;
+  blockedKey1 : boolean;
 
+  roleReadProjectRs : boolean;
+  roleReadProjectSi : boolean;
+  motifAction : string;
+
+  authorized : boolean = false;
+
+  userAuthenticated:any;
+
+  roleBuReseauSecurite;
+  roleBuSystem;
+  roleBuChefProjet;
+  roleBuVolume;
 
   constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
 
    this.service = this.authService.getServName();
 
+   this.userAuthenticated = this.authService.getUserName();
+
     this.userInSession = this.authService.getLastName();
 
     this.authService.getRoles().forEach(authority => {
+  console.log("authority " + authority);
+      if(authority== 'BU_RESEAU_SECURITE'){
+        this.roleBuReseauSecurite = true;
+        this.bu1 = "VALUE_RS";
+        this.selectedBu = "VALUE_RS";
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_CHEF_PROJET'){
+        this.roleBuChefProjet = true;
+
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_SYSTEM'){
+        this.roleBuSystem = true;
+        this.bu1 = "VALUE_SI";
+        this.selectedBu = "VALUE_SI";
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_VOLUME'){
+        this.roleBuVolume = true;
+        this.bu1 = "VOLUME";
+        this.selectedBu = "VOLUME";
+        this.authorized = true;
+
+      }
+
+
       if (authority == 'READ_ALL_PROJECTS') {
         this.roleReadAllProjects = true;
+        this.authorized = true;
 
       }
       if (authority == 'READ_MY_PROJECTS') {
         this.roleReadMyProjects = true;
+        this.authorized = true;
         console.log("heee");
         if(this.authService.getLastName()!=null){
           this.userNameAuthenticated = this.authService.getLastName();
+          if(this.service == 'Commercial'){
+            this.selectedCommercial = this.userNameAuthenticated;
+          }
+          if(this.service == 'Chef Projet') {
+            this.selectedChefProjet = this.userNameAuthenticated;
+          }
         }else{
-          this.userNameAuthenticated ="none"; // for not pass for undefined
+          this.userNameAuthenticated ="undefined"; // for not pass for undefined
         }
 
         }
+
+      if (authority == 'READ_PROJECT_RS') {
+        this.roleReadProjectRs = true;
+        this.authorized = true;
+
+      }
+
+      if (authority == 'READ_PROJECT_SI') {
+
+        this.roleReadProjectSi = true;
+        this.authorized = true;
+
+      }
 
 
       if (authority == 'READ_ALL_RECOUVREMENTS') {
         this.roleReadAllRecouvrement = true;
+
 
       }
       if (authority == 'READ_MY_RECOUVREMENT') {
@@ -188,6 +279,15 @@ export class EtatProjetComponent implements OnInit {
     this.getAllEmployeesAvantVente();
 
     this.getEtatProjet();
+
+    this.getAllChefProjets();
+
+   // this.getAllClients();
+
+    this.getAllCommericals();
+    console.log("this.authrozed" + this.authorized);
+
+
 
   }
 
@@ -293,6 +393,42 @@ export class EtatProjetComponent implements OnInit {
     )
   }
 
+  getAllChefProjets(){
+    this.etatProjetService.getDistinctChefProjetProjet().subscribe(
+      (data: Array<String>)=>{
+        this.chefProjets = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
+  getAllCommericals(){
+    this.etatProjetService.getDistinctCommercialProjet().subscribe(
+      (data: Array<String>)=>{
+        this.commercials = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
+  getAllClients(){
+    this.etatProjetService.getDistinctClientProjet().subscribe(
+      (data: Array<String>)=>{
+        this.clients = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
 
 
  getEtatProjet(){
@@ -336,14 +472,34 @@ export class EtatProjetComponent implements OnInit {
 
   getAllProjet(cloture:boolean,bu1 : string){
 
+    if(this.selectedClient == null){
+      this.selectedClientTmp = "undefined";
+    }else{
+      this.selectedClientTmp = this.selectedClient;
+    }
+
+    if(this.roleReadMyProjects && this.service == 'Commercial'){
+      this.selectedCommercial = this.userNameAuthenticated;
+    }
+
+    if(this.roleReadMyProjects && this.service == 'Chef Projet'){
+      this.selectedChefProjet = this.userNameAuthenticated;
+    }
+
+    if(this.roleReadProjectRs){
+      this.bu1 = 'VALUE_RS';
+    }
+    if(this.roleReadProjectSi){
+      this.bu1 = 'VALUE_SI';
+    }
+
     if(this.bu1 === "VALUE_RS" || this.bu1==="VALUE_SI"){
       this.bu2 = "VALUE_SI / VALUE_RS";
     }else{
       this.bu2 = "undefined";
     }
 
-
-    this.etatProjetService.getProjets(cloture,bu1,this.bu2,this.selectedStatut,this.selectedAffectation,this.userNameAuthenticated).subscribe(
+    this.etatProjetService.getProjets(cloture,bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClientTmp,this.selectedAffectation).subscribe(
       data=>{
         this.pageProjet = data;
 
@@ -368,6 +524,7 @@ export class EtatProjetComponent implements OnInit {
 
 
           this.projets = new Array<Projet>();
+          this.clients = new Array<String>();
           this.pageProjet.forEach(projet => {
             let p = new Projet();
             p.codeProjet = projet.codeProjet;
@@ -375,6 +532,9 @@ export class EtatProjetComponent implements OnInit {
             p.client = projet.client;
             p.codeClient = projet.codeClient;
 
+            if( p.client!=null &&this.clients.indexOf(p.client) === -1) {
+              this.clients.push(p.client);
+            }
 
             p.commercial = projet.commercial;
             p.codeCommercial = projet.codeCommercial;
@@ -421,6 +581,12 @@ export class EtatProjetComponent implements OnInit {
             p.livrer = projet.livrer;
             p.livrerNonFacture = projet.livrerNonFacture;
             p.factEncours = projet.factEncours;
+            p.cloture = projet.cloture;
+            p.decloturedByUser = projet.decloturedByUser;
+            p.priorite = projet.priorite;
+            p.datePvReceptionDefinitive = projet.datePvReceptionDefinitive;
+            p.datePvReceptionProvisoire = projet.datePvReceptionProvisoire;
+            p.syntheseProjet = projet.syntheseProjet;
 
 
             if (projet.commentaires != null && projet.commentaires.length > 0) {
@@ -439,6 +605,15 @@ export class EtatProjetComponent implements OnInit {
             p.intervenant = projet.intervenant;
             p.codeCommercial = projet.codeCommercial;
             p.montantStock = projet.montantStock;
+            p.decloturedByUser = projet.decloturedByUser;
+
+            if(p.dateFinProjet!=null){
+
+              if(moment(p.dateFinProjet)  <  moment()){
+                p.retarder = '#retard';
+              }
+
+            }
 
 
             let details = new Array<Detail>();
@@ -469,14 +644,19 @@ export class EtatProjetComponent implements OnInit {
               (data.projet !=null ? data.projet : "").toLowerCase().includes(filter) ||
             (data.codeProjet !=null ? data.codeProjet : "").toLowerCase().includes(filter) ||
             (data.age !=null ? data.age : "").toString().toLowerCase().includes(filter) ||
+              (data.priorite !=null ? data.priorite : "").toString().toLowerCase().includes(filter) ||
+              (data.retarder !=null ? data.retarder : "").toString().toLowerCase().includes(filter) ||
             (data.codeProjet !=null ? data.codeProjet : "").toLowerCase()
             === filter ;
         };
         this.dataSource.paginator = this.paginator;
+        console.log("page size " + this.paginator.pageSize );
         this.dataSource.sort = this.sort;
+       // this.dataSource.connect().subscribe(d => this.filtredData = d);
         if(this.currentFilter!=null)
         this.applyFilter(this.currentFilter);
         this.getStatistics();
+
 
 
       },err=>{
@@ -504,6 +684,12 @@ export class EtatProjetComponent implements OnInit {
 
     var index = this.getIndexFromFiltrerdList(this.currentProjet.codeProjet);
     this.index = index;
+
+
+
+
+
+
 
     //console.log("this.filtredData  " + JSON.stringify(this.filtredData ));
 
@@ -583,10 +769,13 @@ export class EtatProjetComponent implements OnInit {
   ngOnInit() {
 
     this.selectedBu = "undefined";
-    this.selectedAffectation="undefined";
     this.selectedStatut = "undefined";
+    this.selectedCommercial = "undefined";
+    this.selectedClient = null;
+    this.selectedChefProjet = "undefined";
 
 
+    this.selectedAffectation = "undefined";
 
 
 
@@ -612,6 +801,21 @@ export class EtatProjetComponent implements OnInit {
 
   }
 
+  initFilter(){
+    this.selectedBu = "undefined";
+    this.selectedStatut = "undefined";
+    this.selectedCommercial = "undefined";
+    this.selectedClient = null;
+    this.selectedChefProjet = "undefined";
+    this.dataSource.filter = null;
+    this.selectedAffectation="undefined";
+    this.currentFilter="";
+    //bu1
+    this.getAllProjet(false,this.selectedBu);
+  }
+
+
+
 
 
   doSearch(){
@@ -621,7 +825,12 @@ export class EtatProjetComponent implements OnInit {
     }else{
       this.bu2 = "undefined";
     }
-    this.etatProjetService.getProjets(this.projetCloture,this.bu1,this.bu2,this.selectedStatut,this.selectedAffectation,this.userNameAuthenticated).subscribe(
+
+    if(this.selectedClient ==null){
+      this.selectedClient= "undefined";
+    }
+
+    this.etatProjetService.getProjets(this.projetCloture,this.bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClient,this.selectedAffectation).subscribe(
       data=>{
         console.log("data Search " + JSON.stringify(data));
         this.pageProjet = data;
@@ -738,6 +947,9 @@ export class EtatProjetComponent implements OnInit {
         return <any> new Date(b.date) - <any> new Date(a.date);
       });
 
+
+
+
       console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
 
       this.currentProjet.updated = true;
@@ -753,17 +965,84 @@ export class EtatProjetComponent implements OnInit {
 
   }
 
+  addCommentSystem(motif){
+
+    if(motif.length != 0) {
+      let newCommentaire = new Commentaire();
+
+      newCommentaire.date = new Date();
+      // newCommentaire.user.username = "test";
+      newCommentaire.content = '[ESCALADE]: '+motif;
+      newCommentaire.user = new User();
+      newCommentaire.user.username = "system";
+
+      newCommentaire.user.sigle = "SYSTEM";
+
+
+      if (this.currentProjet.commentaires == null) {
+        this.currentProjet.commentaires = new Array<Commentaire>();
+      }
+
+      this.currentProjet.commentaires.push(newCommentaire);
+
+      this.currentProjet.commentaires.sort((a, b) => {
+        return <any> new Date(b.date) - <any> new Date(a.date);
+      });
+
+
+
+
+      console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
+
+      this.currentProjet.updated = true;
+      this.setPage(1);
+      this.motifAction = null;
+      //this.newEmployerId = null;
+      this.newDatePlannifier = null;
+
+      let userUpdate = new User();
+      userUpdate.username = this.userAuthenticated;
+      this.currentProjet.updatedBy = userUpdate;
+
+
+      this.etatProjetService.updateProjet(this.currentProjet).subscribe((data: Projet) => {
+        //this.currentProjet.updated = false;
+        //this.mode = 2;
+        //this.currentProjet.updated = false;
+        //this.refreshProjets();
+        //this.modalRef.hide();
+      }, err => {
+        this.currentProjet.updated = true;
+        console.log(JSON.stringify(err));
+        this.returnedError = err.error.message;
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(err));
+
+      });
+
+
+    }
+
+
+
+  }
+
   onEditProjet(template: TemplateRef<any>) {
 
-    console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
+    //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
 
-    console.log("new projet to send " + JSON.stringify(this.currentProjet));
+    //console.log("new projet to send " + JSON.stringify(this.currentProjet));
 
 
     if(this.newContentComment != null ){
       console.log("here newContentComment");
       this.addComment();
     }
+
+    let userUpdate = new User();
+    userUpdate.username = this.userAuthenticated;
+    this.currentProjet.updatedBy = userUpdate;
 
 
     this.etatProjetService.updateProjet(this.currentProjet).subscribe((data: Projet) => {
@@ -799,6 +1078,8 @@ export class EtatProjetComponent implements OnInit {
 
     var index = this.getIndexFromFiltrerdList(codeProjet);
 
+    console.log("page " + this.paginator.pageSize / index);
+
     console.log("index found " + index);
     if(index-1 >=0) {
       var precedIndex = index - 1;
@@ -830,6 +1111,9 @@ export class EtatProjetComponent implements OnInit {
 
 
     var index = this.getIndexFromFiltrerdList(codeProjet);
+    console.log("paginator size " + this.paginator.pageSize);
+    console.log("index " + index);
+
 
 
     var suivantIndex = index + 1;
@@ -843,10 +1127,18 @@ export class EtatProjetComponent implements OnInit {
       if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
         console.log("here");
         this.index = suivantIndex;
+        console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
+        this.paginator.pageIndex = Math.floor( this.index/this.paginator.pageSize);
+        console.log("this.paginator.pageIndex= " + this.paginator.pageIndex);
+
+        this.ref.detectChanges();
+      }
         this.currentProjet = this.filtredData[suivantIndex];
         this.setPage(1);
         this.mode=1;
-      }
+           // console.log("index " + this.index);
+
+
 
       //this.suivant = true;
     }
@@ -854,9 +1146,14 @@ export class EtatProjetComponent implements OnInit {
     if(!this.currentProjet.updated && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
       console.log("here");
       this.index = suivantIndex;
+      console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
+      this.paginator.pageIndex = Math.floor( this.index/this.paginator.pageSize);
+      this.ref.detectChanges();
       this.currentProjet = this.filtredData[suivantIndex];
       this.setPage(1);
       this.mode=1;
+
+
     }
 
 
@@ -878,6 +1175,7 @@ export class EtatProjetComponent implements OnInit {
 
  updated(event){
     console.log("updated");
+    event.preventDefault();
     this.currentProjet.updated = true;
     this.ref.detectChanges();
  }
@@ -912,6 +1210,16 @@ export class EtatProjetComponent implements OnInit {
     this.nested2ModalRef =  this.modalService.show(thirdModal, Object.assign({}, {class: 'modal-sm'}));
   }
 
+  showMotifModal( escalader :boolean, fourthModal: TemplateRef<any>) {
+    console.log("here3");
+    if(escalader){
+      this.actionModal = "escalader";
+    }else{
+      this.actionModal = "datefin";
+    }
+    this.nested3ModalRef =  this.modalService.show(fourthModal, Object.assign({}, {class: 'modal-sm'}));
+  }
+
   checkCanceled(thirdModal: TemplateRef<any>){
 
     if(this.currentProjet.updated){
@@ -932,9 +1240,27 @@ export class EtatProjetComponent implements OnInit {
     this.nested2ModalRef.hide();
   }
 
+  annulation3(){
+    this.nested3ModalRef.hide();
+  }
+
+  annulation4(){
+    this.nested4ModalRef.hide();
+  }
+
   ignore2(){
     this.nested2ModalRef.hide();
     this.modalRef.hide();
+  }
+
+  ignore3(){
+    this.nested3ModalRef.hide();
+
+  }
+
+  ignore4(){
+    this.nested4ModalRef.hide();
+
   }
 
   addMonths(date, months) {
@@ -992,7 +1318,9 @@ export class EtatProjetComponent implements OnInit {
 
     var mntProjet = projet.montantCmd;
 
-    var email="mailto:?subject="+this.removeAnd(projet.client)+" / "+ this.removeAnd(codeProjet)+" / " + this.removeAnd(nomProjet)+ "&body= Bonjour,%0A"+ "Commercial: "+(projet.commercial  == null ? "": projet.commercial ) +"%0A"+
+    var email="mailto:?subject="+this.removeAnd(projet.client)+" / "+ this.removeAnd(codeProjet)+" / " + this.removeAnd(nomProjet)+ "&body= Bonjour,%0A"
+      +"Ce message concerne le projet cité en objet et dont le détail est ci-après :%0A"
+      + "Commercial: "+(projet.commercial  == null ? "": projet.commercial ) +"%0A"+
     "Chef projet: "+ (projet.chefProjet  == null ? "": projet.chefProjet ) +"%0A"+
     "BU: "+ (projet.bu  == null ? "": projet.bu ) +"%0A"+
     "Date CMD: "+moment(projet.dateCmd).format('DD/MM/YYYY')  +"%0A"+
@@ -1004,29 +1332,41 @@ export class EtatProjetComponent implements OnInit {
     "Montant factur%C3%A9: "+ (projet.livreFacturePayer  == null ? "": projet.livreFacturePayer +" DH")  +"%0A"+
     "Montant pay%C3%A9: "+(projet.montantPayer  == null ? "": projet.montantPayer +" DH")  +"%0A"+
     "Montant Stock: "+(projet.montantStock  == null ? "": projet.montantStock +" DH")  +"%0A"+
-    "Taux facturation: "+ (projet.facturation == null ? "":(Math.round(projet.facturation * 100)/100).toFixed(2) +"%")+"%0A";
+    "Taux facturation: "+ (projet.facturation == null ? "":(Math.round(projet.facturation * 100)/100).toFixed(2) +"%")+"%0A"+" %0A"+" %0A";
+
 
     if(projet.commentaires!=null){
 
       let lastCommentaire1 = new Commentaire();
       lastCommentaire1= projet.commentaires[0];
-      if(lastCommentaire1)
-      email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": +"  @"+lastCommentaire1.employer) + " "+lastCommentaire1.content+"%0A";
-      let lastCommentaire2 = new Commentaire();
+      if(lastCommentaire1){
+        email = email+ "%0A";
+
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire1.content)+"%0A";
+      }
+       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= projet.commentaires[1];
       if(lastCommentaire2)
-      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": +"  @"+lastCommentaire1.employer) + " "+lastCommentaire2.content+"%0A";
+      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire2.content)+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= projet.commentaires[2];
       if(lastCommentaire3)
-      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": +"  @"+lastCommentaire1.employer) + " "+lastCommentaire3.content+"%0A";
+      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire3.content)+"%0A";
     }
     console.log("email " + email);
 
+    /*Insert commentaire ssytem with motif*/
 
+   // this.addCommentSystem(this.motifAction);
+
+    //this.motifAction =null;
 
 
     window.location.href = email;
+
+
+
+    //this.annulation3();
   }
 
    removeAnd(str : string){
@@ -1047,6 +1387,12 @@ export class EtatProjetComponent implements OnInit {
   selectFiltre(){
     console.log("this.selectedBu " + this.selectedBu);
 
+    this.selectedAffectation = "undefined";
+    if(this.selectedChefProjet !="undefined" || this.selectedStatut !="undefined" ||this.selectedClient !="undefined"
+      ||this.selectedCommercial !="undefined" ||this.selectedBu !="undefined"){
+      this.selectedAffectation = "undefined";
+    }
+
     if(this.selectedBu == "none"){
       console.log("none");
       this.bu1 = undefined;
@@ -1057,6 +1403,8 @@ export class EtatProjetComponent implements OnInit {
         this.bu1 = this.selectedBu;
     }
     this.getAllProjet(this.projetCloture,this.bu1);
+
+
   }
 
   showEtatRecouvrement(type,value){
@@ -1077,8 +1425,36 @@ export class EtatProjetComponent implements OnInit {
 
   }
 
-  checkIFMorethanFifthMinuteAgo(dateComment){
-    let dateCom = moment(dateComment).add(15, 'minutes');
+
+
+  showEtatStock(type,value){
+
+
+
+    switch(type)
+    {
+      case 'codeProjet':console.log("codeProjet "+ value);
+
+     let url =  '/#/etatStockCodeProjet/'+value;
+
+        window.open(url, "_blank");
+
+
+
+
+
+    }
+
+  }
+
+  checkIFMorethanFifthMinuteAgo(commentaie : Commentaire){
+
+    if(commentaie.user.sigle == 'SYSTEM'){
+      return true;
+    }
+
+    let dateCom = moment(commentaie.date).add(15, 'minutes');
+
 
     return moment().isAfter(dateCom);
   }
@@ -1086,18 +1462,119 @@ export class EtatProjetComponent implements OnInit {
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
 
+    //event.preventDefault();
+
     let template:any;
 
-    if (event.keyCode === this.RIGHT_ARROW) {
+    if (event.keyCode === this.RIGHT_ARROW && !this.blockedKey1) {
       console.log("right");
       this.goToSuivant(this.currentProjet.codeProjet,template);
     }
 
-    if (event.keyCode === this.LEFT_ARROW) {
+    if (event.keyCode === this.LEFT_ARROW  && !this.blockedKey1) {
       this.goToPrecedent(this.currentProjet.codeProjet,template);
     }
   }
 
+  blockedKey(){
+    this.blockedKey1 = true;
+  }
+
+  deBlockedKey(){
+    this.blockedKey1 = false;
+  }
+
+  onSelectAllClient(){
+    this.selectedClient = null;
+    this.selectFiltre();
+  }
+
+  searchByAffectation(affecation :string) {
+    console.log("aff "+ affecation);
+    if(affecation == 'true'){
+      this.selectedAffectation = 'true';
+    }
+
+    if(affecation == 'false'){
+      this.selectedAffectation = 'false';
+    }
+;
+    if(affecation == 'undefined'){
+      this.selectedAffectation = 'undefined';
+    }
+
+    this.getAllProjet(false,'undefined');
+
+
+  }
+
+  clotureProjet(codeProjet : string){
+    this.etatProjetService.clotureProjet(codeProjet).subscribe((data: Projet) => {
+      this.currentProjet.updated = false;
+      this.currentProjet.cloture = data.cloture;
+      this.currentProjet.restAlivrer = data.restAlivrer;
+      this.currentProjet.facturation = data.facturation;
+      this.currentProjet.livreFacturePayer=data.livreFacturePayer;
+      this.currentProjet.livrerNonFacture = data.livrerNonFacture;
+      //this.mode = 2;
+      this.currentProjet.updated = false;
+      this.refreshProjets();
+      //this.modalRef.hide();
+    }, err => {
+      this.currentProjet.updated = true;
+      console.log(JSON.stringify(err));
+      this.returnedError = err.error.message;
+      this.authService.logout();
+      this.router.navigateByUrl('/login');
+      console.log("error "  +JSON.stringify(err));
+
+    });
+  }
+
+  declotureProjet(codeProjet : string){
+
+    this.etatProjetService.declotureProjet(codeProjet).subscribe((data: Projet) => {
+      this.currentProjet.updated = false;
+      this.currentProjet.cloture = data.cloture;
+      this.currentProjet.decloturedByUser = data.decloturedByUser;
+      //this.mode = 2;
+      this.currentProjet.updated = false;
+      this.refreshProjets();
+      //this.modalRef.hide();
+    }, err => {
+      this.currentProjet.updated = true;
+      console.log(JSON.stringify(err));
+      this.returnedError = err.error.message;
+      this.authService.logout();
+      this.router.navigateByUrl('/login');
+      console.log("error "  +JSON.stringify(err));
+
+    });
+
+  }
+
+  checkDateFinInCurrentMonth(dateFinProjet: Date){
+
+    if (moment(dateFinProjet).isBefore(new Date()) || moment(dateFinProjet).isSame(new Date(), 'month')) {
+      return true;
+    }else{
+      return false;
+    }
+
+  }
+
+
+  @HostListener('matSortChange', ['$event'])
+  sortChange(e) {
+    // save cookie with table sort data here
+    this.dataSource.sortData(this.dataSource.filteredData,this.dataSource.sort);
+   // console.log("this.before [0] " + this.filtredData[0].codeProjet);
+   // console.log("sorting table");
+    //this.filtredData = this.dataSource.filteredData;
+
+   // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+
+  }
 
 
 

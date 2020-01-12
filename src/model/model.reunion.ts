@@ -2,13 +2,27 @@ import {Employer} from './model.employer';
 import {Projet} from './model.projet';
 
 export class Reunion {
+
   public id: number;
-  public sujet: string;
-  public  employer : Employer;
+
+  public commentaire: string;
+
+  public  employer : String;
 
   public  dateCreation : Date;
 
-  public  datePlannification : Date;
+  public  dateReunion : Date;
+
+  public expired:boolean;
+
+  public client : string;
+
+  public collaborateur : string;
+
+  public fournisseur : string;
+
+  public  statut :string;
+
 
 
 

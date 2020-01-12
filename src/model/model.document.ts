@@ -135,6 +135,15 @@ export class Document {
 
   public retenuGarantieIssue : number;
 
+  public priorite :string;
+
+  public retarder :string;
+
+  public categorie : string;
+
+  public typeBloquage:string;
+
+
 
 
 

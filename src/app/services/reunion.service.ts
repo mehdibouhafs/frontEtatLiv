@@ -26,7 +26,7 @@ export class ReunionService {
   }
 
   updateReunion(id:number, reunion:Reunion){
-    return this.http.put(this.host+'/reunions/'+id,reunion,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.post(this.host+'/reunions?idReunion='+id,reunion,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
   deleteReunion(idReunion : any){
@@ -35,5 +35,9 @@ export class ReunionService {
 
   getAllReunions(){
     return this.http.get(this.host+'/reunions',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getAllFournisseurs(){
+    return this.http.get(this.host+'/fournisseurs',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 }

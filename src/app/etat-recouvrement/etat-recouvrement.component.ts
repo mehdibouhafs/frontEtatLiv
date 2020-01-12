@@ -1,4 +1,7 @@
-import {ChangeDetectorRef, Component, HostListener, OnInit, TemplateRef, ViewChild, ViewContainerRef} from '@angular/core';
+import {
+  ChangeDetectorRef, Component, HostListener, OnInit, TemplateRef, ViewChild, ViewContainerRef,
+  ViewEncapsulation
+} from '@angular/core';
 import {Employer} from '../../model/model.employer';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
@@ -19,7 +22,8 @@ import {User} from '../../model/model.user';
 @Component({
   selector: 'app-etat-recouvrement',
   templateUrl: './etat-recouvrement.component.html',
-  styleUrls: ['./etat-recouvrement.component.css']
+  styleUrls: ['./etat-recouvrement.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class EtatRecouvrementComponent implements OnInit {
 
@@ -36,6 +40,8 @@ export class EtatRecouvrementComponent implements OnInit {
   returnedError : any;
 
   selectedFiles: FileList;
+
+  selectedStatut : any;
 
   keys : Array<string>;
   Documents : Array<Document>;
@@ -56,6 +62,30 @@ export class EtatRecouvrementComponent implements OnInit {
   nestedModalRef : BsModalRef;
 
   nested2ModalRef : BsModalRef;
+
+  nested3ModalRef : BsModalRef;
+
+  nested4ModalRef : BsModalRef;
+
+  motifAction;
+  actionModal : string;
+
+  clients : Array<String> = new Array<string>();
+
+  selectedClient :any;
+
+  commercials: Array<String> = new Array<string>();
+
+  selectedCommercial : any;
+
+  chefProjets : Array<String> = new Array<string>();
+
+  selectedChefProjet : any;
+
+  chargeRecouvrements : Array<String> = new Array<string>();
+
+  anneesPieces : Array<String> = new Array<string>();
+  selectedAnneePiece : any;
 
   displayedColumns: string[] = ['option','numPiece','typeDocument','agePiece','datePiece','client','codeProjet','projet','commercial', 'chefProjet','montantPiece','montantOuvert','age','chargerRecouvrement','ageDepot'];
   public dataSource: MatTableDataSource<Document>;
@@ -79,7 +109,7 @@ export class EtatRecouvrementComponent implements OnInit {
 
   documentCloture : boolean = false;
 
-  selectedChargeRecouvrement : string = null;
+  selectedChargeRecouvrement : string;
 
   currentFilter : string;
 
@@ -95,24 +125,84 @@ export class EtatRecouvrementComponent implements OnInit {
   service : string;
   userInSession :string;
 
+
   roleReadMyProjects : boolean;
 
   RIGHT_ARROW = 39;
   LEFT_ARROW = 37;
 
+  motifRequired : boolean;
+
+  currentDocmentClone : Document;
+
+  motifChangementDeDateRequired : boolean;
+
+  montantRetenuGarantieRequired: boolean;
+
+  dateFinGarentieRequired : boolean;
+
+  typdeBloquageRequired : boolean;
+
+  authorized : boolean;
+
+  userAuthenticated : any;
+
+  roleBuReseauSecurite:any;
+  roleBuSystem:any;
+  roleBuChefProjet:any;
+  roleBuVolume:any;
+
+
   constructor(private authService:AuthenticationService,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatRecouvrementService: EtatRecouvrementService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef,
-  private activatedRoute:ActivatedRoute) {
+              private activatedRoute:ActivatedRoute) {
+
+
     this.service = this.authService.getServName();
+
+    console.log("service "+ this.service);
+
+    this.userAuthenticated = this.authService.getUserName();
 
     this.userInSession = this.authService.getLastName();
 
+    console.log(" this.authService.getRoles() " +  this.authService.getRoles());
+
     this.authService.getRoles().forEach(authority => {
+
+
+
+      if(authority== 'BU_RESEAU_SECURITE'){
+        this.roleBuReseauSecurite = true;
+        this.authorized = false;
+
+      }
+
+      if(authority== 'BU_CHEF_PROJET'){
+        this.roleBuChefProjet = true;
+        this.authorized = false;
+
+      }
+
+      if(authority== 'BU_SYSTEM'){
+        this.roleBuSystem = true;
+        this.authorized = false;
+
+      }
+      if(authority== 'BU_VOLUME'){
+        this.roleBuVolume = true;
+        this.authorized = false;
+
+      }
+
+
       if (authority == 'READ_ALL_PROJECTS') {
         this.roleReadAllProjects = true;
+        this.authorized = true;
 
       }
       if (authority == 'READ_MY_PROJECTS') {
         this.roleReadMyProjects = true;
+        this.authorized = true;
         if(this.authService.getLastName()!=null){
           this.userNameAuthenticated = this.authService.getLastName();
         }else{
@@ -123,16 +213,19 @@ export class EtatRecouvrementComponent implements OnInit {
 
       if (authority == 'READ_ALL_RECOUVREMENTS') {
         this.roleReadAllRecouvrement = true;
+        this.authorized = true;
 
       }
       if (authority == 'READ_MY_RECOUVREMENT') {
         this.roleReadMyRecouvrement = true;
+        this.authorized = true;
 
         if(this.authService.getLastName()!=null){
           this.userNameAuthenticated = this.authService.getLastName();
         }else{
           this.userNameAuthenticated ="undefined";
         }
+        this.selectedChargeRecouvrement = this.userNameAuthenticated;
 
 
       }
@@ -145,8 +238,6 @@ export class EtatRecouvrementComponent implements OnInit {
     console.log("codeCommercial " + codeCommercial);
     const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
     console.log("codeProjet " + codeProjet);
-
-    this.selectedChargeRecouvrement = "none";
 
     const chefProjet = this.activatedRoute.snapshot.params['chefProjet'];
     console.log("chefProjet " + chefProjet);
@@ -190,13 +281,105 @@ export class EtatRecouvrementComponent implements OnInit {
 
     this.getAllEmployees();
 
-    this.getAllEmployeesRecouvrement();
 
     this.getEtatRecouvrement();
 
 
+  }
+
+  addToArray(value : string ,type:string){
+
+    switch(type){
+
+      case 'client':
+        if(this.clients.indexOf(value) === -1 && value!="") {
+          this.clients.push(value);
+        }
+        break;
+      case 'commercial':
+        if(this.commercials.indexOf(value) === -1 && value!="") {
+          this.commercials.push(value);
+        }
+        break;
+
+      case 'chefProjet':
+        if(this.chefProjets.indexOf(value) === -1 && value!="") {
+          this.chefProjets.push(value);
+        }
+        break;
+      case 'chargerRecouvrement':
+        if(this.chargeRecouvrements.indexOf(value) === -1 && value!="") {
+          this.chargeRecouvrements.push(value);
+        }
+        break;
+      case 'anneePiece':
+        if(this.anneesPieces.indexOf(value) === -1 && value!="") {
+          this.anneesPieces.push(value);
+        }
+        break;
 
 
+    }
+
+  }
+
+  sortAllArrays(){
+    this.clients.sort();
+    this.chefProjets.sort();
+    this.chargeRecouvrements.sort();
+    this.commercials.sort();
+
+
+  }
+
+  initFilter(){
+
+    if(this.roleReadMyRecouvrement){
+      if(this.service=="Commercial"){
+        this.selectedChargeRecouvrement = "undefined";
+        this.selectedStatut = "undefined";
+
+        this.selectedCommercial = this.userNameAuthenticated;
+        this.selectedClient = "undefined";
+        this.selectedChefProjet = "undefined";
+        this.selectedAnneePiece ="undefined";
+      }else{
+        if(this.service == "Chef Projet"){
+          this.selectedChargeRecouvrement = "undefined";
+          this.selectedStatut = "undefined";
+
+          this.selectedCommercial = "undefined";
+          this.selectedClient = "undefined";
+          this.selectedChefProjet = this.userNameAuthenticated;
+          this.selectedAnneePiece ="undefined";
+        }else{
+          if(this.service == "Recouvrement"){
+            console.log("Recourvrment initFiltrer" );
+            //this.selectedChargeRecouvrement = this.userNameAuthenticated;
+            this.selectedStatut = "undefined";
+            this.selectedCommercial = "undefined";
+            this.selectedClient = "undefined";
+            this.selectedChefProjet = "undefined";
+            this.selectedAnneePiece ="undefined";
+          }
+        }
+
+      }
+    }else{
+      this.selectedChargeRecouvrement = "undefined";
+      this.selectedStatut = "undefined";
+      this.selectedCommercial = "undefined";
+      this.selectedClient = "undefined";
+      this.selectedChefProjet = "undefined";
+      this.selectedAnneePiece ="undefined";
+
+    }
+    this.dataSource.filter = null;
+    this.currentFilter="";
+
+
+
+    this.getAllDocument(this.documentCloture,this.selectedChargeRecouvrement);
   }
 
 
@@ -249,105 +432,130 @@ export class EtatRecouvrementComponent implements OnInit {
 
   insertIntoDocuments(pageDocument : any){
     this.Documents = new Array<Document>();
-    pageDocument.forEach(document => {
-      let p = new Document();
-      p.codePiece= document.codePiece;
-      p.numPiece = document.numPiece;
-      p.typeDocument  = document.typeDocument;
-      p.datePiece = document.datePiece;
-      p.codeClient = document.codeClient;
-      p.client = document.client;
-      p.refClient = document.refClient;
-      p.codeProjet = document.codeProjet;
-      p.projet = document.projet;
-      p.commercial = document.commercial;
-      p.chefProjet = document.chefProjet;
-      p.montantPiece =  document.montantPiece;
-      p.montantOuvert = document.montantOuvert;
-      p.chargerRecouvrement = document.chargerRecouvrement;
-      p.anneePiece = document.anneePiece;
-      p.agePiece = document.agePiece;
-      p.age = document.age;
-      p.montantPayer = document.montantPayer;
-      p.conditionDePaiement = document.conditionDePaiement;
-      p.caution = document.caution;
-      p.numCaution = document.numCaution;
-      p.typeCaution = document.typeCaution;
-      p.montantCaution = document.montantCaution;
-      p.dateLiberationCaution = document.dateLiberationCaution;
-      p.details = document.details;
-      p.creation = document.creation;
-      p.lastUpdate = document.lastUpdate;
-      p.statut = document.statut;
-      p.motif = document.motif;
-      p.montantGarantie = document.montantGarantie;
-      p.montantProvision = document.montantProvision;
-      p.dateFinGarantie = document.dateFinGarantie;
-      p.datePrevuEncaissement = document.datePrevuEncaissement;
-      p.dureeGarantie = document.dureeGarantie;
-      p.action = document.action;
-      p.responsable = document.responsable;
-      p.dateDepot = document.dateDepot;
-      p.motifChangementDate = document.motifChangementDate;
-      p.datePvProvisoire = document.datePvProvisoire;
-      p.datePrevuReceptionDefinitive = document.datePrevuReceptionDefinitive;
-      p.codeCommercial = document.codeCommercial;
-      p.dateEcheance = document.dateEcheance;
-      p.infoChefProjetOrCommercial = document.infoChefProjetOrCommercial;
-      p.infoClient = document.infoClient;
-      p.infoProjet = document.infoProjet;
+    if(pageDocument!=null){
+      pageDocument.forEach(document => {
+        let p = new Document();
+        p.codePiece= document.codePiece;
+        p.numPiece = document.numPiece;
+        p.typeDocument  = document.typeDocument;
+        p.datePiece = document.datePiece;
+        p.codeClient = document.codeClient;
+        p.client = document.client;
+        p.refClient = document.refClient;
+        p.codeProjet = document.codeProjet;
+        p.projet = document.projet;
+        p.commercial = document.commercial;
+        p.chefProjet = document.chefProjet;
+        p.montantPiece =  document.montantPiece;
+        p.montantOuvert = document.montantOuvert;
+        p.chargerRecouvrement = document.chargerRecouvrement;
+        p.anneePiece = document.anneePiece;
+        p.agePiece = document.agePiece;
+        p.age = document.age;
+        p.montantPayer = document.montantPayer;
+        p.conditionDePaiement = document.conditionDePaiement;
+        p.caution = document.caution;
+        p.numCaution = document.numCaution;
+        p.typeCaution = document.typeCaution;
+        p.montantCaution = document.montantCaution;
+        p.dateLiberationCaution = document.dateLiberationCaution;
+        p.details = document.details;
+        p.creation = document.creation;
+        p.lastUpdate = document.lastUpdate;
+        p.statut = document.statut;
+        p.motif = document.motif;
+        p.montantGarantie = document.montantGarantie;
+        p.montantProvision = document.montantProvision;
+        p.dateFinGarantie = document.dateFinGarantie;
+        p.datePrevuEncaissement = document.datePrevuEncaissement;
+        p.dureeGarantie = document.dureeGarantie;
+        p.action = document.action;
+        p.responsable = document.responsable;
+        p.dateDepot = document.dateDepot;
+        p.motifChangementDate = document.motifChangementDate;
+        p.datePvProvisoire = document.datePvProvisoire;
+        p.datePrevuReceptionDefinitive = document.datePrevuReceptionDefinitive;
+        p.codeCommercial = document.codeCommercial;
+        p.dateEcheance = document.dateEcheance;
+        p.infoChefProjetOrCommercial = document.infoChefProjetOrCommercial;
+        p.infoClient = document.infoClient;
+        p.infoProjet = document.infoProjet;
+        p.priorite = document.priorite;
+        p.categorie = document.categorie;
+        p.typeBloquage = document.typeBloquage;
 
-      if(p.agePiece!=null && p.typeDocument == "Facture"){
-        if(document.agePiece>=0 && document.agePiece<=1){
-          p.isLessThanOneMonth = true;
+        if(p.conditionDePaiement === '- Base de paiement -'){
+          let dateEchenace = moment(p.datePiece).add(3,'month').format();
+          p.dateEcheance = new Date(dateEchenace);
         }
 
-        if(document.agePiece>1 && document.agePiece<=2){
-          p.isLessThanTwoMonth = true;
+
+        if(p.agePiece!=null && p.typeDocument == "Facture"){
+          if(document.agePiece>=0 && document.agePiece<=1){
+            p.isLessThanOneMonth = true;
+          }
+
+          if(document.agePiece>1 && document.agePiece<=2){
+            p.isLessThanTwoMonth = true;
+          }
+
+          if(document.agePiece>2 && document.agePiece<=3){
+            p.isLessThanTreeMonth = true;
+          }
+
+          if(document.agePiece>3 && document.agePiece <=12){
+            p.isMoreThanTreeMonthAndLessThanTweleveMonth = true;
+          }
+
+          if(document.agePiece>12 ){
+            p.isMoreThanTwelveMonth = true;
+          }
+
+          if( moment(p.dateEcheance)  <  moment()){
+            p.isExpiredEcheance = true;
+            p.retarder="#retard";
+          }
+        }
+        if(p.agePiece!=null && p.typeDocument != "Facture"){
+          p.isGris=true;
         }
 
-        if(document.agePiece>2 && document.agePiece<=3){
-          p.isLessThanTreeMonth = true;
+        if(p.dateDepot!=null){
+          p.ageDepot = moment().diff(p.dateDepot, 'months', false);
+
+
         }
 
-        if(document.agePiece>3 && document.agePiece <=12){
-          p.isMoreThanTreeMonthAndLessThanTweleveMonth = true;
+
+
+        if(p.statut=='Retenue Garantie' && p.dateFinGarantie!=null){
+          p.retenuGarantieIssue = moment(p.dateFinGarantie).diff(moment(), 'months', true);
         }
 
-        if(document.agePiece>12 ){
-          p.isMoreThanTwelveMonth = true;
+
+        if(document.commentaires != null && document.commentaires.length > 0){
+          p.commentaires = document.commentaires;
         }
 
-        if( moment(document.dateEcheance)  <=  moment()){
-          p.isExpiredEcheance = true;
-        }
-      }
-      if(p.agePiece!=null && p.typeDocument != "Facture"){
-        p.isGris=true;
-      }
 
-      if(p.dateDepot!=null){
-        p.ageDepot = moment(p.dateDepot).diff(moment(), 'months', true);
+        p.cloture = document.cloture;
 
-      }
-
-      if(p.dateFinGarantie!=null){
-        p.retenuGarantieIssue = moment(p.dateFinGarantie).diff(moment(), 'months', true);
-      }
+        if(p.client!=null)
+          this.addToArray(p.client,'client');
+        if(p.chefProjet!=null)
+          this.addToArray(p.chefProjet,'chefProjet');
+        if(p.chargerRecouvrement!=null)
+          this.addToArray(p.chargerRecouvrement,'chargerRecouvrement');
+        if(p.commercial!=null)
+          this.addToArray(p.commercial,'commercial');
+        if(p.anneePiece!=null)
+          this.addToArray(p.anneePiece+"",'anneePiece');
 
 
-      if(document.commentaires != null && document.commentaires.length > 0){
-        p.commentaires = document.commentaires;
-      }
+        this.Documents.push(p);
+      });
+    }
 
-
-      p.cloture = document.cloture;
-
-
-
-
-      this.Documents.push(p);
-  });
   }
 
 
@@ -360,6 +568,57 @@ export class EtatRecouvrementComponent implements OnInit {
       }
     )
   }
+
+
+  getAllChefProjets(){
+    this.etatRecouvrementService.getDistinctChefProjetDocument().subscribe(
+      (data: Array<String>)=>{
+        this.chefProjets = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
+  getAllCommericals(){
+    this.etatRecouvrementService.getDistinctCommercialDocument().subscribe(
+      (data: Array<String>)=>{
+        this.commercials = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
+  getAllClients(){
+    this.etatRecouvrementService.getDistinctClientDocument().subscribe(
+      (data: Array<String>)=>{
+        this.clients = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
+  getAllannee(){
+    this.etatRecouvrementService.getDistinctAnneePiece().subscribe(
+      (data: Array<String>)=>{
+        this.anneesPieces = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
+
 
 
 
@@ -376,150 +635,100 @@ export class EtatRecouvrementComponent implements OnInit {
 
   getAllDocument(cloture:boolean,chargeRecouvrement :string){
 
-    if(chargeRecouvrement!=null){
-      this.etatRecouvrementService.getDocumentsByChargeRecouvrement(cloture,chargeRecouvrement).subscribe(
-        data=>{
-          this.pageDocument = data;
 
-          this.keys = new Array<string>();
+    console.log("selectChargeRecouvrement " + this.selectedChargeRecouvrement);
 
+    this.etatRecouvrementService.getDocuments(cloture,this.selectedChargeRecouvrement,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,
+      this.selectedClient,this.selectedAnneePiece).subscribe(
+      data=>{
+        this.pageDocument = data;
 
+        this.keys = new Array<string>();
 
-          this.keys.push("codeDocument");
-          if(this.pageDocument[0] !=null && this.pageDocument[0].detaills !=null ){
-            this.pageDocument[0].details.forEach(element => {
-              console.log(element.header.label);
-              let a :string;
-              a = element.header.label;
-              this.keys.push(a);
+        this.keys.push("codeDocument");
+        if(this.pageDocument!=null && this.pageDocument[0] !=null && this.pageDocument[0].detaills !=null ){
+          this.pageDocument[0].details.forEach(element => {
+            console.log(element.header.label);
+            let a :string;
+            a = element.header.label;
+            this.keys.push(a);
 
-            });
-          }
-
-
-          this.insertIntoDocuments(this.pageDocument);
-
-
-
-          this.dataSource =  new MatTableDataSource(this.Documents);
-
-          this.dataSource.filterPredicate = function(data, filter: string): boolean {
-
-            return (data.client !=null ? data.client : "").toLowerCase().includes(filter) ||
-              (data.numPiece !=null ? data.numPiece : "").toLowerCase().includes(filter) ||
-              (data.age !=null ? data.age.toString() : "").toLowerCase().includes(filter) ||
-              (data.commercial !=null ? data.commercial : "").toLowerCase().includes(filter) ||
-              (data.typeDocument !=null ? data.typeDocument : "").toLowerCase().includes(filter) ||
-              (data.chefProjet !=null ? data.chefProjet : "").toLowerCase().includes(filter) ||
-              (data.projet !=null ? data.projet : "").toLowerCase().includes(filter) ||
-              (data.codeProjet !=null ? data.codeProjet : "").toLowerCase().includes(filter) ||
-              (data.chargerRecouvrement !=null ? data.chargerRecouvrement : "").toString().toLowerCase().includes(filter) ||
-              (data.codeProjet !=null ? data.codeProjet : "").toLowerCase()
-              === filter
-
-
-          };
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-          if(this.currentFilter!=null){
-            this.applyFilter(this.currentFilter);
-          }else{
-            this.getStatistics();
-          }
-
-
-          // this.getStatistics();
-
-
-        },err=>{
-          // alert("erreur " + err);
-          console.log("error "  +err);
-          this.authService.logout();
-          this.router.navigateByUrl('/login');
-          console.log("error "  +JSON.stringify(err));
+          });
         }
-      )
-    }else{
-      this.etatRecouvrementService.getDocuments(cloture).subscribe(
-        data=>{
-          this.pageDocument = data;
 
-          this.keys = new Array<string>();
+        this.insertIntoDocuments(this.pageDocument);
 
+        this.dataSource =  new MatTableDataSource(this.Documents);
 
+        this.dataSource.filterPredicate = function(data, filter: string): boolean {
 
-          this.keys.push("codeDocument");
-          if(this.pageDocument[0] !=null && this.pageDocument[0].detaills !=null ){
-            this.pageDocument[0].details.forEach(element => {
-              console.log(element.header.label);
-              let a :string;
-              a = element.header.label;
-              this.keys.push(a);
-
-            });
-          }
-
-          this.insertIntoDocuments(this.pageDocument);
-
-          this.dataSource =  new MatTableDataSource(this.Documents);
-
-          this.dataSource.filterPredicate = function(data, filter: string): boolean {
-
-            return (data.client !=null ? data.client : "").toLowerCase().includes(filter) ||
-              (data.numPiece !=null ? data.numPiece : "").toLowerCase().includes(filter) ||
-              (data.age !=null ? data.age.toString() : "").toLowerCase().includes(filter) ||
-              (data.commercial !=null ? data.commercial : "").toLowerCase().includes(filter) ||
-              (data.typeDocument !=null ? data.typeDocument : "").toLowerCase().includes(filter) ||
-              (data.chefProjet !=null ? data.chefProjet : "").toLowerCase().includes(filter) ||
-              (data.projet !=null ? data.projet : "").toLowerCase().includes(filter) ||
-              (data.codeProjet !=null ? data.codeProjet : "").toLowerCase().includes(filter) ||
-              (data.chargerRecouvrement !=null ? data.chargerRecouvrement : "").toString().toLowerCase().includes(filter) ||
-              (data.codeProjet !=null ? data.codeProjet : "").toLowerCase()
-              === filter
+          return (data.client !=null ? data.client : "").toLowerCase().includes(filter) ||
+            (data.numPiece !=null ? data.numPiece : "").toLowerCase().includes(filter) ||
+            (data.age !=null ? data.age.toString() : "").toLowerCase().includes(filter) ||
+            (data.commercial !=null ? data.commercial : "").toLowerCase().includes(filter) ||
+            (data.typeDocument !=null ? data.typeDocument : "").toLowerCase().includes(filter) ||
+            (data.chefProjet !=null ? data.chefProjet : "").toLowerCase().includes(filter) ||
+            (data.projet !=null ? data.projet : "").toLowerCase().includes(filter) ||
+            (data.codeProjet !=null ? data.codeProjet : "").toLowerCase().includes(filter) ||
+            (data.priorite !=null ? data.priorite : "").toLowerCase().includes(filter) ||
+            (data.retarder !=null ? data.retarder : "").toLowerCase().includes(filter) ||
+            (data.chargerRecouvrement !=null ? data.chargerRecouvrement : "").toString().toLowerCase().includes(filter) ||
+            (data.codeProjet !=null ? data.codeProjet : "").toLowerCase()
+            === filter
 
 
-          };
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-          if(this.currentFilter!=null){
-            this.applyFilter(this.currentFilter);
-          }else{
-            this.getStatistics();
-          }
-
-          // this.getStatistics();
-
-
-        },err=>{
-          // alert("erreur " + err);
-          console.log("error "  +err);
-          this.authService.logout();
-          this.router.navigateByUrl('/login');
-          console.log("error "  +JSON.stringify(err));
+        };
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        if(this.currentFilter!=null){
+          this.applyFilter(this.currentFilter);
+        }else{
+          this.getStatistics();
         }
-      )
-    }
+
+        // this.getStatistics();
+
+
+      },err=>{
+        // alert("erreur " + err);
+        console.log("error "  +err);
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(err));
+      }
+    )
+
 
 
 
 
   }
 
-  selectDocument(Document : Document,template: TemplateRef<any>){
-    this.currentDocument = Document;
+  selectDocument(document : Document,template: TemplateRef<any>){
+    this.motifRequired = false;
+
+    this.currentDocument = document;
+
+    this.currentDocmentClone = new Document();
+
+    this.currentDocmentClone.datePrevuEncaissement = this.currentDocument.datePrevuEncaissement;
+    this.currentDocmentClone.dateDepot = this.currentDocument.dateDepot;
+    this.currentDocmentClone.statut = this.currentDocmentClone.statut;
+
+
     this.setPage(1);
 
     this.mode = 1;
 
     this.filtredData = this.dataSource.filteredData;
 
-    var index = this.getIndexFromFiltrerdList(this.currentDocument.numPiece);
+    var index = this.getIndexFromFiltrerdList(this.currentDocument.codePiece);
     this.index = index;
 
     //console.log("this.filtredData  " + JSON.stringify(this.filtredData ));
 
     // console.log("this.filtredData size  " + this.filtredData.length );
-    console.log("current Document " + JSON.stringify(this.currentDocument));
+    //console.log("current Document " + JSON.stringify(this.currentDocument));
 
     /*if(this.currentDocument.firstCommentaire != null && this.currentDocument.secondCommentaire != null){
       this.isShowTextComment = false;
@@ -594,6 +803,50 @@ export class EtatRecouvrementComponent implements OnInit {
 
   ngOnInit() {
 
+   // this.selectedChargeRecouvrement = "undefined";
+
+    if(this.roleReadMyRecouvrement){
+      if(this.service=="Commercial"){
+        this.selectedChargeRecouvrement = "undefined";
+        this.selectedStatut = "undefined";
+
+        this.selectedCommercial = this.userNameAuthenticated;
+        this.selectedClient = "undefined";
+        this.selectedChefProjet = "undefined";
+        this.selectedAnneePiece ="undefined";
+      }else{
+        if(this.service == "Chef Projet"){
+          this.selectedChargeRecouvrement = "undefined";
+          this.selectedStatut = "undefined";
+
+          this.selectedCommercial = "undefined";
+          this.selectedClient = "undefined";
+          this.selectedChefProjet = this.userNameAuthenticated;
+          this.selectedAnneePiece ="undefined";
+        }else{
+          if(this.service == "Recouvrement"){
+            console.log("Recourvrment initFiltrer" );
+            //this.selectedChargeRecouvrement = this.userNameAuthenticated;
+            this.selectedStatut = "undefined";
+            this.selectedCommercial = "undefined";
+            this.selectedClient = "undefined";
+            this.selectedChefProjet = "undefined";
+            this.selectedAnneePiece ="undefined";
+          }
+        }
+
+      }
+    }else{
+      this.selectedChargeRecouvrement = "undefined";
+      this.selectedStatut = "undefined";
+      this.selectedCommercial = "undefined";
+      this.selectedClient = "undefined";
+      this.selectedChefProjet = "undefined";
+      this.selectedAnneePiece ="undefined";
+
+    }
+
+
 
 
     /* this.commercialFilter.valueChanges.subscribe((commercialFiltreValue) => {
@@ -620,7 +873,8 @@ export class EtatRecouvrementComponent implements OnInit {
 
   doSearch(){
     console.log("this. "+ this.etatRecouvrement.id);
-    this.etatRecouvrementService.getDocuments(this.documentCloture).subscribe(
+    this.etatRecouvrementService.getDocuments(this.documentCloture,this.selectedChargeRecouvrement,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,
+      this.selectedClient,this.selectedAnneePiece).subscribe(
       data=>{
         console.log("data Search " + JSON.stringify(data));
         this.pageDocument = data;
@@ -667,7 +921,7 @@ export class EtatRecouvrementComponent implements OnInit {
   }
 
   activeUpload(){
-   // this.viewUpload = true;
+    // this.viewUpload = true;
     this.refreshAllDocumentsFromSAP();
   }
 
@@ -696,9 +950,9 @@ export class EtatRecouvrementComponent implements OnInit {
 
       this.getAllDocument(this.documentCloture,this.userNameAuthenticated);
     }else{
-        if(this.roleReadAllRecouvrement){
-          this.getAllDocument(this.documentCloture,null);
-        }
+      if(this.roleReadAllRecouvrement){
+        this.getAllDocument(this.documentCloture,null);
+      }
 
     }
 
@@ -722,7 +976,7 @@ export class EtatRecouvrementComponent implements OnInit {
 
       newCommentaire.date = new Date();
       newCommentaire.user = new User();
-      newCommentaire.user.username = this.authService.getUserName();
+      newCommentaire.user.username = this.userAuthenticated;
       console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
       newCommentaire.content = this.newContentComment;
@@ -758,9 +1012,83 @@ export class EtatRecouvrementComponent implements OnInit {
 
   }
 
+  addCommentSystem(motif){
+
+    if(motif.length != 0) {
+      let newCommentaire = new Commentaire();
+
+      newCommentaire.date = new Date();
+      // newCommentaire.user.username = "test";
+      newCommentaire.user = new User();
+
+      if(this.actionModal == 'escalader'){
+        newCommentaire.content = '[ESCALADE]: '+motif;
+        newCommentaire.user.username = "system";
+        newCommentaire.user.sigle = "SYSTEM";
+      }
+      if(this.actionModal == 'udateDatePrevuEncaissement'){
+        newCommentaire.content = '[CHANGEMENT_DATE_ENC]: '+motif;
+        newCommentaire.user.username = this.userAuthenticated;
+        newCommentaire.user.sigle = this.sigleUserAuthenticated;
+      }
+
+
+
+
+
+
+
+      if (this.currentDocument.commentaires == null) {
+        this.currentDocument.commentaires = new Array<Commentaire>();
+      }
+
+      this.currentDocument.commentaires.push(newCommentaire);
+
+      this.currentDocument.commentaires.sort((a, b) => {
+        return <any> new Date(b.date) - <any> new Date(a.date);
+      });
+
+
+
+
+      console.log(" this.currentProjet.commentaires " + this.currentDocument.commentaires);
+
+      this.currentDocument.updated = true;
+      this.setPage(1);
+      this.motifAction = null;
+      //this.newEmployerId = null;
+      this.newDatePlannifier = null;
+
+      let userUpdate = new User();
+      userUpdate.username = this.userAuthenticated;
+      this.currentDocument.updatedBy = userUpdate;
+
+      console.log("edit2 "+ JSON.stringify(this.currentDocument));
+
+      this.etatRecouvrementService.updateDocument(this.currentDocument).subscribe((data: Document) => {
+        this.currentDocument.updated = false;
+        //this.refreshDocuments();
+        //this.modalRef.hide();
+      }, err => {
+        this.currentDocument.updated = true;
+        console.log(JSON.stringify(err));
+        this.returnedError = err.error.message;
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(err));
+      });
+
+    }
+
+    this.nested3ModalRef.hide();
+
+
+
+  }
+
   onEditDocument(template: TemplateRef<any>) {
 
-    console.log("this.currentDocument "  + JSON.stringify(this.currentDocument));
+
 
     console.log("new Document to send " + JSON.stringify(this.currentDocument));
 
@@ -770,13 +1098,19 @@ export class EtatRecouvrementComponent implements OnInit {
       this.addComment();
     }
 
+    console.log("this.authService.getUserName(); " +this.userAuthenticated);
+
+    let userUpdate = new User();
+    userUpdate.username = this.userAuthenticated;
+    this.currentDocument.updatedBy = userUpdate;
+
+    console.log("updatedy "+ JSON.stringify(this.currentDocument.updatedBy ));
 
     this.etatRecouvrementService.updateDocument(this.currentDocument).subscribe((data: Document) => {
       this.currentDocument.updated = false;
-      //this.mode = 2;
       this.currentDocument.updated = false;
-      //this.refreshDocuments();
-      //this.modalRef.hide();
+
+      console.log("this.curre " + this.currentDocument.updated );
     }, err => {
       this.currentDocument.updated = true;
       console.log(JSON.stringify(err));
@@ -786,13 +1120,16 @@ export class EtatRecouvrementComponent implements OnInit {
       console.log("error "  +JSON.stringify(err));
     });
 
+
+
   }
 
   getIndexFromFiltrerdList(codeDocument){
+    console.log("codeDocument "+codeDocument);
     console.log("this.filtredData.size " + this.filtredData.length);
     for(var i=0;i<this.filtredData.length;i++){
-      console.log("this.filtredData[i] " + this.filtredData[i].numPiece);
-      if(this.filtredData[i].numPiece == codeDocument){
+      console.log("this.filtredData[i] " + this.filtredData[i].codePiece);
+      if(this.filtredData[i].codePiece == codeDocument){
         return i;
         break;
       }
@@ -808,7 +1145,7 @@ export class EtatRecouvrementComponent implements OnInit {
       var precedIndex = index - 1;
 
       this.index = precedIndex;
-      if (this.currentDocument.updated) {
+      if (this.currentDocument.updated && !this.typdeBloquageRequired && !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired) {
         //this.showDialog();
         //this.showAnnulationModificationModal(template);
         this.onEditDocument(null);
@@ -820,7 +1157,7 @@ export class EtatRecouvrementComponent implements OnInit {
         }
       }
 
-      if (!this.currentDocument.updated && precedIndex != null && precedIndex >= 0 && precedIndex < this.filtredData.length) {
+      if (!this.currentDocument.updated && !this.typdeBloquageRequired && !this.motifRequired &&  !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired && precedIndex != null && precedIndex >= 0 && precedIndex < this.filtredData.length) {
         this.currentDocument = this.filtredData[precedIndex];
         this.setPage(1);
         this.mode = 1;
@@ -838,14 +1175,14 @@ export class EtatRecouvrementComponent implements OnInit {
 
     var suivantIndex = index + 1;
     console.log("index suivantIndex " + suivantIndex);
-
-    if(this.currentDocument.updated){
+    console.log("motif required "+ this.motifRequired);
+    if(this.currentDocument.updated && !this.typdeBloquageRequired && !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired){
       //this.showDialog();
       //this.showAnnulationModificationModal(template);
       this.onEditDocument(null);
 
       if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-        console.log("here");
+        console.log("here updated ");
         this.index = suivantIndex;
         this.currentDocument = this.filtredData[suivantIndex];
         this.setPage(1);
@@ -855,8 +1192,8 @@ export class EtatRecouvrementComponent implements OnInit {
       //this.suivant = true;
     }
 
-    if(!this.currentDocument.updated && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-      console.log("here");
+    if(!this.currentDocument.updated && !this.typdeBloquageRequired &&  !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length ){
+      console.log("here not updated");
       this.index = suivantIndex;
       this.currentDocument = this.filtredData[suivantIndex];
       this.setPage(1);
@@ -885,6 +1222,247 @@ export class EtatRecouvrementComponent implements OnInit {
     this.currentDocument.updated = true;
     this.ref.detectChanges();
   }
+
+  updatedStatut(event){
+    this.currentDocument.updated = true;
+    this.ref.detectChanges();
+    if(this.currentDocument !=null){
+       if(this.currentDocument.statut!=null && this.currentDocument.statut== 'Bloquée' && (this.currentDocument.motif == '' ||!this.currentDocument.motif)){
+         this.motifRequired = true;
+
+       }else{
+
+         this.motifRequired = false;
+       }
+
+      if(this.currentDocument.statut!=null && this.currentDocument.statut== 'Bloquée' && (this.currentDocument.typeBloquage==null || this.currentDocument.typeBloquage=="")){
+        console.log("type blo null"  );
+        this.typdeBloquageRequired = true;
+      }else{
+        console.log("type blo not null"  );
+        this.typdeBloquageRequired = false;
+      }
+
+
+      if(this.currentDocument.statut!=null && this.currentDocument.statut== 'Retenue Garantie' && this.currentDocument.montantGarantie==0){
+        this.montantRetenuGarantieRequired = true;
+      }else{
+        this.montantRetenuGarantieRequired = false;
+      }
+
+    }
+    if(this.currentDocument.statut ==null || ( this.currentDocument.statut!= 'Bloquée' && this.currentDocument.statut!= 'Retenue Garantie') ){
+      this.motifRequired = false;
+      this.montantRetenuGarantieRequired = false;
+      this.typdeBloquageRequired=false;
+    }
+
+  }
+
+
+
+  updatedMotif(event){
+    this.currentDocument.updated = true;
+    /*if(this.motifRequired){
+      if(this.currentDocument.motif !=null && this.currentDocument.motif != "" && this.currentDocument.motif.length>0){
+
+        this.currentDocument.updated = true;
+        this.motifRequired = false;
+
+      }else{
+        this.motifRequired = true;
+      }
+      this.ref.detectChanges();
+    }
+    if(this.currentDocument.statut == "Bloquée"){
+      console.log("changed this is last " + this.currentDocmentClone.motif);
+      if(this.currentDocmentClone.motif!=null && this.currentDocmentClone.motif.length>=0){
+        console.log("motif avant nest pas vide");
+        if(this.currentDocument.motif == null || this.currentDocument.motif.length==0){
+          console.log(" Motif apres vide");
+          this.motifRequired = true;
+        }
+      }
+    }*/
+    console.log("teste motif");
+    if(this.currentDocument.motif!=null&&  this.currentDocument.motif != "" && this.currentDocument.motif.length>0){
+      this.motifRequired = false;
+    }
+    if(this.currentDocument.statut == "Bloquée" && (this.currentDocument.motif== null || this.currentDocument.motif == "")){
+
+
+      this.motifRequired = true;
+    }
+
+  }
+
+  updatedTypeBloquage(event){
+    this.currentDocument.updated = true;
+    /*if(this.motifRequired){
+      if(this.currentDocument.motif !=null && this.currentDocument.motif != "" && this.currentDocument.motif.length>0){
+
+        this.currentDocument.updated = true;
+        this.motifRequired = false;
+
+      }else{
+        this.motifRequired = true;
+      }
+      this.ref.detectChanges();
+    }
+    if(this.currentDocument.statut == "Bloquée"){
+      console.log("changed this is last " + this.currentDocmentClone.motif);
+      if(this.currentDocmentClone.motif!=null && this.currentDocmentClone.motif.length>=0){
+        console.log("motif avant nest pas vide");
+        if(this.currentDocument.motif == null || this.currentDocument.motif.length==0){
+          console.log(" Motif apres vide");
+          this.motifRequired = true;
+        }
+      }
+    }*/
+    console.log("teste motif");
+    if(this.currentDocument.typeBloquage!=null){
+      this.typdeBloquageRequired = false;
+    }
+    if(this.currentDocument.statut == "Bloquée" && (this.currentDocument.typeBloquage== null || this.currentDocument.typeBloquage == "")){
+
+      this.typdeBloquageRequired = true;
+    }
+
+  }
+
+  updatedDateFinGarentie(event){
+
+    this.currentDocument.updated = true;
+    if(this.currentDocument.dateFinGarantie !=null ){
+      this.dateFinGarentieRequired = false;
+
+    }
+
+    if(this.currentDocument.montantGarantie !=null && this.currentDocument.montantGarantie>0){
+
+      if(!this.currentDocument.dateFinGarantie){
+        this.dateFinGarentieRequired = true;
+      }
+
+    }
+
+  }
+
+  updatedMontantRetenueGarantie(event){
+
+
+    this.currentDocument.updated = true;
+    if(this.currentDocument.montantGarantie >0 ){
+      this.montantRetenuGarantieRequired = false;
+      if(!this.currentDocument.dateFinGarantie){
+        this.dateFinGarentieRequired = true;
+      }
+
+    }
+
+    if(this.currentDocument.montantGarantie==null || this.currentDocument.montantGarantie ==0){
+      this.dateFinGarentieRequired = false;
+
+    }
+
+
+
+    if(this.currentDocument.statut =='Retenue Garantie' &&  this.currentDocument.montantGarantie ==0){
+
+
+      this.montantRetenuGarantieRequired=true;
+
+    }
+
+
+
+
+
+  }
+
+  updatedDatePrevuEncaissement(event,template){
+    console.log("updated last val "+  this.currentDocmentClone.datePrevuEncaissement);
+
+    if(this.currentDocument.typeDocument == 'Facture' &&
+      this.currentDocmentClone.datePrevuEncaissement!= this.currentDocument.datePrevuEncaissement ){
+      if(this.currentDocument.datePrevuEncaissement){
+      console.log("show modal ");
+        this.actionModal=="udateDatePrevuEncaissement";
+        this.showMotifModal(false,template);
+        this.ref.detectChanges();
+        this.currentDocument.updated = true;
+      }else{
+        console.log("affect last value");
+       this.currentDocument.datePrevuEncaissement = this.currentDocmentClone.datePrevuEncaissement;
+
+        console.log("affect last value " + this.currentDocument.datePrevuEncaissement);
+      }
+    }
+
+  }
+
+  updatedMotifChangementDateRecep(event){
+    console.log("changed updatedMotifChangementDateRecep");
+    this.currentDocument.updated=true;
+    if(this.motifChangementDeDateRequired){
+      if(this.currentDocument.motifChangementDate !=null && this.currentDocument.motifChangementDate != "" && this.currentDocument.motifChangementDate.length>0){
+
+        this.motifChangementDeDateRequired = false;
+
+      }else{
+        this.motifChangementDeDateRequired = true;
+      }
+
+      this.ref.detectChanges();
+    }
+
+    if(this.currentDocument.typeDocument == 'Facture' && this.currentDocument.dateDepot &&
+      this.currentDocument.dateDepot!= this.currentDocument.datePiece ) {
+        console.log("changed this is last " + this.currentDocmentClone.motifChangementDate);
+        if (this.currentDocument.motifChangementDate != null && this.currentDocument.motifChangementDate.length >= 0) {
+          this.motifChangementDeDateRequired = false;
+
+        }
+
+      if (this.currentDocument.motifChangementDate == null || this.currentDocument.motifChangementDate.length == 0) {
+        console.log(" MotifChangementDate courrant a ete envoyé");
+        this.motifChangementDeDateRequired = true;
+      }
+    }
+
+
+
+  }
+
+
+
+
+
+
+  updatedDateDepot(event,template){
+    console.log("changed");
+    if(this.currentDocument !=null && this.currentDocument.typeDocument=='Facture') {
+      if ( this.currentDocument.dateDepot && moment(this.currentDocument.datePiece) != moment(this.currentDocument.dateDepot)) {
+        console.log("la " + this.currentDocument.motifChangementDate);
+        //console.log("this.currentDocument.motifChangementDate "+ this.currentDocument.motifChangementDate);
+       // console.log("this.currentDocument.motifChangementDate.length "+this.currentDocument.motifChangementDate.length);
+        if (!this.currentDocument.motifChangementDate ) {
+          this.motifChangementDeDateRequired = true;
+        }
+      } else {
+        if(!this.currentDocument.dateDepot && this.currentDocument.typeDocument=='Facture'){
+          console.log("ici");
+          this.currentDocument.dateDepot = this.currentDocument.datePiece;
+          this.motifChangementDeDateRequired = false;
+        }
+        this.motifChangementDeDateRequired = false;
+      }
+
+    }
+
+  }
+
+
 
 
 
@@ -918,10 +1496,16 @@ export class EtatRecouvrementComponent implements OnInit {
 
   checkCanceled(thirdModal: TemplateRef<any>){
 
-    if(this.currentDocument.updated){
+    if(this.currentDocument.updated &&  !this.typdeBloquageRequired && !this.motifRequired &&  !this.motifChangementDeDateRequired &&  !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired){
       this.onEditDocument(null);
       this.modalRef.hide();
     }else{
+      this.motifRequired=false;
+      this.dateFinGarentieRequired=false;
+      this.montantRetenuGarantieRequired = false;
+      this.motifChangementDeDateRequired= false;
+      this.typdeBloquageRequired=false;
+
       this.modalRef.hide();
     }
 
@@ -972,49 +1556,83 @@ export class EtatRecouvrementComponent implements OnInit {
 
     var nomProjet = currentDocument.projet;
 
+    var indic = "" ;
 
-    var email = "mailto:?subject=" + currentDocument.client + " / " + numPiece + " / " + this.removeAnd(nomProjet) + "&body= Bonjour,%0A" + "Type document: " + currentDocument.typeDocument + "%0A" +
+    switch(this.currentDocument.typeDocument){
+      case "Facture": indic=' la facture '; break;
+      case "Décaissement": indic=' le décaissement '; break;
+      case "Encaissement": indic=' l\'encaissement '; break;
+      case "Avoir": indic=' l\'avoir  '; break;
+      default : indic= " "+this.currentDocument.typeDocument + " "; break;
+    }
+
+
+    var email = "mailto:?subject=" + this.removeAnd(currentDocument.client) + " / " + numPiece  + (nomProjet   == null ? "" :" / "+this.removeAnd(nomProjet)  )+ "&body= Bonjour,"+"%0A"+
+      "Ce message concerne"+indic+"cité en objet."+"%0A"+"Je vous prie de lire les commentaires en bas et de prendre les actions nécessaires."+"%0A"+
+      "Détail de la pièce :"+ "%0A"+
+    "Type document: " + currentDocument.typeDocument + "%0A" +
+
       "Chef projet: " + (currentDocument.chefProjet  == null ? "": currentDocument.chefProjet ) + "%0A" +
       "Commercial: " + (currentDocument.commercial  == null ? "": currentDocument.commercial )  + "%0A" +
       "Ref client: " +   (currentDocument.refClient  == null ? "": currentDocument.refClient )  + "%0A" +
 
       "Montant Pi%C3%A9ce: " +  (currentDocument.montantPiece  == null ? "": currentDocument.montantPiece+" DH" )  + "%0A" +
-      "Montant ouvert: " +   (currentDocument.montantOuvert  == null ? "": currentDocument.montantOuvert +" DH" )  + " DH" + "%0A" +
+      "Montant ouvert: " +   (currentDocument.montantOuvert  == null ? "": currentDocument.montantOuvert +" DH" )  + "%0A" +
       "Charg%C3%A9 recouvrement: " +  (currentDocument.chargerRecouvrement  == null ? "": currentDocument.chargerRecouvrement )  + "%0A" +
 
       "Age Pi%C3%A9ce:" +   (currentDocument.agePiece  == null ? "": currentDocument.agePiece ) + "%0A" +
       "Montant pay%C3%A9: " +  (currentDocument.montantPayer  == null ? "": currentDocument.montantPayer + " DH" )  + "%0A" +
-      "Condition de paiement: " +  (currentDocument.conditionDePaiement  == null ? "": currentDocument.conditionDePaiement )  + "%0A";
-    if (this.currentDocument.caution != null) {
-      email = email + "Caution: " +   (currentDocument.caution  == null ? "": currentDocument.caution )  + "%0A" +
+      "Condition de paiement: " +  (currentDocument.conditionDePaiement  == null ? "": currentDocument.conditionDePaiement )  + "%0A"+
+      "Statut: " +  (currentDocument.statut  == null || currentDocument.statut== 'undefined' ? "": currentDocument.statut ) ;
+       if(this.currentDocument.statut != null &&  this.currentDocument.statut=="Bloquée"){
+         email = email + "%0A"+ "Motif: " +  (currentDocument.motif  == null ? "": this.removeAnd(currentDocument.motif) )  + "%0A";
+       }
+
+    if (this.currentDocument.caution != null && this.currentDocument.caution == true ) {
+      email = email + "Caution: " +   (currentDocument.caution  == null ? "": currentDocument.caution == true ? "Oui": "-" )  + "%0A" +
         "N°caution: " +   (currentDocument.numCaution  == null ? "": currentDocument.numCaution )  + "%0A" +
         "Type caution: " +  (currentDocument.typeCaution  == null ? "": currentDocument.typeCaution )  + "%0A" +
         "Montant caution: " +  (currentDocument.montantCaution  == null ? "": currentDocument.montantCaution + " DH" )   + "%0A" +
-        "Date lib%C3%A9ration caution: " +  (currentDocument.dateLiberationCaution  == null ? "": moment(currentDocument.dateLiberationCaution).format('DD/MM/YYYY') )   + "%0A";
+        "Date lib%C3%A9ration caution: " +  (currentDocument.dateLiberationCaution  == null ? "": moment(currentDocument.dateLiberationCaution).format('DD/MM/YYYY') )   + "%0A" + "%0A" + "%0A";
+    }
+
+    //console.log("email "+ email);
+
+
+    if(currentDocument.commentaires!=null){
+
+      let lastCommentaire1 = new Commentaire();
+      lastCommentaire1= currentDocument.commentaires[0];
+      if(lastCommentaire1){
+        email = email+ "%0A";
+
+        email = email + "%0A";
+        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": this.removeAnd(lastCommentaire1.user.sigle))+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": this.removeAnd(lastCommentaire1.content)  ) +"%0A";
+
+      }
+        let lastCommentaire2 = new Commentaire();
+      lastCommentaire2= currentDocument.commentaires[1];
+      if(lastCommentaire2)
+        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": this.removeAnd(lastCommentaire2.user.sigle))+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": this.removeAnd(lastCommentaire2.content)  ) +"%0A";
+      let lastCommentaire3 = new Commentaire();
+      lastCommentaire3= currentDocument.commentaires[2];
+      if(lastCommentaire3)
+        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": this.removeAnd(lastCommentaire3.user.sigle))+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": this.removeAnd(lastCommentaire3.content)  ) +"%0A";
     }
 
 
-      if(currentDocument.commentaires!=null){
+   // this.addCommentSystem(this.motifAction);
 
-        let lastCommentaire1 = new Commentaire();
-        lastCommentaire1= currentDocument.commentaires[0];
-        if(lastCommentaire1)
-          email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? " : ": lastCommentaire1.user.sigle)+" " +(lastCommentaire1.employer == null ? "": +"  @"+lastCommentaire1.employer) + " "+lastCommentaire1.content+"%0A";
-        let lastCommentaire2 = new Commentaire();
-        lastCommentaire2= currentDocument.commentaires[1];
-        if(lastCommentaire2)
-          email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? " : ": lastCommentaire2.user.sigle)+" " +(lastCommentaire1.employer == null ? "": +"  @"+lastCommentaire1.employer) + " "+lastCommentaire2.content+"%0A";
-        let lastCommentaire3 = new Commentaire();
-        lastCommentaire3= currentDocument.commentaires[2];
-        if(lastCommentaire3)
-          email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? " : ": lastCommentaire3.user.sigle)+" " +(lastCommentaire1.employer == null ? "": +"  @"+lastCommentaire1.employer) + " "+lastCommentaire3.content+"%0A";
-      }
+   // this.motifAction =null;
+
+    //this.annulation3();
+
     window.location.href = email;
-
 
   }
 
   removeAnd(str : string){
+    if(str!=null)
     return str.replace("&","et");
   }
 
@@ -1314,14 +1932,12 @@ export class EtatRecouvrementComponent implements OnInit {
   }
 
 
-  onSelectedChargeRecouv(){
-    if(this.selectedChargeRecouvrement == "none"){
-      this.getAllDocument(this.documentCloture,null);
-    }else{
-      this.getAllDocument(this.documentCloture,this.selectedChargeRecouvrement);
-    }
+  selectFiltre(){
 
-}
+    console.log("selectFiltre " + this.selectedChargeRecouvrement);
+    this.getAllDocument(this.documentCloture,this.selectedChargeRecouvrement);
+
+  }
 
   getStatistics() {
     this.filtredData = this.dataSource.filteredData;
@@ -1345,30 +1961,30 @@ export class EtatRecouvrementComponent implements OnInit {
 
 
 
-      if (element.age === '3M') {
+      if (element.ageDepot <= 3 ) {
         totalLowerThan3month = totalLowerThan3month + element.montantOuvert;
       }
 
-      if (element.age === '6M') {
+      if (element.ageDepot>3 && element.ageDepot <=6) {
         totalLowerThan6month = totalLowerThan6month + element.montantOuvert;
 
       }
 
 
-      if (element.age === 'A12M') {
+      if (element.ageDepot > 6 && element.ageDepot<=12) {
         totalAfter6month = totalAfter6month + element.montantOuvert;
       }
 
-      if (element.age == 'Sup. 12M') {
+      if (element.ageDepot > 12) {
         totalAfter12month = totalAfter12month + element.montantOuvert;
       }
 
-      if(element.retenuGarantieIssue!=null && element.retenuGarantieIssue>=0){
-        totalRetenuGarantieIssue = totalRetenuGarantieIssue + element.montantOuvert;
+      if(element.statut=='Retenue Garantie' && element.retenuGarantieIssue!=null && element.retenuGarantieIssue<0){
+        totalRetenuGarantieIssue = totalRetenuGarantieIssue + element.montantGarantie;
       }
 
-      if(element.statut=='Retenu Garantie'){
-        totalRetenuGarantie = totalRetenuGarantie + element.montantOuvert;
+      if(element.statut=='Retenue Garantie'){
+        totalRetenuGarantie = totalRetenuGarantie + element.montantGarantie;
       }
 
       total =  total + element.montantOuvert;
@@ -1414,26 +2030,87 @@ export class EtatRecouvrementComponent implements OnInit {
     });
   }
 
-  checkIFMorethanFifthMinuteAgo(dateComment){
-    let dateCom = moment(dateComment).add(15, 'minutes');
+  checkIFMorethanFifthMinuteAgo(commentaie : Commentaire){
+
+    if(commentaie.user.sigle == 'SYSTEM'){
+      return true;
+    }
+
+    if(commentaie.content.includes("CHANGEMENT_DATE_ENC")){
+      return true;
+    }
+
+
+    let dateCom = moment(commentaie.date).add(15, 'minutes');
 
     return moment().isAfter(dateCom);
   }
 
+  blockedKey1 : boolean;
 
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
     let template:any;
 
-    if (event.keyCode === this.RIGHT_ARROW) {
+    if (event.keyCode === this.RIGHT_ARROW && !this.blockedKey1) {
       console.log("right");
-      this.goToSuivant(this.currentDocument.numPiece,template);
+      this.goToSuivant(this.currentDocument.codePiece,template);
     }
 
-    if (event.keyCode === this.LEFT_ARROW) {
-      this.goToPrecedent(this.currentDocument.numPiece,template);
+    if (event.keyCode === this.LEFT_ARROW && !this.blockedKey1) {
+      this.goToPrecedent(this.currentDocument.codePiece,template);
     }
   }
+
+  blockedKey(){
+    this.blockedKey1 = true;
+  }
+
+  deBlockedKey(){
+    this.blockedKey1 = false;
+  }
+
+  annulation3(){
+    if(this.actionModal=="udateDatePrevuEncaissement"){
+      console.log("anciencce date prevu enc "+ this.currentDocmentClone.datePrevuEncaissement);
+      this.currentDocument.datePrevuEncaissement = this.currentDocmentClone.datePrevuEncaissement;
+    }
+
+
+    this.nested3ModalRef.hide();
+  }
+
+  showMotifModal( escalader :boolean, fourthModal: TemplateRef<any>) {
+    this.motifAction = "";
+    if(escalader){
+      this.actionModal = "escalader";
+    }else{
+      this.actionModal = 'udateDatePrevuEncaissement';
+    }
+
+    this.nested3ModalRef =  this.modalService.show(fourthModal, Object.assign({}, {class: 'modal-sm'}));
+  }
+
+  checkingCurrentStatut(statut:String){
+    if(this.currentDocument.statut != statut){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  @HostListener('matSortChange', ['$event'])
+  sortChange(e) {
+    // save cookie with table sort data here
+    this.dataSource.sortData(this.dataSource.filteredData,this.dataSource.sort);
+    // console.log("this.before [0] " + this.filtredData[0].codeProjet);
+    // console.log("sorting table");
+    //this.filtredData = this.dataSource.filteredData;
+
+    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+
+  }
+
 
 
 

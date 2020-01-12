@@ -15,10 +15,10 @@ export class EtatRecouvrementService {
 
   constructor(private  http:HttpClient,private authenticationService:AuthenticationService){}
 
-  getDocuments(cloture : boolean) {
+  getDocuments(cloture : boolean,chargeRecouvrement:string,statut:string,commercial:string,chefProjet:string,client:string,anneePiece:string) {
     //return this.http.get(this.host+"/getProjets?username="+username, {headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
     //return this.http.get(this.host+"/getProjects?idEtatProjet=1"+"&page="+page+"&size="+size);
-    return this.http.get(this.host+"/getDocuments?idEtatRecouvrement=1&cloturer="+cloture,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.get(this.host+"/getDocuments?idEtatRecouvrement=1&cloturer="+cloture+"&chargeRecouvrement="+chargeRecouvrement+"&statut="+statut+"&commercial="+commercial+"&chefProjet="+chefProjet+"&client="+client+"&anneePiece="+anneePiece,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
   uploadEtat(file:File, file_name:string){
@@ -93,10 +93,30 @@ export class EtatRecouvrementService {
     );
   }
 
+  getDistinctAnneePiece(){
+    return this.http.get(this.host+'/getDistinctAnneePiece',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
+  }
 
   refreshDocuments(){
     return this.http.get(this.host+'/refreshDocuments',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+
+  getDistinctClientDocument(){
+    return this.http.get(this.host+'/getDistinctClientDocument',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+
+  getDistinctCommercialDocument(){
+    return this.http.get(this.host+'/getDistinctCommercialDocument',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  getDistinctChefProjetDocument(){
+    return this.http.get(this.host+'/getDistinctChefProjetDocument',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
   }
 
 

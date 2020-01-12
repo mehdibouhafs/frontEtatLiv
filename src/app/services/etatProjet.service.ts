@@ -17,10 +17,20 @@ export class EtatProjetService {
 
   constructor(private  http:HttpClient,private authenticationService:AuthenticationService){}
 
-  getProjets(cloture : boolean,bu1 : string,bu2 : string,statut:string,chefProjet:string,commercialOrChefProjet:string) {
+  getProjets(cloture : boolean,bu1 : string,bu2 : string,statut:string,commercial:string,chefProjet:string,client:string,affectationChefProjet :string) {
     //return this.http.get(this.host+"/getProjets?username="+username, {headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
     //return this.http.get(this.host+"/getProjects?idEtatProjet=1"+"&page="+page+"&size="+size);
-    return this.http.get(this.host+"/getProjectsWithStatut?idEtatProjet=1&cloturer="+cloture+"&bu1="+bu1+"&bu2="+bu2+"&statut="+statut+"&chefProjet="+chefProjet+"&commercialOrChefProjet="+commercialOrChefProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.get(this.host+"/getProjectsWithStatut?idEtatProjet=1&cloturer="+cloture+"&bu1="+bu1+"&bu2="+bu2+"&statut="+statut+"&chefProjet="+chefProjet+"&commercial="+commercial+"&client="+client+"&affectationChefProjet="+affectationChefProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  declotureProjet(codeProjet : string){
+    return this.http.put(this.host+'/declotureProjet?codeProjet='+codeProjet,'',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  clotureProjet(codeProjet : string){
+    return this.http.put(this.host+'/clotureProjet?codeProjet='+codeProjet,'',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
   }
 
 
@@ -84,6 +94,30 @@ export class EtatProjetService {
   }
 
 
+  getDistinctClientProjet(){
+    return this.http.get(this.host+'/getDistinctClientProjet',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  getDistinctCommercialProjet(){
+    return this.http.get(this.host+'/getDistinctCommercialProjet',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  getDistinctChefProjetProjet(){
+    return this.http.get(this.host+'/getDistinctChefProjetProjet',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  getProjetsByChefDeProjetIsNull(){
+    return this.http.get(this.host+'/getProjetsByChefDeProjetIsNull',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  getProjetsByChefDeProjetNotNull(){
+    return this.http.get(this.host+'/getProjetsByChefDeProjetNotNull',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
 
 
 

@@ -30,6 +30,22 @@ export class AuthentificationComponent implements OnInit {
           this.authService.saveToken(jwtToken);
 
           this.authService.getRoles().forEach(authority => {
+
+            if(authority== 'BU_RESEAU_SECURITE'){
+              this.routeToProjects = true;
+
+            }
+
+            if(authority== 'BU_CHEF_PROJET'){
+              this.routeToProjects = true;
+
+            }
+
+            if(authority== 'BU_SYSTEM'){
+              this.routeToProjects = true;
+
+            }
+
             if (authority == 'READ_ALL_PROJECTS') {
               console.log("onlogin1");
               this.routeToProjects = true;

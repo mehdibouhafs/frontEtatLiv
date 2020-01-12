@@ -1,3 +1,5 @@
+
+<div [hidden]="authorized==false">
 <nav class="navbar navbar-inverse" style="background-color: #337ab7;color: white">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -6,19 +8,21 @@
   border-radius: 4px;
   padding: 5px;
   width: 150px;
-background-color: white" src="assets/logo.png" alt="Munisys">
+background-color: white" src="assets/logo.png" alt="Munisys" routerLink="/notifications">
       </div>
       <p></p>
     </div>
     <ul class="nav navbar-nav">
-      <li ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
-      <li><a style="color: white" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
-      <li style="background-color: #5ed0b0" ><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i> Reunions </a></li>
+      <li  ><a style="color: white" routerLink="/notifications" ><i class="fa fa-dashboard" aria-hidden="true"></i> Notifications</a></li>
+      <li  ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
+      <li ><a style="color: white" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
+      <li ><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
+      <li  style="background-color: #5ed0b0"><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i>  Reunions </a></li>
     </ul>
     <!--<button class="btn btn-danger navbar-btn">Button</button>-->
     <ul class="nav navbar-nav pull-right">
       <li><a style="color: white" ><i class="fa fa-user-circle-o" aria-hidden="true"> {{userInSession}}</i> </a></li>
-      <li ><a style="color: white" (click)="logout()">  <i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+      <li ><a style="color: white" (click)="logout()"> <i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
     </ul>
   </div>
 </nav>
@@ -28,7 +32,7 @@ background-color: white" src="assets/logo.png" alt="Munisys">
       <div class="col-md-4"></div>
 
     <div class="col-md-4"></div>
-    <div class="btn btn-primary btn-xs pull-right" (click)="showReunion(template2)"><button> Créer une réunion </button></div>
+    <div class="btn btn-primary btn-xs pull-right" (click)="showReunion(template11)"><button> Crée une réunion </button></div>
   </div>
 
 </div>
@@ -39,41 +43,75 @@ background-color: white" src="assets/logo.png" alt="Munisys">
 </mat-form-field>
 
 
-<table mat-table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+<table mat-table  (matSortChange)="sortChange($event)" [dataSource]="dataSource" class="mat-elevation-z8" matSort>
 
   <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
 
   <!-- Position Column -->
   <!-- Symbol Column -->
-  <ng-container matColumnDef="datePlannification"  >
-    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Plannifier  </th>
-    <td mat-cell *matCellDef="let element"> {{element.datePlannification | date:'dd/MM/yyyy HH:mm'}} </td>
+  <ng-container matColumnDef="dateReunion"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Reunion  </th>
+    <td mat-cell *matCellDef="let element"> {{element.dateReunion | date:'dd/MM/yyyy HH:mm'}} </td>
   </ng-container>
 
 
   <ng-container matColumnDef="employer">
-    <th mat-header-cell *matHeaderCellDef  mat-sort-header> collaborateur </th>
-    <td mat-cell *matCellDef="let element"> {{element.employer.name}} </td>
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Client/Collaborateur/Fournisseur </th>
+    <td mat-cell *matCellDef="let element"> <div *ngIf="element.collaborateur && element.collaborateur.length>0"> {{element.collaborateur}}</div>
+      <div *ngIf="element.client && element.client.length>0"> {{element.client}}</div>
+      <div *ngIf="element.fournisseur && element.fournisseur.length>0"> {{element.fournisseur}}</div>
+    </td>
   </ng-container>
 
-  <ng-container matColumnDef="sujet">
-    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Sujet </th>
-    <td mat-cell *matCellDef="let element"> {{element.sujet}} </td>
+  <ng-container matColumnDef="commentaire">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Commentaire </th>
+    <td mat-cell *matCellDef="let element"> {{element.commentaire}} </td>
   </ng-container>
 
 
 
-  <ng-container matColumnDef="option"  >
+  <ng-container matColumnDef="option1"  >
     <th mat-header-cell *matHeaderCellDef >   </th>
-    <td mat-cell *matCellDef="let element" > <a style="cursor:pointer;margin-left: 20px;font-size: 20px"  (click)="deleteRenunion(element,template)"><i class="fa fa-trash fa-3" aria-hidden="true"></i>
-    </a>  <a style="  cursor:pointer;margin-left: 20px;font-size: 20px"  (click)="selectReunion(element,template)"><i class="fa fa-pencil-square-o fa-3" aria-hidden="true"></i>
-    </a> </td>
+    <td mat-cell *matCellDef="let element" >
+      <div>
+        <a style="cursor:pointer;font-size: 15px;margin-right:10px "  (click)="showModalDetelete(element,deleteReunionModal)"><i class="fa fa-trash fa-3" aria-hidden="true"></i>
+        </a>
+
+      </div>
+
+      </td>
+  </ng-container>
+
+  <ng-container matColumnDef="option2"  >
+    <th mat-header-cell *matHeaderCellDef >   </th>
+    <td mat-cell *matCellDef="let element" >
+      <div>
+
+        <a style="cursor:pointer;;font-size: 15px; margin-right:10px"  (click)="showModalUpdateStatut(element,updateReunionModal)"><i class="fa fa-check fa-3" aria-hidden="true"></i>
+        </a>
+
+      </div>
+
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="option3"  >
+    <th mat-header-cell *matHeaderCellDef >   </th>
+    <td mat-cell *matCellDef="let element" >
+      <div>
+
+        <a style="cursor:pointer;;font-size: 15px"  (click)="selectReunion(element,template10)"><i class="fa fa-edit fa-3" aria-hidden="true"></i>
+        </a>
+      </div>
+
+    </td>
   </ng-container>
 
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngStyle]= "(currentReunion!=null && currentReunion.id==row.id) && {'background-color':'#62a7fd3d'}"></tr>
 
 
 </table>
@@ -87,57 +125,104 @@ background-color: white" src="assets/logo.png" alt="Munisys">
 
 
 
-<ng-template #template>
-  <div class="modal-header">
 
+<ng-template #template10>
+  <div class="modal-header" style="background-color: #337ab7;color: white">
 
-    <div><i class="fa fa-calendar fa-lg"></i> Détail de la reunion :
-      <strong>{{currentReunion.id}}</strong>
-      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
-        <span aria-hidden="true">X</span>
-      </button>
-    </div>
+    <i class="fa fa-calendar fa-sm"> Modification d'une reunion :</i>
 
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true" style="color:white">X</span>
+    </button>
   </div>
 
+  <form #f="ngForm" (ngSubmit)="updateRenunion()">
+    <div class="modal-body">
 
-  <div class="modal-body">
+      <div class="row">
 
-    <div class="row">
+        <div class="form-group col-sm-12">
 
-      <div class="form-group col-sm-6">
-
-        <label for="datePlannification"><i class="fa fa-life-ring fa-lg"></i> Date prochaine réunion :</label>
+          <label for="dateReunion3"><i class="fa fa-calendar-check-o fa-lg"></i> Date prochaine réunion :</label>
 
 
-        <input id="datePlannification" name="dateFinProjet"  type="date" class="form-control input-sm" [ngModel]="currentReunion.datePlannification| date:'yyyy-MM-dd'" (ngModelChange)="currentReunion.datePlannification= $event"
-               [value]="currentReunion.datePlannification | date:'yyyy-MM-dd'"  >
+          <input id="dateReunion3" name="dateReunion3"  type="date" class="form-control input-sm" [ngModel]="currentReunion.dateReunion | date:'yyyy-MM-dd'" (ngModelChange)="currentReunion.dateReunion = $event"
+                 [value]="currentReunion.dateReunion | date:'yyyy-MM-dd'" #BirthDate="ngModel"  required>
+        </div>
+
 
       </div>
 
-      <div class="form-group col-sm-6">
 
-        <label for="employer"><i class="fa fa-user-circle fa-lg"></i> Collaborateur:</label>
-        <select id="employer" class="browser-default custom-select" name="newEmployerId" [(ngModel)]="currentReunion.employer" disabled>
-          <option selected>Sélectionner un collaborateur </option>
-          <option *ngFor="let employe of employees"
-                  [value]="employe">{{employe.name}}</option>
-        </select>
+
+      <div class="row">
+
+        <div class="form-group col-sm-12">
+          <label ><i class="fa fa-building fa-lg"></i> Avec :</label>
+          <div class="radio" style="margin-top: 0px;">
+            <label><input type="radio" name="optradio" [(ngModel)]="selectedAvec" value="client"    >Client</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="optradio" [(ngModel)]="selectedAvec" value="fournisseur3" >Fournisseur  </label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="optradio" [(ngModel)]="selectedAvec" value ="collaborateur"   > Collaborateur </label>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="form-group col-sm-12" *ngIf="selectedAvec=='collaborateur'">
+
+          <label for="newEmployerId3"><i class="fa fa-user-circle fa-lg"></i> Collaborateur:</label>
+          <select  id="newEmployerId3" style="max-width: 360px;" class="browser-default custom-select" name="collaborateur" [(ngModel)]="currentReunion.collaborateur" (change)="changeSeletedTo('Collaborateur')"  required>
+            <option selected>Sélectionner un collaborateur </option>
+            <option *ngFor="let employe of employees"
+                    [value]="employe.name">{{employe.name}}</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-sm-12" *ngIf="selectedAvec=='client'">
+
+          <label for="clients3"><i class="fa fa-university fa-lg"></i> Client:</label>
+          <select style="max-width: 360px;"  id="clients3" class="browser-default custom-select" name="client"  [(ngModel)]="currentReunion.client" (change)="changeSeletedTo('Client')"  required>
+            <option selected>Sélectionner un client </option>
+            <option *ngFor="let client of clients"
+                    [value]="client">{{client}}</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="form-group col-sm-12" *ngIf="selectedAvec=='fournisseur3'">
+
+          <label for="fournisseurs3"><i class="fa fa-building fa-lg"></i> Fournisseur:</label>
+          <select style="max-width: 360px;"  style="margin-left: 10px" id="fournisseurs3" class="browser-default custom-select" name="fournisseur" [(ngModel)]="currentReunion.fournisseur" (change)="changeSeletedTo('Fournisseur')"  required>
+            <option selected>Sélectionner un fournisseur </option>
+            <option *ngFor="let fournisseur of fournisseurs"
+                    [value]="fournisseur">{{fournisseur}}</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-sm-12">
+
+          <label for="commentaire3"><i class="fa fa-comment fa-lg"></i> Commentaire :</label>
+          <textarea id="commentaire3" class="form-control input-sm" name="commentaire"  placeholder="Saisir le commentaire.." rows="5" [(ngModel)]="currentReunion.commentaire" required></textarea>
+
+        </div>
+
 
       </div>
-    </div>
-
-
-    <div class="row">
-      <div class="form-group col-sm-6">
-
-        <label for="sujet1"><i class="fa fa-user-circle fa-lg"></i> Sujet :</label>
-        <textarea id="sujet1" class="form-control input-sm" name="sujet1" [(ngModel)]="currentReunion.sujet"  rows="3" ngModel required></textarea>
-
-      </div>
-    </div>
-
-
 
 
 
@@ -147,22 +232,23 @@ background-color: white" src="assets/logo.png" alt="Munisys">
 
 
 
-  <div class="modal-footer">
-    <button type="button" class="btn btn-info btn-xs pull-right" (click)="updateRenunion()" >Modifier</button>
-  </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-info btn-xs pull-right"  [disabled]="!f.valid">Modifier réunion</button>
 
+    </div>
+  </form>
 
 </ng-template>
-  <ng-template #template2>
-    <div class="modal-header">
 
-      <p class="heading"> <i class="fa fa-calendar fa-lg"></i> Créer une reunion :
 
-      </p>
 
+  <ng-template #template11>
+    <div class="modal-header" style="background-color: #337ab7;color: white">
+
+     <i class="fa fa-calendar fa-sm"> Nouvelle reunion :</i>
 
       <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
-        <span aria-hidden="true">&times;</span>
+        <span aria-hidden="true" style="color:white">X</span>
       </button>
     </div>
 
@@ -171,19 +257,43 @@ background-color: white" src="assets/logo.png" alt="Munisys">
 
       <div class="row">
 
-        <div class="form-group col-sm-6">
+        <div class="form-group col-sm-12">
 
-          <label for="datePlannification2"><i class="fa fa-life-ring fa-lg"></i> Date prochaine réunion :</label>
+          <label for="dateReunion2"><i class="fa fa-calendar-check-o fa-lg"></i> Date prochaine réunion :</label>
 
-          <input id="datePlannification2" class="form-control inputsm" type="datetime-local"
-                 name="datePlannification2" ngModel required>
+          <input id="dateReunion2" class="form-control inputsm" type="date"
+                 name="dateReunion2" ngModel required>
 
         </div>
 
-        <div class="form-group col-sm-6">
+
+      </div>
+
+
+
+      <div class="row">
+
+        <div class="form-group col-sm-12">
+          <label ><i class="fa fa-building fa-lg"></i> Avec :</label>
+          <div class="radio" style="margin-top: 0px;">
+            <label><input type="radio" name="optradio" [(ngModel)]="selectedAvec" value="client"    >Client</label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="optradio" [(ngModel)]="selectedAvec" value="fournisseur" >Fournisseur  </label>
+          </div>
+          <div class="radio">
+            <label><input type="radio" name="optradio" [(ngModel)]="selectedAvec" value ="collaborateur"   > Collaborateur </label>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="form-group col-sm-12" *ngIf="selectedAvec=='collaborateur'">
 
           <label for="newEmployerId"><i class="fa fa-user-circle fa-lg"></i> Collaborateur:</label>
-          <select style="margin-left: 10px" id="newEmployerId" class="browser-default custom-select" name="collaborateur" ngModel  required>
+          <select  id="newEmployerId" style="max-width: 360px;" class="browser-default custom-select" name="collaborateur" ngModel  required>
             <option selected>Sélectionner un collaborateur </option>
             <option *ngFor="let employe of employees"
                     [value]="employe.id">{{employe.name}}</option>
@@ -192,14 +302,43 @@ background-color: white" src="assets/logo.png" alt="Munisys">
         </div>
       </div>
 
-        <div class="row">
-          <div class="form-group col-sm-6">
+      <div class="row">
+        <div class="form-group col-sm-12" *ngIf="selectedAvec=='client'">
 
-            <label for="sujet"><i class="fa fa-user-circle fa-lg"></i> Sujet :</label>
-            <textarea id="sujet" class="form-control input-sm" name="sujet"  placeholder="Ecrire le sujet.." rows="3" ngModel required></textarea>
+          <label for="clients"><i class="fa fa-university fa-lg"></i> Client:</label>
+          <select style="max-width: 360px;"  id="clients" class="browser-default custom-select" name="client" ngModel  required>
+            <option selected>Sélectionner un client </option>
+            <option *ngFor="let client of clients"
+                    [value]="client">{{client}}</option>
+          </select>
 
-          </div>
         </div>
+      </div>
+
+      <div class="row">
+
+        <div class="form-group col-sm-12" *ngIf="selectedAvec=='fournisseur'">
+
+          <label for="fournisseurs"><i class="fa fa-building fa-lg"></i> Fournisseur:</label>
+          <select style="max-width: 360px;"  style="margin-left: 10px" id="fournisseurs" class="browser-default custom-select" name="fournisseur" ngModel  required>
+            <option selected>Sélectionner un fournisseur </option>
+            <option *ngFor="let fournisseur of fournisseurs"
+                    [value]="fournisseur">{{fournisseur}}</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-sm-12">
+
+          <label for="commentaire"><i class="fa fa-comment fa-lg"></i> Commentaire :</label>
+          <textarea id="commentaire" class="form-control input-sm" name="commentaire"  placeholder="Saisir le commentaire.." rows="5" ngModel required></textarea>
+
+        </div>
+
+
+      </div>
 
 
 
@@ -212,7 +351,7 @@ background-color: white" src="assets/logo.png" alt="Munisys">
 
 
     <div class="modal-footer">
-      <button type="submit" class="btn btn-info btn-xs pull-right"  [disabled]="!f.valid">Créer</button>
+      <button type="submit" class="btn btn-info btn-xs pull-right"  [disabled]="!f.valid">Créer une réunion</button>
 
     </div>
     </form>
@@ -220,3 +359,47 @@ background-color: white" src="assets/logo.png" alt="Munisys">
   </ng-template>
 
 
+<ng-template #deleteReunionModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulation(deleteReunionModal)">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Voullez-vous vraiment supprimer cette reunion ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="deleteRenunion(currentReunion)">Supprimer</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulation(deleteReunionModal)">Annuler</button>
+
+  </div>
+</ng-template>
+
+<ng-template #updateReunionModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulation(updateReunionModal)">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Avez-vous effectué cette réunion ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="updateRenunion()">Valider</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulation(updateReunionModal)">Annuler</button>
+
+  </div>
+</ng-template>
+
+</div>
+
+<div [hidden]="authorized==true">
+
+  <p> Erreur 403 vous n'etes pas autorisé à acceder à cette page</p>
+</div>

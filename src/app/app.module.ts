@@ -25,7 +25,13 @@ import localeFr from '@angular/common/locales/fr';
 import { EtatRecouvrementComponent } from './etat-recouvrement/etat-recouvrement.component';
 import {EtatRecouvrementService} from './services/etatRecouvrement.service';
 import {NgxSpinnerModule} from 'ngx-spinner';
+import { EtatStockComponent } from './etat-stock/etat-stock.component';
+import {EtatStockService} from './services/etatStock.service';
+import {NgSelectModule} from '@ng-select/ng-select';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import {EventService} from "./services/event.service";
 registerLocaleData(localeFr, 'fr');
+
 
 @NgModule({
   declarations: [
@@ -33,7 +39,9 @@ registerLocaleData(localeFr, 'fr');
     EtatProjetComponent,
     AuthentificationComponent,
     ReunionComponent,
-    EtatRecouvrementComponent
+    EtatRecouvrementComponent,
+    EtatStockComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -51,13 +59,14 @@ registerLocaleData(localeFr, 'fr');
     NgbModule,
     ModalModule.forRoot(),
     ReactiveFormsModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    NgSelectModule
 
 
 
 
   ],
-  providers: [CurrencyPipe,AuthenticationService,EtatProjetService,EtatRecouvrementService,UserService,ReunionService,PagerService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
+  providers: [EventService,CurrencyPipe,AuthenticationService,EtatProjetService,EtatRecouvrementService,EtatStockService,UserService,ReunionService,PagerService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],
 
 })
