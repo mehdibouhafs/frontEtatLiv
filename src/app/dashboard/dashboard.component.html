@@ -1,0 +1,2006 @@
+
+<div [hidden]="authorized==false">
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.8)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+<nav class="navbar navbar-inverse customNav">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <div  href="munisys.jpg" style="background-color: white;margin-left: -15px;margin-right: 70px;">
+        <img style="border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 150px;
+background-color: white" src="assets/logo.png" alt="Munisys">
+      </div>
+      <p></p>
+    </div>
+    <ul class="nav navbar-nav">
+      <li *ngIf="roleReadAllProjects ||roleReadMyProjects  || roleReadAllRecouvrement "  style="background-color: #5ed0b0" ><a style="color: white" ><i class="fa fa-dashboard" aria-hidden="true"></i> Notifications</a></li>
+      <li *ngIf="roleReadAllProjects ||roleReadMyProjects  " ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
+      <li *ngIf="roleReadMyRecouvrement || roleReadAllRecouvrement || roleReadMyProjects"><a style="color: white" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
+      <li *ngIf="roleReadAllProjects ||roleReadMyProjects"><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
+      <li *ngIf="roleReadAllProjects"><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i>  Reunions </a></li>
+    </ul>
+    <!--<button class="btn btn-danger navbar-btn">Button</button>-->
+    <ul class="nav navbar-nav pull-right">
+      <li><a style="color: white" ><i class="fa fa-user-circle-o" aria-hidden="true"> {{userInSession}}</i> </a></li>
+      <li ><a style="color: white" (click)="logout()"> <i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="table-container">
+    <label><i class="fa fa-tasks" aria-hidden="true"></i> Notifications projets </label>
+
+    <mat-form-field >
+
+      <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilterEventsProjet" (keyup)="applyFilterEventsProjet($event.target.value)" placeholder="Filter">
+      <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
+
+    </mat-form-field>
+
+
+    <table mat-table  #firstTable
+           #firstTableSort="matSort" [dataSource]="dataSourceEventsProjet" class="mat-elevation-z8"  matSort>
+
+      <!--- Note that these columns can be defined in any order.
+            The actual rendered columns are set as a property on the row definition" -->
+
+
+      <ng-container matColumnDef="optionProjet"  >
+        <th mat-header-cell *matHeaderCellDef >  &nbsp; </th>
+        <td mat-cell *matCellDef="let element" > <a style="  cursor:pointer;"  (click)="selectProjet(element,templateProjet)"><i class="fa fa-eye" aria-hidden="true"></i>
+        </a> </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="dateProjet" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.date | date:'dd/MM/yyyy HH:MM'}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="codeProjetProjet" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Code projet </th>
+        <td mat-cell *matCellDef="let element"> {{element.projet.codeProjet}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="actionsProjet" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Actions </th>
+        <td mat-cell *matCellDef="let element"> {{element.actions}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="collaborateurProjet" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Collaboratteur </th>
+        <td mat-cell *matCellDef="let element"> {{element.createdBy.lastName}}  </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsEventsProjet; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsEventsProjet;" [ngStyle]= "(currentEventProjet!=null && currentEventProjet.projet.codeProjet==row.projet.codeProjet) && {'background-color':'#62a7fd3d'}"></tr>
+
+
+    </table>
+    <mat-paginator #firstTablePaginator="matPaginator" [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="table-container">
+    <label><i class="fa fa-tasks" aria-hidden="true"></i> Notifications recouvrement </label>
+
+    <mat-form-field >
+
+      <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilterEventsDocument" (keyup)="applyFilterDocument($event.target.value)" placeholder="Filter">
+      <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
+
+    </mat-form-field>
+
+
+    <table mat-table #secondTable
+           #secondTableSort="matSort" [dataSource]="dataSourceEventsDocument" class="mat-elevation-z8"  matSort>
+
+      <!--- Note that these columns can be defined in any order.
+            The actual rendered columns are set as a property on the row definition" -->
+
+
+      <ng-container matColumnDef="optionDocument"  >
+        <th mat-header-cell *matHeaderCellDef >  &nbsp; </th>
+        <td mat-cell *matCellDef="let element" > <a style="  cursor:pointer;"  (click)="selectDocument(element,templateDocument)"><i class="fa fa-eye" aria-hidden="true"></i>
+        </a> </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="dateDocument" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.date | date:'dd/MM/yyyy HH:MM'}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="codePieceDocument" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Code piéce </th>
+        <td mat-cell *matCellDef="let element"> {{element.document.codePiece}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="actionsDocument" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Actions </th>
+        <td mat-cell *matCellDef="let element"> {{element.actions}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="collaborateurDocument" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Collaboratteur </th>
+        <td mat-cell *matCellDef="let element"> {{element.createdBy.lastName}}  </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsEventsDocument; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsEventsDocument;" [ngStyle]= "(currentEventDocument!=null && currentEventDocument.document.codePiece==row.document.codePiece) && {'background-color':'#62a7fd3d'}"></tr>
+
+
+    </table>
+    <mat-paginator #secondTablePaginator="matPaginator" [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="table-container">
+    <label><i class="fa fa-tasks" aria-hidden="true"></i> Notifications stock </label>
+
+    <mat-form-field >
+
+      <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilterEventsProduit" (keyup)="applyFilterEventsProduit($event.target.value)" placeholder="Filter">
+      <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
+
+    </mat-form-field>
+
+
+    <table mat-table #thirdTable
+           #thirdTableSort="matSort" [dataSource]="dataSourceEventsProduit" class="mat-elevation-z8"  matSort>
+
+      <!--- Note that these columns can be defined in any order.
+            The actual rendered columns are set as a property on the row definition" -->
+
+
+      <ng-container matColumnDef="optionProduit"  >
+        <th mat-header-cell *matHeaderCellDef >  &nbsp; </th>
+        <td mat-cell *matCellDef="let element" > <a style="  cursor:pointer;"  (click)="selectProduit(element,templateProduit)"><i class="fa fa-eye" aria-hidden="true"></i>
+        </a> </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="dateProduit" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.date | date:'dd/MM/yyyy HH:MM'}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="idProduit" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Stock </th>
+        <td mat-cell *matCellDef="let element"> {{element.produit.id}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="actionsProduit" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Actions </th>
+        <td mat-cell *matCellDef="let element"> {{element.actions}}   </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="collaborateurProduit" >
+        <th mat-header-cell *matHeaderCellDef  mat-sort-header> Collaboratteur </th>
+        <td mat-cell *matCellDef="let element"> {{element.createdBy.lastName}}  </td>
+      </ng-container>
+
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsEventsProduit; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsEventsProduit;" [ngStyle]= "(currentEventProduit!=null && currentEventProduit.id==row.id) && {'background-color':'#62a7fd3d'}"></tr>
+
+
+    </table>
+    <mat-paginator  #thirdTablePaginator="matPaginator" [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+    </div>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+<ng-template #templateProjet>
+  <div *ngIf="mode==1">
+    <form  #f="ngForm" (ngSubmit)="onEditProjet(templateProjet)">
+      <div class="modal-header" [ngStyle]="{'background-color' : currentProjet.priorite == '#PB' ? 'red' : currentProjet.priorite =='#PM'?'yellow': currentProjet.priorite =='#PH' ?'green':'' }">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="checkCanceledProjet(thirdModal)">
+          <span style="font-size: 20px;" aria-hidden="true">&times;</span>
+        </button>
+        <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail du projet :
+          <strong style="font-size: 13px;
+    color: #337ab7;">{{currentProjet.codeProjet}} / {{currentProjet.projet}} </strong>
+        </p>
+
+      </div>
+
+
+      <div class="modal-body" style="padding: 0px">
+
+
+        <div class="card mt-3 tab-card">
+          <div class="card-header tab-card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="myTabProjet" role="tablist">
+              <li class="nav-item active">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="one-tabProjet" data-toggle="tab" href="#oneProjet" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-newspaper-o" aria-hidden="true"></i> Client Facturé : {{currentProjet.client}}</a>
+              </li>
+              <li class="nav-item">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="tree-tabProjet" data-toggle="tab" href="#treeProjet" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-gavel" aria-hidden="true"></i> Condition Facturation</a>
+              </li>
+              <li class="nav-item">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="two-tabProjet" data-toggle="tab" href="#twoProjet" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i> Plus d'informations</a>
+              </li>
+              <li class="nav-item">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="fourth-tabProjet" data-toggle="tab" href="#fourthProjet" role="tab" aria-controls="fourth" aria-selected="false" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i> Info Projet</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="tab-content" id="myTabContentProjet">
+            <div class="tab-pane active" id="oneProjet" role="tabpanel" aria-labelledby="one-tabProjet">
+              <div class="row" style="padding: 2px">
+                <div class="col-xs-12 col-md-6" style="padding-left: 20px;
+    padding-right: 0px;
+    margin-right: -10px;">
+                  <div class="panel-group">
+                    <div class="panel panel-primary">
+
+
+                      <div class="panel panel-info">
+
+                        <div class="panel-body" >
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-handshake-o fa-lg"></i> Commercial :</label>
+                              <span style="max-width: 108px;"
+                                    class="labelModal"> {{currentProjet.commercial}}</span>
+                            </div>
+
+
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-money fa-lg"></i> Mnt CMD :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentProjet.montantCmd | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-money fa-lg"></i> Montant Stock :</label>
+
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"><a style="font-size: 10px; cursor: pointer;text-decoration : underline;" target="_blank"  (click)="showEtatStock('codeProjet',currentProjet.codeProjet)">{{currentProjet.montantStock | currency:'DH':'symbol':undefined:'fr'}}</a> </span>
+                            </div>
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-user-circle fa-lg"></i>  Chef Projet :</label>
+                              <span style="max-width: 114px;"
+                                    class="labelModal">{{currentProjet.chefProjet}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label style="width: 65px"> <i class="fa fa fa-money fa-lg"></i> LIV :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal">{{currentProjet.livrer | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-user fa-lg"></i> Réf.CMD :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentProjet.refCom}}</span>
+                            </div>
+
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-users fa-lg"></i> BU :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal">  {{currentProjet.bu}}</span>
+                            </div>
+
+
+
+
+                            <div class="form-group col-sm-4">
+                              <label style="width: 65px"> <i class="fa fa-money fa-lg"></i> RAL :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentProjet.restAlivrer | currency:'DH':'symbol':undefined:'fr' }}</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-file-text-o fa-lg"></i> Facturation :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal">{{currentProjet.facturation | number : '1.2-2'}} %</span>
+                            </div>
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-calendar-times-o fa-lg"></i> Date CMD :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal">{{currentProjet.dateCmd | date:'dd/MM/yyyy'}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label style="width: 65px"> <i class="fa fa-money fa-lg"></i> LNF :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal">{{currentProjet.livrerNonFacture | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i>  Prestation Commandé (jrs) :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentProjet.prestationCommande}} </span>
+                            </div>
+                          </div>
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-flag fa-lg"></i> Statut :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentProjet.statut}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label style="width: 65px"> <i class="fa fa fa-money fa-lg"></i> LFP :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal">  {{currentProjet.livreFacturePayer | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-money fa-lg"></i>  RAL Prestation (jrs) :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal">{{currentProjet.ralJrsPrestCalc}}</span>
+                            </div>
+                          </div>
+
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i> Age :</label>
+
+                              <span class="filled-circle2" style="margin-left: 2px" *ngIf="currentProjet.age <= 6">{{currentProjet.age}}</span>
+
+                              <span  *ngIf="currentProjet.age > 6" style="margin-left: 2px" class="filled-circle">{{currentProjet.age}}</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa fa-money fa-lg"></i> Mnt payé :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentProjet.montantPayer | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-bookmark fa-lg"></i> Fac. En cours :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentProjet.factEncours}}</span>
+                            </div>
+
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa fa-money fa-lg"></i> Mnt Rest a Rcpt :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentProjet.montantResteAReceptionnner | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-8">
+
+                            </div>
+                          </div>
+
+
+
+
+
+
+                          <!-- modifiable -->
+                          <div style="background-color: #337ab7;
+    color: white;
+    margin-top: -1px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    height: 15px;
+    font-size: 10px;"> <a style="color: white;  font-size: 9px;"> <i class="fa fa-info fa-lg"></i> Information du projet</a></div>
+
+                          <div class="row">
+
+
+
+
+
+
+                            <div class="form-group col-sm-4">
+
+                              <label for="dateFinProjet1"><i class="fa fa-calendar-times-o fa-lg"></i> Date Fin du Projet :</label>
+
+                              <input id="dateFinProjet1" name="dateFinProjet"  type="date" class="form-control input-sm" [ngModel]="currentProjet.dateFinProjet | date:'yyyy-MM-dd'" (ngModelChange)="currentProjet.dateFinProjet = $event"
+                                     [value]="currentProjet.dateFinProjet | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updatedProjet($event)" [disabled]="service=='Commercial'">
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+
+                              <label for="condPaiement1"><i class="fa fa-file-text-o fa-lg"></i> Conditon Paiement :</label>
+
+                              <input id="condPaiement1" class="form-control input-sm"
+                                     placeholder="saisir la condition de paiement"
+                                     [(ngModel)]="currentProjet.condPaiement" name="condPaiement"  (change)="updatedProjet($event)" [disabled]="service=='Commercial'" >
+
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label for="garantie1"><i class="fa fa-bullseye fa-lg"></i> Durée garantie :</label>
+
+                              <input id="garantie1" class="form-control input-sm"
+                                     placeholder="saisir une garantie"
+                                     [(ngModel)]="currentProjet.garantie" name="garantie"  (change)="updatedProjet($event)" [disabled]="service=='Commercial'" >
+
+
+                            </div>
+
+
+
+
+                          </div>
+
+
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+
+                              <label for="priorite"><i class="fa fa-flag fa-lg"></i> Priorité :</label>
+                              <select id="priorite" class="browser-default custom-select" name="selectPriorite" [(ngModel)]="currentProjet.priorite" (change)="updatedProjet($event)" [disabled]="service=='Commercial'" >
+                                <option value="undefined" selected>Sélectioner la priorité </option>
+                                <option value="#PH">Priorité Haute</option>
+                                <option value="#PM">Priorité Moyenne</option>
+                                <option value="#PB">Priorité Faible</option>
+                              </select>
+
+                            </div>
+
+                            <div class="form-group col-sm-8">
+
+                              <label for="risque1"><i class="fa fa-exclamation-triangle  fa-lg"></i> Risque :</label>
+
+                              <textarea id="risque1" name ="risque" class="form-control input-sm" [(ngModel)]="currentProjet.risque" placeholder="saisissez un risque"   rows="2" (change)="updatedProjet($event)" [disabled]="service=='Commercial'" ></textarea>
+
+                            </div>
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label for="avantVente2"><i class="fa fa-user fa-lg"></i> Avant vente :</label>
+                              <select style="margin-left: 5px;width: 175px;" id="avantVente2" class="browser-default custom-select" name="avantVente2" [(ngModel)]="currentProjet.avantVente" (change)="updatedProjet($event)" [disabled]="service=='Commercial'" >
+                                <option selected>Sélectionner l'avant vente </option>
+                                <option *ngFor="let employe of employeesAvantVente"
+                                        [ngValue]="employe.name">{{employe.name}}</option>
+                              </select>
+                            </div>
+
+
+                            <div class="form-group col-sm-8">
+                              <label for="perimetreProjet1"><i class="fa fa-arrows  fa-lg"></i> Périmetre Projet :</label>
+
+                              <textarea id="perimetreProjet1" name ="perimetreProjet" class="form-control input-sm" [(ngModel)]="currentProjet.perimetreProjet" placeholder="saisissez le perimetre du projet"   rows="2" (change)="updatedProjet($event)" [disabled]="service=='Commercial'"  ></textarea>
+                            </div>
+
+
+                          </div>
+
+
+
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label for="intervenantPrincipal1"><i class="fa fa-user fa-lg"></i> Intervenant Principal :</label>
+                              <select style="margin-left: 5px" id="intervenantPrincipal1" class="browser-default custom-select" name="intervenantPrincipal1" [(ngModel)]="currentProjet.intervenantPrincipal" (change)="updatedProjet($event)" [disabled]="service=='Commercial'" >
+                                <option selected>Sélectionner l'intervenant principal </option>
+                                <option *ngFor="let employe of employees"
+                                        [ngValue]="employe.name">{{employe.name}}</option>
+                              </select>
+
+
+                            </div>
+                            <div class="form-group col-sm-8">
+
+                              <label for="commentaireDirection1"><i class="fa fa-gavel fa-lg"></i> Synthèse projet :</label>
+
+                              <textarea id="commentaireDirection1" name ="commentaireDirection1" class="form-control input-sm" [(ngModel)]="currentProjet.syntheseProjet" placeholder="saisissez une synthèse du projet"  rows="2" (change)="updatedProjet($event)" [disabled]="service=='Commercial'" ></textarea>
+
+
+
+                            </div>
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label for="intervenantSecondaire1"><i class="fa fa-user fa-lg"></i> Intervenant Secondaire :</label>
+                              <select style="margin-left: 5px;width: 175px" id="intervenantSecondaire1" class="browser-default custom-select" name="intervenantSecondaire1" [(ngModel)]="currentProjet.intervenantSecondaire" (change)="updatedProjet($event)" [disabled]="service=='Commercial'" >
+                                <option selected>Sélectionner l'intervenant secondaire </option>
+                                <option *ngFor="let employe of employees"
+                                        [ngValue]="employe.name">{{employe.name}}</option>
+                              </select>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+
+                            </div>
+                            <div class="form-group col-sm-3">
+
+
+
+
+
+                            </div>
+
+                          </div>
+
+                          <div class="row">
+
+
+
+                            <div class="form-group col-sm-4">
+                            </div>
+
+                          </div>
+
+
+
+
+
+
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+
+
+
+
+
+
+
+                </div>
+
+                <div class="col-xs-12 col-md-6">
+                  <div class="panel-group" >
+                    <div class="panel panel-primary">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">
+                          <a data-toggle="collapse" href="#collapse14"><i class="fa fa-commenting-o fa-lg"></i> Commentaires </a>
+                        </h4>
+                      </div>
+
+                      <div class="panel-group">
+                        <div class="panel panel-default">
+                          <div class="panel-body" style="min-height: 674px;max-height: 674px">
+
+
+                            <div class="row">
+                              <div class="form-group col-sm-6">
+
+                                <label for="newEmployerIdProjet"><i class="fa fa-user-circle fa-lg"></i> Collaborateur :</label>
+
+                                <input id="newEmployerIdProjet" class="form-control input-sm"
+                                       placeholder="saisir le collaborateur"
+                                       [(ngModel)]="newEmployerIdProjet" name="newEmployerIdProjet"  >
+
+
+                              </div>
+
+                            </div>
+
+
+                            <textarea class="form-control input-sm" name="newContentComment" [(ngModel)]="newContentCommentProjet"  placeholder="Ecrire un commentaire.." rows="2"  (change)="updatedProjet($event)" ></textarea>
+                            <p></p>
+                            <button type="button" class="btn btn-info btn-xs pull-right" style="margin-top: 10px;" (click)="addCommentProjet()" [disabled]="!newContentCommentProjet"><i class="fa fa-plus" aria-hidden="true"></i> Ajouter</button>
+                            <div class="clearfix"></div>
+                            <hr>
+                            <ul class="media-list">
+
+                              <li class="media" *ngFor="let commentaire of pagedItemsProjet">
+                                <a href="#" class="pull-left">
+
+                                  <span class="badge badge-success">{{commentaire.user.sigle}} :</span>
+
+                                </a>
+                                <div class="media-body">
+                                <span class="text-muted pull-right"   >
+                                    <small class="text-muted">{{commentaire.date | date:'dd/MM/yyyy HH:mm'}} </small>
+                                    <a *ngIf="!checkIFMorethanFifthMinuteAgo(commentaire) " style="cursor: pointer" (click)="deleteCommentaireProjet(commentaire)"><i class="fa fa-times fa-lg"></i> </a>
+                                </span>
+
+                                  <span class="badge badge-info" *ngIf="commentaire.employer">@ {{commentaire.employer}}</span>
+                                  <p style="font-size: 11px;max-width: 500px;">
+                                    {{commentaire.content}}
+                                  </p>
+                                </div>
+                              </li>
+
+
+                            </ul>
+
+                            <div class="row"  *ngIf="pagerProjet">
+                              <div class="form-group col-sm-3">
+                              </div>
+                              <div class="form-group col-sm-6">
+                                <!-- pager -->
+                                <ul *ngIf="pagerProjet.pages && pagerProjet.pages.length" class="pagination">
+
+                                  <li [ngClass]="{disabled:pagerProjet.currentPage === 1}">
+                                    <a style="font-size: 11px;" (click)="setPageProjet(pagerProjet.currentPage - 1)" >Précédant</a>
+                                  </li>
+                                  <li *ngFor="let page of pagerProjet.pages" [ngClass]="{active:pagerProjet.currentPage === page}">
+                                    <a style="font-size: 11px;" (click)="setPageProjet(page)">{{page}}</a>
+                                  </li>
+                                  <li [ngClass]="{disabled:pagerProjet.currentPage === pagerProjet.totalPages}">
+                                    <a style="font-size: 11px;" (click)="setPageProjet(pagerProjet.currentPage + 1)"  >Suivant</a>
+                                  </li>
+
+                                </ul>
+                              </div>
+                              <div class="form-group col-sm-3">
+                              </div>
+
+                            </div>
+
+
+
+
+
+
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="tab-pane fade" id="twoProjet" role="tabpanel" aria-labelledby="two-tabProjet">
+
+              <div class="panel-group" >
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+
+                  </div>
+
+                  <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-body" style="min-height: 598px;max-height: 598px">
+                        <div class="row">
+
+                          <div class="col-md-12">
+
+                            <label for="info1"><i class="fa fa-building  fa-lg"></i> Info Client :</label>
+
+                            <textarea style="    margin-bottom: 30px;"  id="info1" name ="info1" class="form-control input-sm" [(ngModel)]="currentProjet.infoClient" placeholder="saisissez des informations du client"   rows="7" (change)="updatedProjet($event)"  ></textarea>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="info2"><i class="fa fa-truck  fa-lg"></i> Info Fournisseurs :</label>
+
+                            <textarea style="    margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentProjet.infoFournisseur" disabled  rows="7" (change)="updatedProjet($event)"></textarea>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="treeProjet" role="tabpanel" aria-labelledby="tree-tabProjet">
+
+              <div class="panel-group" >
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+
+                  </div>
+
+                  <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                        <div class="row">
+
+                          <div class="col-md-4">
+                            <label> <i class="fa fa fa-gavel fa-lg"></i> Condition fact:</label>
+
+                            <span style="max-width: 130px;"
+                                  class="labelModal"> {{currentProjet.conditionFacturation}}</span>
+                          </div>
+                          <div class="col-md-4"></div>
+                          <div class="col-md-4"></div>
+
+
+                        </div>
+                        <div class="row">
+                          <div class="form-group col-sm-4">
+                            <label for="datePvReceptionProvisoire"><i class="fa fa-calendar-times-o fa-lg"></i> Date Pv Réception Provisoire :</label>
+
+                            <input id="datePvReceptionProvisoire" name="datePvReceptionProvisoire"  type="date" class="form-control input-sm" [ngModel]="currentProjet.datePvReceptionProvisoire | date:'yyyy-MM-dd'" (ngModelChange)="currentProjet.datePvReceptionProvisoire = $event"
+                                   [value]="currentProjet.datePvReceptionProvisoire | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updatedProjet($event)" [disabled]="service=='Commercial'">
+
+                          </div>
+                          <div class="col-md-4"></div>
+                          <div class="col-md-4"></div>
+                        </div>
+                        <div class="row">
+                          <div class="form-group col-sm-4">
+                            <label for="datePvReceptionDefinitive"><i class="fa fa-calendar-times-o fa-lg"></i> Date Pv Réception Provisoire :</label>
+
+                            <input id="datePvReceptionDefinitive" name="datePvReceptionDefinitive"  type="date" class="form-control input-sm" [ngModel]="currentProjet.datePvReceptionDefinitive | date:'yyyy-MM-dd'" (ngModelChange)="currentProjet.datePvReceptionDefinitive = $event"
+                                   [value]="currentProjet.datePvReceptionDefinitive | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updatedProjet($event)" [disabled]="service=='Commercial'">
+
+                          </div>
+                          <div class="col-md-4"></div>
+                          <div class="col-md-4"></div>
+                        </div>
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+            <div class="tab-pane fade" id="fourthProjet" role="tabpanel" aria-labelledby="fourth-tabProjet">
+
+              <div class="panel-group" >
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+
+                  </div>
+
+                  <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="info3"><i class="fa fa-briefcase  fa-lg"></i> Info projet :</label>
+
+                            <textarea style="    margin-bottom: 30px;"  id="info3" name ="info3" class="form-control input-sm" [(ngModel)]="currentProjet.infoProjet" placeholder="saisissez des informations du projet"   rows="30" (change)="updatedProjet($event)" ></textarea>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+
+        <!-- First -->
+
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+      <div class="modal-footer" style="padding: 0px">
+
+        <div class="row">
+
+          <div class="form-group col-xs-2 col-md-2">
+            <p></p>
+          </div>
+          <div class="form-group col-xs-3 col-md-2">
+            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : indexProjet-1>=0 ? '#337ab7' : 'black'}"  (click)="goToPrecedentProjet(currentProjet.codeProjet)" ><i class="fa fa-backward fa-lg"></i> Précédant</a>
+          </div>
+          <div class="form-group col-xs-4 col-md-2">
+            <label style="padding: 3px;"><span style="color: #3875d7">{{indexProjet+1}}</span> /<span style="color: red">{{filtredDataEventsProjet.length}}</span> </label>
+          </div>
+          <div class="form-group col-xs-4 col-md-2">
+            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : indexProjet+2<=filtredDataEventsProjet.length ? '#337ab7' : 'black'}" (click)="goToSuivantProjet(currentProjet.codeProjet)"> Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
+          </div>
+          <div class="form-group col-xs-3 col-md-4">
+
+            <a style="cursor: pointer;padding: 4px;
+    font-size: 10px;" class="btn btn-primary btn-sm " (click)="composeEmailProjet(currentProjet)" target="_blank" ><i class="fa fa-share" aria-hidden="true"></i> Email</a>
+
+            <button style="color: white;
+      background-color: #f11346;font-size: 10px;
+      padding: 4px;"  class="btn btn-danger" *ngIf="!currentProjet.cloture && currentProjet.decloturedByUser"  (click)="clotureProjet(currentProjet)" ><i class="fa fa-window-close-o" aria-hidden="true"></i> Cloturé</button>
+
+            <button style="color: white;
+      background-color: #1b7d30;font-size: 10px;
+      padding: 4px;"  class="btn btn-success" *ngIf="currentProjet.cloture"  (click)="declotureProjet(currentProjet)" ><i class="fa fa-folder-open" aria-hidden="true"></i> Décloturé </button>
+
+            <button  type="submit" class="btn btn-sm pull-right btn-primary" style="    margin-right: 10px;
+    height: 23px;
+    font-size: 10px;
+    padding: 1px;
+    width: 80px;
+}" [disabled]="!this.currentProjet.updated" ><i
+              class="fa fa-floppy-o"></i>
+              Modifier
+            </button>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </form>
+
+  </div>
+
+
+</ng-template>
+
+
+<ng-template #templateDocument style="width: 95%">
+  <div *ngIf="mode==1">
+    <form  #f="ngForm" (ngSubmit)="onEditDocument(templateDocument)">
+      <div class="modal-header" [ngStyle]=" {'background-color' : currentDocument.isExpiredEcheance == true && currentDocument.typeDocument == 'Facture'  ? '#FF000F' : currentDocument.typeDocument == 'Facture'  ? '#4dff03' : '#CED3D0'}">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="checkCanceledDocument(thirdModal)">
+          <span style="font-size: 20px;" aria-hidden="true">&times;</span>
+        </button>
+        <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail du Document :
+          <strong style="font-size: 13px;
+    color: #337ab7;">{{currentDocument.numPiece}} / {{currentDocument.projet}} </strong>
+        </p>
+
+
+      </div>
+
+
+      <div class="modal-body" style="padding: 0px">
+
+
+        <div class="card mt-3 tab-card">
+          <div class="card-header tab-card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+              <li class="nav-item active">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-newspaper-o" aria-hidden="true"></i> Client Facturé : {{currentDocument.client}}</a>
+              </li>
+              <li class="nav-item">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i> Plus d'informations</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane active" id="one" role="tabpanel" aria-labelledby="one-tab">
+              <div class="row" style="padding: 2px">
+                <div class="col-xs-12 col-md-6" style="padding-left: 20px;
+    padding-right: 0px;
+    margin-right: -10px;">
+                  <div class="panel-group">
+                    <div class="panel panel-primary">
+
+
+                      <div class="panel panel-info">
+
+                        <div class="panel-body" >
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-bars fa-lg"></i> Type document :</label>
+                              <span style="max-width: 110px;"
+                                    class="labelModal"> {{currentDocument.typeDocument}}</span>
+                            </div>
+
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-handshake-o fa-lg"></i> Commercial :</label>
+                              <span style="max-width: 110px;"
+                                    class="labelModal"> {{currentDocument.commercial}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-user fa-lg"></i> Chef Projet :</label>
+                              <span style="max-width: 110px;"
+                                    class="labelModal"> {{currentDocument.chefProjet}}</span>
+                            </div>
+
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-tag fa-lg"></i> Ref Client :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.refClient}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-money fa-lg"></i> Montant Pièce:</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentDocument.montantPiece | currency:'DH':'symbol':undefined:'fr'}}</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-money fa-lg"></i> Montant Ouvert:</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentDocument.montantOuvert | currency:'DH':'symbol':undefined:'fr'}}</span>
+
+
+                            </div>
+
+                          </div>
+
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-flag fa-lg"></i> Catégorie :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.categorie }}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i> Date facture  :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.datePiece | date:'dd/MM/yyyy' }}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i> Date Echeance :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.dateEcheance | date:'dd/MM/yyyy'  }}</span>
+                            </div>
+
+                          </div>
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-user fa-lg"></i> Chargé Recouvrement :</label>
+
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.chargerRecouvrement}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i> Age Piéce:</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.agePiece}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-money fa-lg"></i> Montant Payé :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentDocument.montantPayer | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+
+                          </div>
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-sticky-note fa-lg"></i> Condition de paiement :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.conditionDePaiement}}</span>
+
+                            </div>
+
+
+
+
+
+                          </div>
+
+
+
+
+
+
+
+
+                          <!--other new details -->
+                          <div class="row" *ngIf="currentDocument.details!= null && currentDocument.details.length >0">
+                            <div class="panel-group">
+                              <div class="panel panel-info">
+                                <div class="panel-heading">
+                                  <h4 class="panel-title">
+                                    <a data-toggle="collapse" href="#collapse11"> <i class="fa fa-camera-retro fa-lg"></i> Plus de details</a>
+                                  </h4>
+                                </div>
+                                <div id="collapse11" class="panel-collapse collapse">
+                                  <div class="panel-body"><div *ngFor="let detail of currentDocument.details; let i = index">
+
+                                    <div class="form-group col-sm-3">
+                                      {{detail.key}} :
+                                      <label >{{detail.value}}</label>
+                                    </div>
+
+                                  </div></div>
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
+
+                          <!-- modifiable -->
+                          <div style="background-color: #337ab7;
+    color: white;
+    margin-top: -1px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    height: 15px;
+    font-size: 10px;"> <a style="color: white;  font-size: 9px;"> <i class="fa fa-info fa-lg"></i> Information du Document</a></div>
+
+
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+
+                              <label for="statut" class="control-label  "><i class="fa fa-flag fa-lg"></i> Statut :</label>
+
+                              <select style="margin-left: 5px;width: 175px;" id="statut" class="browser-default custom-select" name="avantVente2" [(ngModel)]="currentDocument.statut" (change)="updatedStatut($event)" >
+                                <option value="Non Traitée par CR">Non Traitée par CR</option>
+                                <option value="Non Deposée">Non Déposée</option>
+                                <option value="Bloquée">Bloquée</option>
+                                <option value="Validée par client">Validée par client</option>
+                                <option value="En Cours de paiement">En Cours de paiement</option>
+                                <option value="Payée">Payée</option>
+                                <option value="Litige">Litige</option>
+                                <option value="Retenue Garantie">Retenue Garantie</option>
+                                <option value="Avoir à faire">Avoir à faire</option>
+                                <option value="En cours de validation">En cours de validation</option>
+                              </select>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label for="typeBloquage"><i class="fa fa-arrows  fa-lg"></i> Type de blocage :</label>
+                              <select style="margin-left: 5px;width: 175px;" id="typeBloquage" class="browser-default custom-select" name="typeBloquage" [(ngModel)]="currentDocument.typeBloquage" (change)="updatedTypeBloquage($event)" [disabled]="checkingCurrentStatut('Bloquée')" >
+                                <option></option>
+                                <option value="Opérationnel">Opérationnel</option>
+                                <option value="Administratif">Administratif</option>
+                                <option value="Opérationnel&Administratif">Opérationnel & Administratif</option>
+                              </select>
+                              <span *ngIf="typdeBloquageRequired" style="color:red">Veuillez sélectionner un  type de bloquage</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+
+                              <label for="motif"><i class="fa fa-sticky-note fa-lg"></i> Motif :</label>
+                              <textarea id="motif" name ="motif" class="form-control input-sm" [(ngModel)]="currentDocument.motif" placeholder="saisissez le motif"   rows="2" (change)="updatedMotif($event)" ></textarea>
+                              <span *ngIf="motifRequired" style="color:red">Veuillez saisir le motif</span>
+
+
+                            </div>
+
+
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label for="dateDepot"><i class="fa fa-user fa-lg"></i> Date de dépot :</label>
+
+                              <input id="dateDepot" name="dateDepot"  type="date" class="form-control input-sm" [ngModel]="currentDocument.dateDepot | date:'yyyy-MM-dd'" (ngModelChange)="currentDocument.dateDepot = $event"
+                                     [value]="currentDocument.dateDepot | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updatedDateDepot($event,fourthModal)" >
+
+
+                            </div>
+
+                            <div class="form-group col-sm-8">
+
+                              <label for="motifChangementDate"><i class="fa fa-gavel fa-lg"></i> Motif changement de date :</label>
+
+                              <textarea id="motifChangementDate" name ="motifChangementDate" class="form-control input-sm" [(ngModel)]="currentDocument.motifChangementDate" placeholder="saisissez le motif changement de date"  rows="2" (change)="updatedMotifChangementDateRecep($event)" ></textarea>
+                              <span *ngIf="motifChangementDeDateRequired" style="color:red">Veuillez saisir le motif de changement de date</span>
+
+
+                            </div>
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4"[hidden]="checkingCurrentStatut('Retenue Garantie')" >
+
+                              <label for="montantGarantie"><i class="fa fa-money  fa-lg"></i> Montant Retenue Garantie :</label>
+
+                              <input id="montantGarantie" class="form-control input-sm"
+                                     placeholder="saisir le montant garantie" type="number" min="0" step="any"
+                                     [(ngModel)]="currentDocument.montantGarantie" name="montantGarantie"  (change)="updatedMontantRetenueGarantie($event)" [disabled]="checkingCurrentStatut('Retenue Garantie')" >
+
+                              <span *ngIf="montantRetenuGarantieRequired" style="color:red">Veuillez saisir le montant Retenu Garantie</span>
+                            </div>
+
+
+
+
+
+                            <div class="form-group col-sm-4" [hidden]="checkingCurrentStatut('Retenue Garantie')">
+
+                              <label for="dateFinGarantie"><i class="fa fa-calendar-plus-o fa-lg"></i> Date fin garantie :</label>
+                              <input id="dateFinGarantie" name="dateFinGarantie"  type="date" class="form-control input-sm" [ngModel]="currentDocument.dateFinGarantie | date:'yyyy-MM-dd'" (ngModelChange)="currentDocument.dateFinGarantie  = $event"
+                                     [value]="currentDocument.dateFinGarantie | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updatedDateFinGarentie($event)" [disabled]="checkingCurrentStatut('Retenue Garantie')" >
+
+                              <span *ngIf="dateFinGarentieRequired" style="color:red">Veuillez saisir la date fin de garantie</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+
+                              <label for="datePrevuEncaissement"><i class="fa fa-calendar-check-o fa-lg"></i> Date prévue encaissement :</label>
+
+                              <input id="datePrevuEncaissement" name="datePrevuEncaissement"  type="date" class="form-control input-sm" [ngModel]="currentDocument.datePrevuEncaissement | date:'yyyy-MM-dd'" (ngModelChange)="currentDocument.datePrevuEncaissement = $event"
+                                     [value]="currentDocument.datePrevuEncaissement | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="  updatedDatePrevuEncaissement($event,fourthModal)" >
+
+
+
+                            </div>
+
+
+                          </div>
+
+
+
+
+
+                          <div class="row">
+
+
+
+
+
+
+
+
+
+
+
+                          </div>
+
+
+
+
+
+                          <div class="row">
+
+
+
+
+                          </div>
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+
+                            </div>
+                            <div class="form-group col-sm-4"></div>
+                            <div class="form-group col-sm-4">
+
+
+                            </div>
+
+                          </div>
+
+
+
+
+
+
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+
+
+
+
+
+
+
+                </div>
+
+                <div class="col-xs-12 col-md-6">
+                  <div class="panel-group" >
+                    <div class="panel panel-primary">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">
+                          <a data-toggle="collapse" href="#collapse14"><i class="fa fa-commenting-o fa-lg"></i> Commentaires </a>
+                        </h4>
+                      </div>
+
+                      <div class="panel-group">
+                        <div class="panel panel-default">
+                          <div class="panel-body" style="min-height: 507px;max-height: 507px">
+
+
+                            <div class="row">
+                              <div class="form-group col-sm-6">
+
+                                <label for="newEmployerIdDocument"><i class="fa fa-user-circle fa-lg"></i> Collaborateur :</label>
+
+                                <input id="newEmployerIdDocument" class="form-control input-sm"
+                                       placeholder="saisir le collaborateur"
+                                       [(ngModel)]="newEmployerIdDocument" name="newEmployerIdDocument"  >
+
+
+                              </div>
+
+                            </div>
+
+
+                            <textarea class="form-control input-sm" name="newContentCommentDocument" [(ngModel)]="newContentCommentDocument"  placeholder="Ecrire un commentaire.." rows="2"  (change)="updatedDocument($event)" ></textarea>
+                            <p></p>
+                            <button type="button" class="btn btn-info btn-xs pull-right" style="margin-top: 10px;" (click)="addCommentDocument()" [disabled]="!newContentCommentDocument"><i class="fa fa-plus" aria-hidden="true"></i> Ajouter</button>
+                            <div class="clearfix"></div>
+                            <hr>
+                            <ul class="media-list">
+
+                              <li class="media" *ngFor="let commentaire of pagedItemsDocument">
+                                <a href="#" class="pull-left">
+
+                                  <span class="badge badge-success">{{commentaire.user.sigle}} :</span>
+
+                                </a>
+                                <div class="media-body">
+                                <span class="text-muted pull-right">
+                                    <small class="text-muted">{{commentaire.date | date:'dd/MM/yyyy HH:mm'}} </small>
+                                    <a *ngIf="!checkIFMorethanFifthMinuteAgo(commentaire)" style="cursor: pointer" (click)="deleteCommentaireDocument(commentaire)"><i class="fa fa-times fa-lg"></i> </a>
+                                </span>
+
+                                  <span class="badge badge-info" *ngIf="commentaire.employer">avec {{commentaire.employer}}</span>
+                                  <p style="font-size: 11px;max-width: 500px;">
+                                    {{commentaire.content}}
+                                  </p>
+                                </div>
+                              </li>
+
+
+                            </ul>
+
+                            <div class="row"  *ngIf="pagerDocument">
+                              <div class="form-group col-sm-3">
+                              </div>
+                              <div class="form-group col-sm-6">
+                                <!-- pager -->
+                                <ul *ngIf="pagerDocument.pages && pagerDocument.pages.length" class="pagination">
+
+                                  <li [ngClass]="{disabled:pagerDocument.currentPage === 1}">
+                                    <a style="font-size: 11px;" (click)="setPageDocument(pagerDocument.currentPage - 1)" >Précédant</a>
+                                  </li>
+                                  <li *ngFor="let page of pagerDocument.pages" [ngClass]="{active:pagerDocument.currentPage === page}">
+                                    <a style="font-size: 11px;" (click)="setPageDocument(page)">{{page}}</a>
+                                  </li>
+                                  <li [ngClass]="{disabled:pagerDocument.currentPage === pagerDocument.totalPages}">
+                                    <a style="font-size: 11px;" (click)="setPageDocument(pagerDocument.currentPage + 1)"  >Suivant</a>
+                                  </li>
+
+                                </ul>
+                              </div>
+                              <div class="form-group col-sm-3">
+                              </div>
+
+                            </div>
+
+
+
+
+
+
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="two-tab">
+
+              <div class="panel-group" >
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+
+                  </div>
+
+                  <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-body" style="min-height: 598px;max-height: 598px">
+                        <div class="row">
+
+                          <div class="col-md-12">
+
+                            <label for="info1"><i class="fa fa-building  fa-lg"></i> Info Client :</label>
+
+                            <textarea style="    margin-bottom: 30px;"  id="info1" name ="info1" class="form-control input-sm" [(ngModel)]="currentDocument.infoClient" placeholder="saisissez des informations du client"   rows="7" (change)="updatedDocument($event)"  ></textarea>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="info2"><i class="fa fa-truck  fa-lg"></i> Info Chef de projet / Commercial :</label>
+
+                            <textarea style="    margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentDocument.infoChefProjetOrCommercial" placeholder="saisissez des informations du fournisseurs"   rows="7" (change)="updatedDocument($event)"  ></textarea>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="info3"><i class="fa fa-briefcase  fa-lg"></i> Info Document :</label>
+
+                            <textarea style="    margin-bottom: 30px;"  id="info3" name ="info3" class="form-control input-sm" [(ngModel)]="currentDocument.infoProjet" placeholder="saisissez des informations du projet"   rows="7" (change)="updatedDocument($event)"  ></textarea>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+
+        <!-- First -->
+
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+      <div class="modal-footer" style="padding: 0px">
+
+        <div class="row">
+
+          <div class="form-group col-xs-2 col-md-2">
+            <p></p>
+          </div>
+          <div class="form-group col-xs-3 col-md-2">
+            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : indexDocument-1>=0 ? '#337ab7' : 'black'}"  (click)="goToPrecedentDocument(currentDocument.codePiece)" ><i class="fa fa-backward fa-lg"></i> Précédant</a>
+          </div>
+          <div class="form-group col-xs-4 col-md-2">
+            <label style="padding: 3px;"><span style="color: #3875d7">{{indexDocument+1}}</span> /<span style="color: red">{{filtredDataEventsDocument.length}}</span> </label>
+          </div>
+          <div class="form-group col-xs-4 col-md-2">
+            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : indexDocument+2<=filtredDataEventsDocument.length ? '#337ab7' : 'black'}" (click)="goToSuivantDocument(currentDocument.codePiece)"> Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
+          </div>
+          <div class="form-group col-xs-3 col-md-4">
+
+            <a style="cursor: pointer;padding: 4px;
+    font-size: 10px;" class="btn btn-primary btn-sm " (click)="composeEmailDocument(currentDocument)" target="_blank"><i class="fa fa-share" aria-hidden="true"></i> Email </a>
+
+            <button  type="submit" class="btn btn-sm pull-right btn-primary" style="    margin-right: 10px;
+    height: 23px;
+    font-size: 10px;
+    padding: 1px;
+    width: 80px;
+}" [disabled]="!currentDocument.updated || typdeBloquageRequired || motifRequired || motifChangementDeDateRequired || montantRetenuGarantieRequired ||dateFinGarentieRequired" ><i
+              class="fa fa-floppy-o"></i>
+              Modifier
+            </button>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </form>
+
+  </div>
+
+
+
+</ng-template>
+
+
+
+<ng-template #secondModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulationDocument()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce Document ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="annulationDocument()">Annuler</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulationModificationDocument(currentDocument.numPiece,secondModal)">Ignorer</button>
+
+  </div>
+</ng-template>
+
+
+<ng-template #thirdModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulationDocument2()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce Document ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="annulationDocument2()">Annuler</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="ignoreDocument2()">Ignorer</button>
+
+  </div>
+
+
+
+
+
+
+</ng-template>
+
+
+<ng-template #fourthModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulationDocument3()">
+      <span aria-hidden="true">X</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <label for="motif2"><i class="fa fa-sticky-note fa-lg"></i> Motif :</label>
+      <textarea id="motif2" name ="motif2" class="form-control input-sm" [(ngModel)]="motifActionDocument" required placeholder="saisissez le motif"   rows="2" required ></textarea>
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulationDocument3()">Annuler</button>
+    <button class="btn btn-primary btn-sm " *ngIf="actionModalDocument == 'udateDatePrevuEncaissement' || actionModalDocument == 'updateDateDepot' "  [disabled]="(motifActionDocument==null || motifActionDocument == ''||  motifActionDocument.length <0 ) " (click)="addCommentSystemDocument(motifActionDocument)" target="_blank"><i class="fa fa-share" aria-hidden="true"></i> Valider </button>
+    <button class="btn btn-primary btn-sm " *ngIf="actionModalDocument == 'escalader'"  [disabled]="(motifActionDocument==null || motifActionDocument == ''||  motifActionDocument.length <0 ) " (click)="composeEmailDocument(currentDocument)" target="_blank"><i class="fa fa-share" aria-hidden="true"></i> Escalader </button>
+
+  </div>
+
+
+
+
+
+
+</ng-template>
+
+
+
+  <ng-template #templateProduit>
+    <div *ngIf="mode==1">
+      <form  #f="ngForm" (ngSubmit)="onEditProduit(templateProduit)">
+        <div class="modal-header" >
+          <button type="button" class="close pull-right" aria-label="Close" (click)="checkCanceledProduit(thirdModal)">
+            <span style="font-size: 20px;" aria-hidden="true">&times;</span>
+          </button>
+          <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail  :
+            <strong style="font-size: 13px;
+    color: #337ab7;">{{currentProduit.itemCode}} / {{currentProduit.itemName}} </strong>
+          </p>
+
+        </div>
+
+        <div class="modal-body" style="padding: 0px">
+
+          <div class="card mt-3 tab-card">
+            <div class="card-header tab-card-header">
+              <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                <li class="nav-item active">
+                  <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-newspaper-o" aria-hidden="true"></i>  Stock : {{currentProduit.id}}</a>
+                </li>
+                <li class="nav-item">
+                  <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i> Plus d'informations</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane active" id="one" role="tabpanel" aria-labelledby="one-tab">
+                <div class="row" style="padding: 2px">
+                  <div class="col-xs-12 col-md-6" style="padding-left: 20px;
+    padding-right: 0px;
+    margin-right: -10px;">
+                    <div class="panel-group">
+                      <div class="panel panel-primary">
+
+
+                        <div class="panel panel-info">
+
+                          <div class="panel-body" >
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-tag fa-lg"></i> Ref article :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.itemCode}}</span>
+                              </div>
+
+
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-shopping-bag fa-lg"></i> Description :</label>
+                                <span style="max-width: 130px;min-width: 82px;"
+                                      class="labelModal"> {{currentProduit.itemName }}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i> Montant  :</label>
+                                <span style="max-width: 130px;min-width: 82px;"
+                                      class="labelModal"> {{currentProduit.montant | currency:'DH':'symbol':undefined:'fr'}}</span>
+                              </div>
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-object-group fa-lg"></i>  Nature :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.nature}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-object-group fa-lg"></i>  Sous Nature :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.sousNature}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-object-group fa-lg"></i>  Domaine :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.domaine}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-object-group fa-lg"></i>  SousDomaine :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.sousDomaine}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-bookmark fa-lg"></i>  Marque :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.marque}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-cubes fa-lg"></i>  N°Lot :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.numLot}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-university fa-lg"></i>  Client :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.client}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-handshake-o fa-lg"></i>  Commercial :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.commercial}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-handshake-o fa-lg"></i> Chefprojet :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.chefProjet}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calendar fa-lg"></i>  Date CMD :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.dateCmd | date:'dd/MM/yyyy'}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-flag-o fa-lg"></i>  BU :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.bu}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-home fa-lg"></i> Magasin :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.nomMagasin}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calculator fa-lg"></i>  Qte :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.qte}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calculator fa-lg"></i>  Qte RAL :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.qteRal}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i> PMP :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.pmp | currency:'DH':'symbol':undefined:'fr'}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calendar-check-o fa-lg"></i>  Date entre :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentProduit.dateEntre | date:'dd/MM/yyyy'}}</span>
+                              </div>
+
+
+
+
+                            </div>
+
+
+
+
+
+
+
+
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+
+
+
+
+
+
+
+                  </div>
+
+                  <div class="col-xs-12 col-md-6">
+                    <div class="panel-group" >
+                      <div class="panel panel-primary">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse14"><i class="fa fa-commenting-o fa-lg"></i> Commentaires </a>
+                          </h4>
+                        </div>
+
+                        <div class="panel-group">
+                          <div class="panel panel-default">
+                            <div class="panel-body" style="min-height: 374px;max-height: 374px">
+
+
+                              <div class="row">
+                                <div class="form-group col-sm-6">
+
+                                  <label for="newEmployerIdProduit"><i class="fa fa-user-circle fa-lg"></i> Collaborateur :</label>
+
+                                  <input id="newEmployerIdProduit" class="form-control input-sm"
+                                         placeholder="saisir le collaborateur"
+                                         [(ngModel)]="newEmployerIdProduit" name="newEmployerIdProduit"  >
+
+
+                                </div>
+
+                              </div>
+
+
+                              <textarea class="form-control input-sm" name="newContentComment" [(ngModel)]="newContentCommentProduit"  placeholder="Ecrire un commentaire.." rows="2"  (change)="updatedProduit($event)" ></textarea>
+                              <p></p>
+                              <button type="button" class="btn btn-info btn-xs pull-right" style="margin-top: 10px;" (click)="addCommentProduit()" [disabled]="!newContentCommentProduit"><i class="fa fa-plus" aria-hidden="true"></i> Ajouter</button>
+                              <div class="clearfix"></div>
+                              <hr>
+                              <ul class="media-list">
+
+                                <li class="media" *ngFor="let commentaire of pagedItemsProduit">
+                                  <a href="#" class="pull-left">
+
+                                    <span class="badge badge-success">{{commentaire.user.sigle}} :</span>
+
+                                  </a>
+                                  <div class="media-body">
+                                <span class="text-muted pull-right"   >
+                                    <small class="text-muted">{{commentaire.date | date:'dd/MM/yyyy HH:mm'}} </small>
+                                    <a *ngIf="!checkIFMorethanFifthMinuteAgo(commentaire) " style="cursor: pointer" (click)="deleteCommentaireProduit(commentaire)"><i class="fa fa-times fa-lg"></i> </a>
+                                </span>
+
+                                    <span class="badge badge-info" *ngIf="commentaire.employer">@ {{commentaire.employer}}</span>
+                                    <p style="font-size: 11px;max-width: 500px;">
+                                      {{commentaire.content}}
+                                    </p>
+                                  </div>
+                                </li>
+
+
+                              </ul>
+
+                              <div class="row"  *ngIf="pagerProduit">
+                                <div class="form-group col-sm-3">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                  <!-- pager -->
+                                  <ul *ngIf="pagerProduit.pages && pagerProduit.pages.length" class="pagination">
+
+                                    <li [ngClass]="{disabled:pagerProduit.currentPage === 1}">
+                                      <a style="font-size: 11px;" (click)="setPageProduit(pagerProduit.currentPage - 1)" >Précédant</a>
+                                    </li>
+                                    <li *ngFor="let page of pagerProduit.pages" [ngClass]="{active:pagerProduit.currentPage === page}">
+                                      <a style="font-size: 11px;" (click)="setPageProduit(page)">{{page}}</a>
+                                    </li>
+                                    <li [ngClass]="{disabled:pagerProduit.currentPage === pagerProduit.totalPages}">
+                                      <a style="font-size: 11px;" (click)="setPageProduit(pagerProduit.currentPage + 1)"  >Suivant</a>
+                                    </li>
+
+                                  </ul>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                </div>
+
+                              </div>
+
+
+
+
+
+
+                            </div>
+                          </div>
+
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="two-tab">
+
+                <div class="panel-group" >
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">
+
+                    </div>
+
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-body" style="min-height: 598px;max-height: 598px">
+                          <div class="row">
+
+                            <div class="col-md-12">
+
+                              <label for="info111"><i class="fa fa-building  fa-lg"></i> Commentaire article projet :</label>
+
+                              <textarea style="    margin-bottom: 30px;"  id="info111" name ="info1" class="form-control input-sm" [(ngModel)]="currentProduit.commentaireArtcileProjet" placeholder="saisissez des commantaires sur l'article de ce projet"   rows="7" (change)="updatedProduit($event)" ></textarea>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <label for="info222"><i class="fa fa-truck  fa-lg"></i> Commentaire lot :</label>
+
+                              <textarea style="    margin-bottom: 30px;" id="info222" name ="info2" class="form-control input-sm" [(ngModel)]="currentProduit.commentaireLot" placeholder="saisissez des commantaires pour le lot"    rows="7" (change)="updatedProduit($event)" ></textarea>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <label for="info333"><i class="fa fa-briefcase  fa-lg"></i> Commentaire réference :</label>
+
+                              <textarea style="    margin-bottom: 30px;"  id="info333" name ="info3" class="form-control input-sm" [(ngModel)]="currentProduit.commentaireReference" placeholder="saisissez un commentaire sur cette réference"   rows="7" (change)="updatedProduit($event)" ></textarea>
+                            </div>
+                          </div>
+
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+
+
+          <!-- First -->
+
+
+
+
+
+
+
+
+        </div>
+
+
+
+
+        <div class="modal-footer" style="padding: 0px">
+
+          <div class="row">
+
+            <div class="form-group col-xs-2 col-md-2">
+              <p></p>
+            </div>
+            <div class="form-group col-xs-3 col-md-2">
+              <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : indexProduit-1>=0 ? '#337ab7' : 'black'}"  (click)="goToPrecedentProduit(currentProduit.id)" ><i class="fa fa-backward fa-lg"></i> Précédant</a>
+            </div>
+            <div class="form-group col-xs-4 col-md-2">
+              <label style="padding: 3px;"><span style="color: #3875d7">{{indexProduit+1}}</span> /<span style="color: red">{{filtredDataEventsProduit.length}}</span> </label>
+            </div>
+            <div class="form-group col-xs-4 col-md-2">
+              <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : indexProduit+2<=filtredDataEventsProduit.length ? '#337ab7' : 'black'}" (click)="goToSuivantProduit(currentProduit.id)"> Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
+            </div>
+            <div class="form-group col-xs-3 col-md-4">
+
+              <a style="cursor: pointer;padding: 4px;
+    font-size: 10px;" class="btn btn-primary btn-sm " (click)="composeEmailProduit(currentProduit)" target="_blank" ><i class="fa fa-share" aria-hidden="true"></i> Email</a>
+
+
+              <button  type="submit" class="btn btn-sm pull-right btn-primary" style="    margin-right: 10px;
+    height: 23px;
+    font-size: 10px;
+    padding: 1px;
+    width: 80px;
+}" [disabled]="!this.currentProduit.updated" ><i
+                class="fa fa-floppy-o"></i>
+                Modifier
+              </button>
+            </div>
+          </div>
+
+
+
+
+        </div>
+      </form>
+
+    </div>
+
+
+
+  </ng-template>
+</div>
+<div [hidden]="authorized==true">
+  <p> Erreur 403 vous n'etes pas autorisé à acceder à cette page</p>
+</div>
+
+
