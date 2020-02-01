@@ -7,7 +7,7 @@
 >
   <p style="font-size: 20px; color: white">Loading...</p>
 </ngx-spinner>
-<nav class="navbar navbar-inverse" style="background-color: #337ab7;color: white">
+<nav class="navbar navbar-inverse customNav">
   <div class="container-fluid">
     <div class="navbar-header">
       <div  href="munisys.jpg" style="background-color: white;margin-left: -15px;margin-right: 70px;">
@@ -196,6 +196,7 @@ background-color: white" src="assets/logo.png" alt="Munisys">
   <div class="col-md-2">
     <label for="client">Client :</label>
     <br/>
+
     <select style="margin-left: 5px;width: 175px;height: 26px;" id="client" class="browser-default custom-select" name="client"  [(ngModel)]="selectedClient" (change)="selectFiltre()" >
       <option value="undefined" selected>Filtrer par client </option>
       <option *ngFor="let client of clients"
@@ -223,19 +224,53 @@ background-color: white" src="assets/logo.png" alt="Munisys">
               [ngValue]="annee">{{annee}}</option>
     </select>
 
-
-
-
   </div>
 
   <div class="col-md-2">
-    <label for="raz">RAZ  :</label>
+    <label for="raz" style="margin-top: 8px;">RAZ  :</label>
     <br/>
     <button  id="raz" style="color: white;
       background-color: #337ab7;font-size: 12px;width: 55px;
       padding: 4px;
     margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i>  </button>
 
+  </div>
+
+  <div class="col-md-2" >
+    <label for="downloadSituationPrevu" style="margin-top: 8px;">Télècharger l'état des encaissements prévu   :</label>
+    <br/>
+    <button  id="downloadSituationPrevu" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="getEncaissementPrevu($event)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
+  </div>
+
+
+  <div class="col-md-2" *ngIf="selectedClient!='undefined'">
+    <label for="downloadReleve" style="margin-top: 8px;">Télècharger le relevé client :</label>
+    <br/>
+    <button  id="downloadReleve" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="getReleveClient($event)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
+  </div>
+
+  <div class="col-md-2" *ngIf="selectedClient!='undefined'" >
+    <label for="downloadSituation" style="margin-top: 8px;">Télècharger la situation par statut   :</label>
+    <br/>
+    <button  id="downloadSituation" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="getCountSumDocumentsByClient($event)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
+  </div>
+
+  <div class="col-md-2" *ngIf="selectedClient!='undefined' && checkEncaissement()">
+    <label for="downloadSituationEncaissment" style="margin-top: 8px;">Télècharger les encaissements par mois    :</label>
+    <br/>
+    <button  id="downloadSituationEncaissment" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)=" showSituationDownloadModal(situationDownload)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
   </div>
 
 
@@ -1022,6 +1057,43 @@ background-color: white" src="assets/logo.png" alt="Munisys">
 
 
 </ng-template>
+
+
+
+  <ng-template #situationDownload style="width: 55%">
+    <div class="modal-header">
+      <h4>Télécharge la situation client par date </h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="annulationSituationDownload()">
+        <span aria-hidden="true">X</span>
+      </button>
+    </div>
+    <div class="modal-body rejection-body">
+      <div class="row">
+
+        <div class="form-group col-sm-12">
+      <div class="body-title-container">
+        <label for="dateDownloadSituation"><i class="fa fa-calendar fa-lg"></i> Date :</label>
+
+        <input id="dateDownloadSituation" name="dateDownloadSituation" type="month"  class="form-control input-sm" [(ngModel)]="dateDownloadSituation"
+                 >
+
+
+      </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger btn-sm" (click)="annulationSituationDownload()">Annuler</button>
+      <button class="btn btn-primary btn-sm " (click)="getDocumentByClientOnDate($event)" [disabled]="!dateDownloadSituation" ><i class="fa fa-download" aria-hidden="true"></i>Télécharger </button>
+    </div>
+
+
+
+
+
+
+  </ng-template>
 
 </div>
 

@@ -31,6 +31,10 @@ export class AuthentificationComponent implements OnInit {
 
           this.authService.getRoles().forEach(authority => {
 
+            if(authority=='BU_COMMERCIAL'){
+              this.routeToProjects = true;
+            }
+
             if(authority== 'BU_RESEAU_SECURITE'){
               this.routeToProjects = true;
 
@@ -73,6 +77,12 @@ export class AuthentificationComponent implements OnInit {
         }
       )
   }
+
+
+
+
+
+
 
 
 

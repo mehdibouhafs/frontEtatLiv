@@ -93,6 +93,23 @@ export class EtatRecouvrementService {
     );
   }
 
+  exportEncaissementNextMonth(){
+    return this.http.get(this.host+'/exportEncaissementNextMonth',{responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  exportReleveClient(client:string){
+    return this.http.get(this.host+'/exportReleveClient?client='+client,{responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getDocumentByClientOnDate(client:string,month : any,year : any){
+    return this.http.get(this.host+'/exportSituationDocumentsByClientDate?client='+client+"&month="+month+"&year="+year,{responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getCountSumDocumentsByClient(client:string){
+    return this.http.get(this.host+'/exportSituationDocumentsByClient?client='+client,{responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
   getDistinctAnneePiece(){
     return this.http.get(this.host+'/getDistinctAnneePiece',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 

@@ -70,7 +70,7 @@ export class EtatStockComponent implements OnInit {
 
   actionModal: string;
 
-  displayedColumns: string[] = ['option', 'itemCode', 'description', 'nature', 'sousNature', 'domaine', 'sousDomaine', 'numLot', 'client', 'nomMagasin', 'qte', 'pmp', 'montant'];
+  displayedColumns: string[] = ['option', 'itemCode', 'description', 'nature', 'sousNature', 'domaine', 'sousDomaine', 'numLot', 'client', 'nomMagasin', 'qte','pmp', 'montant','dateEntre'];
   public dataSource: MatTableDataSource<Produit>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -81,6 +81,7 @@ export class EtatStockComponent implements OnInit {
   pager: any = {};
   // paged items
   pagedItems: any[];
+  
 
   suivant: boolean;
 
@@ -154,6 +155,7 @@ export class EtatStockComponent implements OnInit {
   roleBuSystem:any;
   roleBuChefProjet:any;
   roleBuVolume:any;
+  roleBuCommercial:any;
 
 
   constructor(private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
@@ -164,6 +166,13 @@ export class EtatStockComponent implements OnInit {
 
 
     this.authService.getRoles().forEach(authority => {
+
+      if(authority== 'BU_COMMERCIAL'){
+       this.roleBuCommercial = true;
+        //this.service = 'Commercial';
+        this.authorized = true;
+
+      }
 
       if(authority== 'BU_RESEAU_SECURITE'){
         this.roleBuReseauSecurite = true;
@@ -260,6 +269,19 @@ export class EtatStockComponent implements OnInit {
     this.getDistinctLot();
 
 
+
+
+  }
+
+
+  sortAll(){
+    this.natures.sort();
+    this.sousNatures.sort();
+    this.domaines.sort();
+    this.sousDomaines.sort();
+    this.numsLots.sort();
+    this.clients.sort();
+    this.magasins.sort();
   }
 
   ngOnInit() {
@@ -359,6 +381,8 @@ export class EtatStockComponent implements OnInit {
 
           });
         }
+
+
         this.lastUpdate = this.produits[0].lastUpdate;
         this.sortAllArrays();
         this.clientsList = this.clients;
@@ -450,6 +474,7 @@ export class EtatStockComponent implements OnInit {
     this.magasins.sort();
     this.numsLots.sort();
     this.natures.sort();
+    this.sousNatures.sort();
     this.domaines.sort();
     this.sousDomaines.sort();
 
@@ -801,6 +826,8 @@ export class EtatStockComponent implements OnInit {
         this.router.navigateByUrl('/login');
         console.log("error " + JSON.stringify(err));
       })
+
+    this.sortAll();
 
   }
 

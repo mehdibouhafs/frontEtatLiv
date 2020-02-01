@@ -173,6 +173,7 @@ export class EtatProjetComponent implements OnInit {
   roleBuSystem;
   roleBuChefProjet;
   roleBuVolume;
+  roleBuCommercial;
 
   constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
 
@@ -183,7 +184,15 @@ export class EtatProjetComponent implements OnInit {
     this.userInSession = this.authService.getLastName();
 
     this.authService.getRoles().forEach(authority => {
-  console.log("authority " + authority);
+    console.log("authority " + authority);
+      //this.authorized = false;
+      if(authority== 'BU_COMMERCIAL'){
+        this.roleBuCommercial = true;
+        this.service = 'Commercial';
+        this.authorized = true;
+
+      }
+
       if(authority== 'BU_RESEAU_SECURITE'){
         this.roleBuReseauSecurite = true;
         this.bu1 = "VALUE_RS";
@@ -397,6 +406,7 @@ export class EtatProjetComponent implements OnInit {
     this.etatProjetService.getDistinctChefProjetProjet().subscribe(
       (data: Array<String>)=>{
         this.chefProjets = data;
+        this.chefProjets.sort();
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
@@ -409,6 +419,7 @@ export class EtatProjetComponent implements OnInit {
     this.etatProjetService.getDistinctCommercialProjet().subscribe(
       (data: Array<String>)=>{
         this.commercials = data;
+        this.commercials.sort();
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
@@ -421,6 +432,7 @@ export class EtatProjetComponent implements OnInit {
     this.etatProjetService.getDistinctClientProjet().subscribe(
       (data: Array<String>)=>{
         this.clients = data;
+        this.clients.sort();
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
@@ -630,6 +642,10 @@ export class EtatProjetComponent implements OnInit {
           });
         }
 
+        this.clients.sort();
+
+
+
         this.dataSource =  new MatTableDataSource(this.projets);
         this.dataSource.filterPredicate = function(data, filter: string): boolean {
 
@@ -668,7 +684,6 @@ export class EtatProjetComponent implements OnInit {
     )
 
   }
-
 
 
   selectProjet(projet : Projet,template: TemplateRef<any>){
@@ -1405,6 +1420,7 @@ export class EtatProjetComponent implements OnInit {
     this.getAllProjet(this.projetCloture,this.bu1);
 
 
+
   }
 
   showEtatRecouvrement(type,value){
@@ -1508,8 +1524,8 @@ export class EtatProjetComponent implements OnInit {
 
   }
 
-  clotureProjet(codeProjet : string){
-    this.etatProjetService.clotureProjet(codeProjet).subscribe((data: Projet) => {
+  clotureProjet(projet : Projet){
+    this.etatProjetService.clotureProjet(projet).subscribe((data: Projet) => {
       this.currentProjet.updated = false;
       this.currentProjet.cloture = data.cloture;
       this.currentProjet.restAlivrer = data.restAlivrer;
@@ -1531,11 +1547,14 @@ export class EtatProjetComponent implements OnInit {
     });
   }
 
-  declotureProjet(codeProjet : string){
+  declotureProjet(projet : Projet){
 
-    this.etatProjetService.declotureProjet(codeProjet).subscribe((data: Projet) => {
+    this.etatProjetService.declotureProjet(projet).subscribe((data: Projet) => {
       this.currentProjet.updated = false;
+      console.log("data.cloture " + data.cloture);
+
       this.currentProjet.cloture = data.cloture;
+      console.log("this.currentProjet.cloture " + this.currentProjet.cloture);
       this.currentProjet.decloturedByUser = data.decloturedByUser;
       //this.mode = 2;
       this.currentProjet.updated = false;

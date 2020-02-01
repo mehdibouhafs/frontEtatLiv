@@ -8,7 +8,7 @@
 >
   <p style="font-size: 20px; color: white">Loading...</p>
 </ngx-spinner>
-<nav class="navbar navbar-inverse" style="background-color: #337ab7;color: white">
+<nav class="navbar navbar-inverse customNav">
   <div class="container-fluid">
     <div class="navbar-header">
       <div  href="munisys.jpg" style="background-color: white;margin-left: -15px;margin-right: 70px;">
@@ -22,9 +22,9 @@ background-color: white" src="assets/logo.png" alt="Munisys">
     </div>
     <ul class="nav navbar-nav">
       <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadProjectRs || roleReadProjectSi || roleReadAllRecouvrement "  routerLink="/notifications" ><a style="color: white" ><i class="fa fa-dashboard" aria-hidden="true"></i> Notifications</a></li>
-      <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadProjectRs || roleReadProjectSi "  ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
+      <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadProjectRs || roleReadProjectSi || roleBuCommercial "  ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
       <li *ngIf="roleReadMyRecouvrement || roleReadAllRecouvrement || roleReadMyProjects"><a style="color: white" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
-      <li *ngIf="roleReadAllProjects ||roleReadMyProjects" style="background-color: #5ed0b0"><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
+      <li *ngIf="roleReadAllProjects ||roleReadMyProjects ||roleBuCommercial" style="background-color: #5ed0b0"><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
       <li *ngIf="roleReadAllProjects"><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i>  Reunions </a></li>
     </ul>
     <!--<button class="btn btn-danger navbar-btn">Button</button>-->
@@ -320,7 +320,10 @@ background-color: white" src="assets/logo.png" alt="Munisys">
     <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant
     <td mat-cell *matCellDef="let element"> {{element.montant | currency:'DH':'symbol':undefined:'fr'}}  </td></ng-container>
 
-
+  <ng-container matColumnDef="dateEntre"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date d'entrée </th>
+    <td mat-cell *matCellDef="let element"> {{element.dateEntre | date:'dd/MM/yyyy'}}   </td>
+  </ng-container>
 
 
 

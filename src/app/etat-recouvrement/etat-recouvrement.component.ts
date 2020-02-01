@@ -65,12 +65,13 @@ export class EtatRecouvrementComponent implements OnInit {
 
   nested3ModalRef : BsModalRef;
 
-  nested4ModalRef : BsModalRef;
+  nested4ModalSituationDownloadRef : BsModalRef;
 
   motifAction;
   actionModal : string;
 
   clients : Array<String> = new Array<string>();
+
 
   selectedClient :any;
 
@@ -169,6 +170,12 @@ export class EtatRecouvrementComponent implements OnInit {
 
     this.authService.getRoles().forEach(authority => {
 
+      if(authority== 'BU_COMMERCIAL'){
+        // this.roleBuCommercial = true;
+        //this.service = 'Commercial';
+        this.authorized = false;
+
+      }
 
 
       if(authority== 'BU_RESEAU_SECURITE'){
@@ -284,6 +291,8 @@ export class EtatRecouvrementComponent implements OnInit {
 
     this.getEtatRecouvrement();
 
+    this.sortAllArrays();
+
 
   }
 
@@ -328,6 +337,7 @@ export class EtatRecouvrementComponent implements OnInit {
     this.chefProjets.sort();
     this.chargeRecouvrements.sort();
     this.commercials.sort();
+    this.anneesPieces.sort();
 
 
   }
@@ -556,6 +566,9 @@ export class EtatRecouvrementComponent implements OnInit {
       });
     }
 
+
+    this.sortAllArrays();
+
   }
 
 
@@ -598,6 +611,7 @@ export class EtatRecouvrementComponent implements OnInit {
     this.etatRecouvrementService.getDistinctClientDocument().subscribe(
       (data: Array<String>)=>{
         this.clients = data;
+        this.clients.sort();
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
@@ -1934,9 +1948,10 @@ export class EtatRecouvrementComponent implements OnInit {
 
   selectFiltre(){
 
-    console.log("selectFiltre " + this.selectedChargeRecouvrement);
+    console.log("checkEncaissement " + this.checkEncaissement()
+    );
     this.getAllDocument(this.documentCloture,this.selectedChargeRecouvrement);
-
+    this.sortAllArrays();
   }
 
   getStatistics() {
@@ -2109,6 +2124,134 @@ export class EtatRecouvrementComponent implements OnInit {
 
     // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
+  }
+
+
+  getReleveClient($event){
+    $event.stopPropagation();
+    $event.preventDefault();
+
+    console.log("filtre "+ this.dataSource.filter);
+    var result= this.etatRecouvrementService.exportReleveClient(this.selectedClient);
+
+    var d = new Date();
+
+    console.log("day " + d.getDay());
+    var fileName = "Releve-"+this.selectedClient+"-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".pdf";
+
+    result.subscribe((response: any) => {
+      let dataType = response.type;
+      let binaryData = [];
+      binaryData.push(response);
+      let downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
+      if (fileName)
+        downloadLink.setAttribute('download', fileName);
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    });
+  }
+
+  getCountSumDocumentsByClient($event) {
+    $event.stopPropagation();
+    $event.preventDefault();
+
+    console.log("filtre " + this.dataSource.filter);
+    var result = this.etatRecouvrementService.getCountSumDocumentsByClient(this.selectedClient);
+
+    var d = new Date();
+
+    console.log("day " + d.getDay());
+    var fileName = "Releve-" + this.selectedClient + "-" + moment(new Date()).format("DD-MM-YYYY") + "-" + d.getHours() + "-" + d.getMinutes() + ".pdf";
+
+    result.subscribe((response: any) => {
+      let dataType = response.type;
+      let binaryData = [];
+      binaryData.push(response);
+      let downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
+      if (fileName)
+        downloadLink.setAttribute('download', fileName);
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    });
+  }
+
+  getDocumentByClientOnDate($event) {
+    $event.stopPropagation();
+    $event.preventDefault();
+
+    console.log("dateDownloadSituation " + this.dateDownloadSituation);
+    var result = this.etatRecouvrementService.getDocumentByClientOnDate(this.selectedClient,this.dateDownloadSituation.split("-")[1],this.dateDownloadSituation.split("-")[0]);
+
+    var d = new Date();
+
+    console.log("day " + d.getDay());
+    var fileName = "Encaissements-" + this.selectedClient + "-" + moment(new Date()).format("DD-MM-YYYY") + "-" + d.getHours() + "-" + d.getMinutes() + ".pdf";
+
+    result.subscribe((response: any) => {
+      let dataType = response.type;
+      let binaryData = [];
+      binaryData.push(response);
+      let downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
+      if (fileName)
+        downloadLink.setAttribute('download', fileName);
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    });
+    this.nested4ModalSituationDownloadRef.hide();
+  }
+
+  dateDownloadSituation : any;
+
+  showSituationDownloadModal(  situationDownloaddModal: TemplateRef<any>) {
+
+    this.dateDownloadSituation = null;
+
+    this.nested4ModalSituationDownloadRef =  this.modalService.show(situationDownloaddModal, Object.assign({}, {class: 'modal-sm'}));
+  }
+
+  annulationSituationDownload(){
+    this.nested4ModalSituationDownloadRef.hide();
+  }
+
+  checkEncaissement(){
+  if(this.filtredData!=null && this.selectedClient!="undefined") {
+    for (var i = 0; i < this.filtredData.length; i++) {
+      if (this.filtredData[i].typeDocument == 'Encaissement') {
+        return true;
+
+      }
+    }
+  }
+    return false;
+  }
+
+
+  getEncaissementPrevu($event){
+    $event.stopPropagation();
+    $event.preventDefault();
+
+    console.log("filtre "+ this.dataSource.filter);
+    var result= this.etatRecouvrementService.exportEncaissementNextMonth();
+
+    var d = new Date();
+
+    console.log("day " + d.getDay());
+    var fileName = "EncaissementsPrevu-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".pdf";
+
+    result.subscribe((response: any) => {
+      let dataType = response.type;
+      let binaryData = [];
+      binaryData.push(response);
+      let downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
+      if (fileName)
+        downloadLink.setAttribute('download', fileName);
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    });
   }
 
 
