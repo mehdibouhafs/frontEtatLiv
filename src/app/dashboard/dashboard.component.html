@@ -8,32 +8,7 @@
 >
   <p style="font-size: 20px; color: white">Loading...</p>
 </ngx-spinner>
-<nav class="navbar navbar-inverse customNav">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <div  href="munisys.jpg" style="background-color: white;margin-left: -15px;margin-right: 70px;">
-        <img style="border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 5px;
-  width: 150px;
-background-color: white" src="assets/logo.png" alt="Munisys">
-      </div>
-      <p></p>
-    </div>
-    <ul class="nav navbar-nav">
-      <li *ngIf="roleReadAllProjects ||roleReadMyProjects  || roleReadAllRecouvrement "  style="background-color: #5ed0b0" ><a style="color: white" ><i class="fa fa-dashboard" aria-hidden="true"></i> Notifications</a></li>
-      <li *ngIf="roleReadAllProjects ||roleReadMyProjects  " ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
-      <li *ngIf="roleReadMyRecouvrement || roleReadAllRecouvrement || roleReadMyProjects"><a style="color: white" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
-      <li *ngIf="roleReadAllProjects ||roleReadMyProjects"><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
-      <li *ngIf="roleReadAllProjects"><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i>  Reunions </a></li>
-    </ul>
-    <!--<button class="btn btn-danger navbar-btn">Button</button>-->
-    <ul class="nav navbar-nav pull-right">
-      <li><a style="color: white" ><i class="fa fa-user-circle-o" aria-hidden="true"> {{userInSession}}</i> </a></li>
-      <li ><a style="color: white" (click)="logout()"> <i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
-    </ul>
-  </div>
-</nav>
+  <app-navigation-bar [notifNav]="true"></app-navigation-bar>
 
 <div class="row">
   <div class="col-md-6">

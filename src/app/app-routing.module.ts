@@ -6,6 +6,7 @@ import {ReunionComponent} from './reunion/reunion.component';
 import {EtatRecouvrementComponent} from './etat-recouvrement/etat-recouvrement.component';
 import {EtatStockComponent} from './etat-stock/etat-stock.component';
 import {DashboardComponent} from "./dashboard/dashboard.component";
+import {ContratComponent} from "./contrat/contrat.component";
 
 
 
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path:"notifications",component:DashboardComponent},
   {path:"etatProjet",component:EtatProjetComponent},
   {path:"etatRecouvrement",component:EtatRecouvrementComponent},
+  {path:"etatRecouvrementNumDocument/:numDocument",component:EtatRecouvrementComponent},
   {path:"etatRecouvrementCodeCommercial/:codeCommercial",component:EtatRecouvrementComponent},
   {path:"etatRecouvrementCodeClient/:codeClient",component:EtatRecouvrementComponent},
   {path:"etatRecouvrementChefProjet/:chefProjet",component:EtatRecouvrementComponent},
@@ -21,7 +23,8 @@ const routes: Routes = [
   {path:"etatStock",component:EtatStockComponent},
   {path:"etatStockCodeProjet/:codeProjet",component:EtatStockComponent},
   {path:"login",component:AuthentificationComponent},
-  {path:"consultReunions",component:ReunionComponent}
+  {path:"consultReunions",component:ReunionComponent},
+  {path:"contrats",component:ContratComponent},
 
 ];
 

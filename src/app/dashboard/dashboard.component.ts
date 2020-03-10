@@ -1,4 +1,7 @@
-import {Component, OnInit, TemplateRef, ViewChild, ViewContainerRef, ViewEncapsulation} from '@angular/core';
+import {
+  Component, HostListener, OnInit, TemplateRef, ViewChild, ViewContainerRef,
+  ViewEncapsulation
+} from '@angular/core';
 import {AuthenticationService} from "../services/authentification.service";
 import {CurrencyPipe} from "@angular/common";
 import {NgxSpinnerService} from "ngx-spinner";
@@ -512,10 +515,10 @@ export class DashboardComponent implements OnInit {
   }
 
 
-
+  currentModal : any;
 
   selectProjet(event : Event,template: TemplateRef<any>){
-
+    this.currentModal="PROJET";
     this.currentProjet = event.projet;
     this.setPageProjet(1);
     this.mode = 1;
@@ -817,6 +820,7 @@ export class DashboardComponent implements OnInit {
   nestedModalRefDocument:any;
 
   selectDocument(event : Event,template: TemplateRef<any>){
+    this.currentModal="DOCUMENT";
     this.motifRequired = false;
 
     this.currentDocument = event.document;
@@ -1483,6 +1487,7 @@ export class DashboardComponent implements OnInit {
   }
 
   selectProduit(event : Event,template: TemplateRef<any>){
+    this.currentModal="PRODUIT";
     this.currentProduit = event.produit;
     this.setPageProduit(1);
 
@@ -1849,6 +1854,36 @@ export class DashboardComponent implements OnInit {
     this.mode=1;
   }
 
+  RIGHT_ARROW = 39;
+  LEFT_ARROW = 37;
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+
+    //event.preventDefault();
+
+    let template:any;
+
+    if (event.keyCode === this.RIGHT_ARROW ) {
+      console.log("right");
+
+      switch(this.currentModal){
+        case "PROJET": this.goToSuivantProjet(this.currentProjet.codeProjet); break;
+        case "PRODUIT": this.goToSuivantProduit(this.currentProduit.id);break;
+        case "DOCUMENT": this.goToSuivantDocument(this.currentDocument.numPiece);break;
+      }
+
+
+    }
+
+    if (event.keyCode === this.LEFT_ARROW) {
+
+      switch(this.currentModal){
+        case "PROJET": this.goToPrecedentProjet(this.currentProjet.codeProjet); break;
+        case "PRODUIT": this.goToPrecedentProduit(this.currentProduit.id);break;
+        case "DOCUMENT": this.goToPrecedentDocument(this.currentDocument.numPiece);break;
+      }
+    }
+  }
 
 
 

@@ -81,7 +81,7 @@ export class EtatStockComponent implements OnInit {
   pager: any = {};
   // paged items
   pagedItems: any[];
-  
+
 
   suivant: boolean;
 
@@ -1088,6 +1088,7 @@ export class EtatStockComponent implements OnInit {
     }*/
   }
 
+  errorUpdate:boolean;
   onEditProduit(template: TemplateRef<any>) {
 
     //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
@@ -1108,16 +1109,14 @@ export class EtatStockComponent implements OnInit {
     this.etatStockService.updateProduit(this.currentProduit).subscribe((data: Produit) => {
       this.currentProduit.updated = false;
       //this.mode = 2;
-      this.currentProduit.updated = false;
+      this.errorUpdate=false;
       //this.refreshProjets();
       //this.modalRef.hide();
     }, err => {
+
       this.currentProduit.updated = true;
-      console.log(JSON.stringify(err));
-      this.returnedError = err.error.message;
-      this.authService.logout();
-      this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      this.errorUpdate=true;
+
 
     });
 

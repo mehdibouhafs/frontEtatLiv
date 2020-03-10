@@ -250,6 +250,12 @@ export class EtatRecouvrementComponent implements OnInit {
     console.log("chefProjet " + chefProjet);
     const codeClient = this.activatedRoute.snapshot.params['codeClient'];
     console.log("codeClient " + codeClient);
+
+    const numDocument = this.activatedRoute.snapshot.params['numDocument'];
+    if(numDocument!=null){
+      console.log("numDocument");
+      this.getDocumentsByNumDocument(false,numDocument);
+    }else
     if(codeCommercial!=null){
       console.log("filtredByCOmm " + codeCommercial);
       this.getDocumentsByCommercial(this.documentCloture,codeCommercial);
@@ -297,6 +303,7 @@ export class EtatRecouvrementComponent implements OnInit {
   }
 
   addToArray(value : string ,type:string){
+
 
     switch(type){
 
@@ -360,7 +367,7 @@ export class EtatRecouvrementComponent implements OnInit {
 
           this.selectedCommercial = "undefined";
           this.selectedClient = "undefined";
-          this.selectedChefProjet = this.userNameAuthenticated;
+          this.selectedChefProjet = this.userNameAuthenticated.toUpperCase();
           this.selectedAnneePiece ="undefined";
         }else{
           if(this.service == "Recouvrement"){
@@ -1081,15 +1088,12 @@ export class EtatRecouvrementComponent implements OnInit {
 
       this.etatRecouvrementService.updateDocument(this.currentDocument).subscribe((data: Document) => {
         this.currentDocument.updated = false;
+        this.errorUpdate=false;
         //this.refreshDocuments();
         //this.modalRef.hide();
       }, err => {
         this.currentDocument.updated = true;
-        console.log(JSON.stringify(err));
-        this.returnedError = err.error.message;
-        this.authService.logout();
-        this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(err));
+        this.errorUpdate = true;
       });
 
     }
@@ -1099,7 +1103,7 @@ export class EtatRecouvrementComponent implements OnInit {
 
 
   }
-
+  errorUpdate : boolean;
   onEditDocument(template: TemplateRef<any>) {
 
 
@@ -1122,16 +1126,12 @@ export class EtatRecouvrementComponent implements OnInit {
 
     this.etatRecouvrementService.updateDocument(this.currentDocument).subscribe((data: Document) => {
       this.currentDocument.updated = false;
-      this.currentDocument.updated = false;
+      this.errorUpdate=false;
 
       console.log("this.curre " + this.currentDocument.updated );
     }, err => {
       this.currentDocument.updated = true;
-      console.log(JSON.stringify(err));
-      this.returnedError = err.error.message;
-      this.authService.logout();
-      this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+    this.errorUpdate=true;
     });
 
 
@@ -1152,6 +1152,7 @@ export class EtatRecouvrementComponent implements OnInit {
 
   goToPrecedent(codeDocument,template){
 
+    if(!this.errorUpdate){
     var index = this.getIndexFromFiltrerdList(codeDocument);
 
     console.log("index found " + index);
@@ -1177,42 +1178,45 @@ export class EtatRecouvrementComponent implements OnInit {
         this.mode = 1;
       }
     }
-
+    }
 
   }
 
   goToSuivant(codeDocument,template){
 
+    if(!this.errorUpdate){
 
-    var index = this.getIndexFromFiltrerdList(codeDocument);
+      var index = this.getIndexFromFiltrerdList(codeDocument);
 
 
-    var suivantIndex = index + 1;
-    console.log("index suivantIndex " + suivantIndex);
-    console.log("motif required "+ this.motifRequired);
-    if(this.currentDocument.updated && !this.typdeBloquageRequired && !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired){
-      //this.showDialog();
-      //this.showAnnulationModificationModal(template);
-      this.onEditDocument(null);
+      var suivantIndex = index + 1;
+      console.log("index suivantIndex " + suivantIndex);
+      console.log("motif required "+ this.motifRequired);
+      if(this.currentDocument.updated && !this.typdeBloquageRequired && !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired){
+        //this.showDialog();
+        //this.showAnnulationModificationModal(template);
+        this.onEditDocument(null);
 
-      if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-        console.log("here updated ");
+        if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
+          console.log("here updated ");
+          this.index = suivantIndex;
+          this.currentDocument = this.filtredData[suivantIndex];
+          this.setPage(1);
+          this.mode=1;
+        }
+
+        //this.suivant = true;
+      }
+
+      if(!this.currentDocument.updated && !this.typdeBloquageRequired &&  !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length ){
+        console.log("here not updated");
         this.index = suivantIndex;
         this.currentDocument = this.filtredData[suivantIndex];
         this.setPage(1);
         this.mode=1;
       }
-
-      //this.suivant = true;
     }
 
-    if(!this.currentDocument.updated && !this.typdeBloquageRequired &&  !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length ){
-      console.log("here not updated");
-      this.index = suivantIndex;
-      this.currentDocument = this.filtredData[suivantIndex];
-      this.setPage(1);
-      this.mode=1;
-    }
 
 
   }
@@ -1732,6 +1736,58 @@ export class EtatRecouvrementComponent implements OnInit {
         }
 
 
+
+        this.insertIntoDocuments(this.pageDocument);
+
+        this.dataSource =  new MatTableDataSource(this.Documents);
+
+        this.dataSource.filterPredicate = function(data, filter: string): boolean {
+
+
+          return data.client.toLowerCase().includes(filter) ||
+            data.numPiece.toLowerCase().includes(filter) ||
+            data.age.toString().toLowerCase().includes(filter) ||
+            data.chefProjet.toLowerCase().includes(filter) ||
+            data.commercial.toLowerCase().includes(filter) ||
+            data.chargerRecouvrement.toLowerCase()
+            === filter ;
+        };
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        if(this.currentFilter!=null){
+          this.applyFilter(this.currentFilter);
+        }else{
+          this.getStatistics();
+        }
+
+
+      },err=>{
+        // alert("erreur " + err);
+        console.log("error "  +err);
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(err));
+      }
+    )
+  }
+
+  getDocumentsByNumDocument(cloturer:boolean,numDocument : string){
+    console.log("numDoc " + numDocument);
+    this.etatRecouvrementService.getDocumentsByNumDocument(cloturer,numDocument).subscribe(
+      data=>{
+        this.pageDocument = data;
+
+        this.keys = new Array<string>();
+        this.keys.push("codeDocument");
+        if(this.pageDocument[0] !=null && this.pageDocument[0].detaills !=null ){
+          this.pageDocument[0].details.forEach(element => {
+            console.log(element.header.label);
+            let a :string;
+            a = element.header.label;
+            this.keys.push(a);
+
+          });
+        }
 
         this.insertIntoDocuments(this.pageDocument);
 

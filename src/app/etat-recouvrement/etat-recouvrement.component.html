@@ -7,32 +7,7 @@
 >
   <p style="font-size: 20px; color: white">Loading...</p>
 </ngx-spinner>
-<nav class="navbar navbar-inverse customNav">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <div  href="munisys.jpg" style="background-color: white;margin-left: -15px;margin-right: 70px;">
-        <img style="border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 5px;
-  width: 150px;
-background-color: white" src="assets/logo.png" alt="Munisys">
-      </div>
-      <p></p>
-    </div>
-    <ul class="nav navbar-nav"  >
-      <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadAllRecouvrement "  routerLink="/notifications" ><a style="color: white" ><i class="fa fa-dashboard" aria-hidden="true"></i> Notifications</a></li>
-      <li  *ngIf="roleReadAllProjects || roleReadMyProjects " ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i>  Projets</a></li>
-      <li  *ngIf="roleReadAllProjects || roleReadMyProjects " style="background-color: #5ed0b0"><a style="color: white" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
-      <li *ngIf="roleReadAllProjects ||roleReadMyProjects"><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
-      <li *ngIf="roleReadAllProjects" ><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i> Reunions </a></li>
-    </ul>
-    <!--<button class="btn btn-danger navbar-btn">Button</button>-->
-    <ul class="nav navbar-nav pull-right">
-      <li><a style="color: white" ><i class="fa fa-user-circle-o" aria-hidden="true"> {{userInSession}}</i> </a></li>
-      <li ><a style="color: white" (click)="logout()"> <i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
-    </ul>
-  </div>
-</nav>
+  <app-navigation-bar [recouvNav]="true"></app-navigation-bar>
 
 
 
@@ -420,6 +395,9 @@ background-color: white" src="assets/logo.png" alt="Munisys">
 
       <div class="modal-body" style="padding: 0px">
 
+        <div *ngIf="errorUpdate" id="errorUpdate" class="alert alert-danger" style="text-align: center;font-size: 14px;margin: 0px;height: 10px;line-height: 2px;">
+          <strong style="font-size: 14px">Erreur!</strong> Problème d'envoi de donnée au serveur ! Merci de contacter l'administrateur
+        </div>
 
         <div class="card mt-3 tab-card">
           <div class="card-header tab-card-header">

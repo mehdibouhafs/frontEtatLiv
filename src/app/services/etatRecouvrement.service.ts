@@ -66,6 +66,10 @@ export class EtatRecouvrementService {
     return this.http.get(this.host+'/getDocumentsByCodeCommercial?cloture='+cloturer+"&codeCommercial="+codeCommercial,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
+  getDocumentsByNumDocument(cloturer : boolean , numDocument:string){
+    return this.http.get(this.host+'/getDocumentsByNumDocument?cloture='+cloturer+"&numDocument="+numDocument,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
   getDocumentsByCommercialOrChefProjet(cloturer : boolean , commercialOrChefProjet:string){
     return this.http.get(this.host+'/getDocumentsByCommercialOrChefProjet?cloture='+cloturer+"&commercialOrChefProjet="+commercialOrChefProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }

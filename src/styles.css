@@ -1106,4 +1106,333 @@ textarea {
   hyphens: auto;
 }
 
+.mat-column-actions{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+
+
+.mat-column-pilote{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 8% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-sousTraiter{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 6% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-montantContrat{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 9% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+
+.mat-column-periodeFacturationLabel{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 8% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+
+
+
+.mat-column-occurenceFacturationLabel{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-montantFactureAn{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-montantRestFactureAn{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+
+.mat-column-du{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-au{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+
+
+.mat-column-periodeFacturation{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-montantPrevision{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-descriptionArticle{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 15% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-remarque{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 15% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+.mat-column-numeroDocument{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-totalCmd{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-montantFacture{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-montantRnf{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.mat-column-fournisseur{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 7% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+
+.mat-column-dateEnregistrement{
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  flex: 0 0 28% !important;
+  width: 10% !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+
+
 

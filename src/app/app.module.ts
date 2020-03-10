@@ -30,6 +30,13 @@ import {EtatStockService} from './services/etatStock.service';
 import {NgSelectModule} from '@ng-select/ng-select';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import {EventService} from "./services/event.service";
+import { ContratComponent } from './contrat/contrat.component';
+import {ContratService} from "./services/contrat.service";
+import { ViewEcheanceComponent } from './view-echeance/view-echeance.component';
+import { ViewCommandesFournisseurComponent } from './view-commandes-fournisseur/view-commandes-fournisseur.component';
+import { NavigationBarComponent } from './navigation-bar/navigation-bar.component';
+import { ViewFacturesComponent } from './view-factures/view-factures.component';
+import { ViewPiecesComponent } from './view-pieces/view-pieces.component';
 registerLocaleData(localeFr, 'fr');
 
 
@@ -41,7 +48,13 @@ registerLocaleData(localeFr, 'fr');
     ReunionComponent,
     EtatRecouvrementComponent,
     EtatStockComponent,
-    DashboardComponent
+    DashboardComponent,
+    ContratComponent,
+    ViewEcheanceComponent,
+    ViewCommandesFournisseurComponent,
+    NavigationBarComponent,
+    ViewFacturesComponent,
+    ViewPiecesComponent
   ],
   imports: [
     BrowserModule,
@@ -62,11 +75,8 @@ registerLocaleData(localeFr, 'fr');
     NgxSpinnerModule,
     NgSelectModule
 
-
-
-
   ],
-  providers: [EventService,CurrencyPipe,AuthenticationService,EtatProjetService,EtatRecouvrementService,EtatStockService,UserService,ReunionService,PagerService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
+  providers: [ContratService,EventService,CurrencyPipe,AuthenticationService,EtatProjetService,EtatRecouvrementService,EtatStockService,UserService,ReunionService,PagerService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],
 
 })

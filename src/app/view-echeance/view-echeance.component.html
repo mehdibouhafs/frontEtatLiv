@@ -1,0 +1,72 @@
+<table mat-table  #echeanceTable
+       #echeanceTableSort="matSort" [dataSource]="dataSourceEcheance" class="mat-elevation-z8" matSort>
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="du">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Période Du </th>
+    <td mat-cell *matCellDef="let element"> {{element.du | date:'dd/MM/yyyy'}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="au"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Période Au </th>
+    <td mat-cell *matCellDef="let element"> {{element.au | date:'dd/MM/yyyy'}}   </td>
+  </ng-container>
+
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="montantPrevision">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Prévisionnel  </th>
+    <td mat-cell *matCellDef="let element"  > {{element.montantPrevision | currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="periodeFacturation">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Fréquence de facturation   </th>
+    <td mat-cell *matCellDef="let element"  >{{element.periodeFacturation}}  </td>
+  </ng-container>
+
+
+  <ng-container matColumnDef="factures">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header>N°Factures  </th>
+    <td mat-cell *matCellDef="let element"  > [ <div style="display: inline;" *ngFor="let fact of element.factures2 ; let i = index" [attr.data-index]="i">
+      <a style="cursor: pointer;text-decoration : underline;font-size: 11px;" target="_blank" [routerLink]="['/etatRecouvrementNumDocument/',fact]"  >{{fact}}<div style="display: inline;" *ngIf="i+1 < element.factures2.length">, </div> </a>
+    </div> ] </td>
+  </ng-container>
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="montantFacture">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Facturé  </th>
+    <td mat-cell *matCellDef="let element"  > {{element.montantFacture | currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="montantRestFacture">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant R.A.Facturé  </th>
+    <td mat-cell *matCellDef="let element"  > {{element.montantRestFacture | currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+
+  <ng-container matColumnDef="occurenceFacturation"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Périodicité </th>
+    <td mat-cell *matCellDef="let element"> <div *ngIf="element.occurenceFacturation=='DEBUTPERIODE'">Début de Période</div> <div *ngIf="element.occurenceFacturation=='FINPERIODE'">Fin de Période</div>   </td></ng-container>
+
+  <ng-container matColumnDef="commentaire"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Commentaire</th>
+    <td mat-cell *matCellDef="let element">
+
+        <input  placeholder="Ecrire un commentaire" input="text"   [(ngModel)]="element.commentaire" (change)="onEditEcheance(element)" >
+  </td>
+  </ng-container>
+
+
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnsEcheance; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumnsEcheance;" ></tr>
+
+
+</table>
+<mat-paginator #echeanceTablePaginator="matPaginator"  [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+

@@ -294,7 +294,7 @@ export class EtatProjetComponent implements OnInit {
    // this.getAllClients();
 
     this.getAllCommericals();
-    console.log("this.authrozed" + this.authorized);
+    console.log("this.selectedBu" + this.selectedBu);
 
 
 
@@ -783,7 +783,13 @@ export class EtatProjetComponent implements OnInit {
 
   ngOnInit() {
 
-    this.selectedBu = "undefined";
+    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite){
+
+    }else{
+      this.selectedBu = "undefined";
+    }
+
+
     this.selectedStatut = "undefined";
     this.selectedCommercial = "undefined";
     this.selectedClient = null;
@@ -817,6 +823,13 @@ export class EtatProjetComponent implements OnInit {
   }
 
   initFilter(){
+
+    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite){
+
+    }else{
+      this.selectedBu = "undefined";
+    }
+
     this.selectedBu = "undefined";
     this.selectedStatut = "undefined";
     this.selectedCommercial = "undefined";
@@ -1021,18 +1034,15 @@ export class EtatProjetComponent implements OnInit {
 
 
       this.etatProjetService.updateProjet(this.currentProjet).subscribe((data: Projet) => {
+        this.errorUpdate=false;
         //this.currentProjet.updated = false;
         //this.mode = 2;
         //this.currentProjet.updated = false;
         //this.refreshProjets();
         //this.modalRef.hide();
       }, err => {
-        this.currentProjet.updated = true;
-        console.log(JSON.stringify(err));
-        this.returnedError = err.error.message;
-        this.authService.logout();
-        this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(err));
+       this.errorUpdate=true;
+
 
       });
 
@@ -1043,6 +1053,7 @@ export class EtatProjetComponent implements OnInit {
 
   }
 
+  errorUpdate : boolean;
   onEditProjet(template: TemplateRef<any>) {
 
     //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
@@ -1062,17 +1073,12 @@ export class EtatProjetComponent implements OnInit {
 
     this.etatProjetService.updateProjet(this.currentProjet).subscribe((data: Projet) => {
       this.currentProjet.updated = false;
-      //this.mode = 2;
-      this.currentProjet.updated = false;
+      //this.mode = 2
+      this.errorUpdate=false;
       //this.refreshProjets();
       //this.modalRef.hide();
     }, err => {
-      this.currentProjet.updated = true;
-      console.log(JSON.stringify(err));
-      this.returnedError = err.error.message;
-      this.authService.logout();
-      this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+     this.errorUpdate=true;
 
     });
 
@@ -1091,6 +1097,7 @@ export class EtatProjetComponent implements OnInit {
 
   goToPrecedent(codeProjet,template){
 
+    if(!this.errorUpdate){
     var index = this.getIndexFromFiltrerdList(codeProjet);
 
     console.log("page " + this.paginator.pageSize / index);
@@ -1118,59 +1125,62 @@ export class EtatProjetComponent implements OnInit {
         this.mode = 1;
       }
     }
+    }
+
 
 
   }
 
   goToSuivant(codeProjet,template){
 
+  if(!this.errorUpdate){
+      var index = this.getIndexFromFiltrerdList(codeProjet);
+      console.log("paginator size " + this.paginator.pageSize);
+      console.log("index " + index);
 
-    var index = this.getIndexFromFiltrerdList(codeProjet);
-    console.log("paginator size " + this.paginator.pageSize);
-    console.log("index " + index);
+
+
+      var suivantIndex = index + 1;
+      console.log("index suivantIndex " + suivantIndex);
+
+      if(this.currentProjet.updated ){
+        //this.showDialog();
+        //this.showAnnulationModificationModal(template);
+        this.onEditProjet(null);
+
+        if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
+          console.log("here");
+          this.index = suivantIndex;
+          console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
+          this.paginator.pageIndex = Math.floor( this.index/this.paginator.pageSize);
+          console.log("this.paginator.pageIndex= " + this.paginator.pageIndex);
+
+          this.ref.detectChanges();
+        }
+          this.currentProjet = this.filtredData[suivantIndex];
+          this.setPage(1);
+          this.mode=1;
+             // console.log("index " + this.index);
 
 
 
-    var suivantIndex = index + 1;
-    console.log("index suivantIndex " + suivantIndex);
+        //this.suivant = true;
+      }
 
-    if(this.currentProjet.updated){
-      //this.showDialog();
-      //this.showAnnulationModificationModal(template);
-      this.onEditProjet(null);
-
-      if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
+      if(!this.currentProjet.updated && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
         console.log("here");
         this.index = suivantIndex;
         console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
         this.paginator.pageIndex = Math.floor( this.index/this.paginator.pageSize);
-        console.log("this.paginator.pageIndex= " + this.paginator.pageIndex);
-
         this.ref.detectChanges();
-      }
         this.currentProjet = this.filtredData[suivantIndex];
         this.setPage(1);
         this.mode=1;
-           // console.log("index " + this.index);
 
 
+      }
 
-      //this.suivant = true;
-    }
-
-    if(!this.currentProjet.updated && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-      console.log("here");
-      this.index = suivantIndex;
-      console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
-      this.paginator.pageIndex = Math.floor( this.index/this.paginator.pageSize);
-      this.ref.detectChanges();
-      this.currentProjet = this.filtredData[suivantIndex];
-      this.setPage(1);
-      this.mode=1;
-
-
-    }
-
+  }
 
   }
 
@@ -1340,6 +1350,7 @@ export class EtatProjetComponent implements OnInit {
     "BU: "+ (projet.bu  == null ? "": projet.bu ) +"%0A"+
     "Date CMD: "+moment(projet.dateCmd).format('DD/MM/YYYY')  +"%0A"+
       "AGE: "+ (projet.age  == null ? "": projet.age )+"%0A"+
+      "Synthèse du projet:"+ (projet.syntheseProjet  == null ? "": projet.syntheseProjet )+"%0A"+
       "Montant CMD: "+(projet.montantCmd  == null ? "": projet.montantCmd +" DH")+"%0A"+
     "LIV: "+(projet.livraison  == null ? "": projet.livraison +" DH") +"%0A"+
       "RAL: "+ (projet.restAlivrer  == null ? "": projet.restAlivrer +" DH")  +"%0A"+
@@ -1399,24 +1410,29 @@ export class EtatProjetComponent implements OnInit {
     this.getAllProjet(false,this.bu1);
   }
 
-  selectFiltre(){
+  selectFiltre() {
     console.log("this.selectedBu " + this.selectedBu);
 
     this.selectedAffectation = "undefined";
-    if(this.selectedChefProjet !="undefined" || this.selectedStatut !="undefined" ||this.selectedClient !="undefined"
-      ||this.selectedCommercial !="undefined" ||this.selectedBu !="undefined"){
+    if (this.selectedChefProjet != "undefined" || this.selectedStatut != "undefined" || this.selectedClient != "undefined"
+      || this.selectedCommercial != "undefined" || this.selectedBu != "undefined") {
       this.selectedAffectation = "undefined";
     }
 
-    if(this.selectedBu == "none"){
+
+    if (this.selectedBu == "none") {
       console.log("none");
       this.bu1 = undefined;
       this.bu2 = undefined;
-    }else {
+    } else {
       console.log("not none");
-        this.bu2 = undefined;
-        this.bu1 = this.selectedBu;
+      this.bu2 = undefined;
+      this.bu1 = this.selectedBu;
     }
+
+
+
+
     this.getAllProjet(this.projetCloture,this.bu1);
 
 
