@@ -128,9 +128,12 @@ export class Projet {
   public retarder :string;
 
   public  conditionFacturation :string;
+
   public  montantResteAReceptionnner:number;
 
+  public tauxAvancement : number;
 
+  public statutProjet : string;
 
 
 }

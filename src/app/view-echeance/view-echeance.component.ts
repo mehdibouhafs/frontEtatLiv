@@ -8,6 +8,7 @@ import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
 import {Router} from "@angular/router";
 import {ContratService} from "../services/contrat.service";
 import {AuthenticationService} from "../services/authentification.service";
+import {CommentaireEcheance} from "../../model/model.commentaireEcheance";
 
 @Component({
   selector: 'app-view-echeance',
@@ -29,9 +30,9 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
 
   @Output() errorUpdate= new EventEmitter<boolean>();
 
-
+  commentaireEcheances : Array<CommentaireEcheance>;
   constructor(private router:Router,private contratService : ContratService,private authService: AuthenticationService) {
-
+    this.getAllCommentaitreEcheance();
   }
 
   ngOnInit() {
@@ -88,5 +89,18 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
     });
 
   }
+
+  getAllCommentaitreEcheance(){
+    this.contratService.getAllCommentaireEcheance().subscribe(
+      (data: Array<CommentaireEcheance>)=>{
+        this.commentaireEcheances = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
 
 }

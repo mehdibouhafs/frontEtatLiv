@@ -180,7 +180,7 @@
       </select>
     </div>
 
-    <div class="col-md-2" *ngIf="service!='Commercial'">
+    <div class="col-md-2" *ngIf="roleReadAllProjects">
 
       <label style="margin-top: 8px;margin-left: 8px;"> Affectation au chef projet :</label>
       <div class="radio" style="margin-top: 0px;">
@@ -654,7 +654,7 @@
 
                                 <label for="risque1"><i class="fa fa-exclamation-triangle  fa-lg"></i> Risque :</label>
 
-                                <textarea id="risque1" name ="risque" class="form-control input-sm" [(ngModel)]="currentProjet.risque" placeholder="saisissez un risque"   rows="2" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
+                                <textarea id="risque1" name ="risque" class="form-control input-sm" [(ngModel)]="currentProjet.risque" placeholder="saisissez un risque"   rows="2" (change)="updatedRisque($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
 
                               </div>
 
@@ -697,9 +697,9 @@
                               </div>
                               <div class="form-group col-sm-8">
 
-                                <label for="commentaireDirection1"><i class="fa fa-gavel fa-lg"></i> Synthèse projet :</label>
+                                <label for="commentaireDirection1"><i class="fa fa-gavel fa-lg"></i> Situation actuelle du projet :</label>
 
-                                <textarea id="commentaireDirection1" name ="commentaireDirection1" class="form-control input-sm" [(ngModel)]="currentProjet.syntheseProjet" placeholder="saisissez une synthèse du projet"  rows="2" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                                <textarea id="commentaireDirection1" name ="commentaireDirection1" class="form-control input-sm" [(ngModel)]="currentProjet.syntheseProjet" placeholder="saisissez une synthèse du projet"  rows="2" (change)="updatedSituationActuelle($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
 
 
 
@@ -718,14 +718,19 @@
                               </div>
 
                               <div class="form-group col-sm-4">
-
+                                <label for="statutProjet"><i class="fa fa-flag-o fa-lg"></i> Statut Projet :</label>
+                                <select style="margin-left: 5px;width: 175px" id="statutProjet" class="browser-default custom-select" name="intervenantSecondaire1" [(ngModel)]="currentProjet.statutProjet" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+                                  <option value="A Planifier">A Planifier</option>
+                                  <option value="En cours">En cours</option>
+                                  <option value="Réceptionné">Réceptionné</option>
+                                  <option value="En attente">En attente</option>
+                                  <option value="Cloturé">Cloturé</option>
+                                  <option value="Annulé">Annulé</option>
+                                </select>
                               </div>
-                              <div class="form-group col-sm-3">
-
-
-
-
-
+                              <div class="form-group col-sm-4">
+                                <label for="statutProjet"><i class="fa fa-flag-o fa-lg"></i> Taux d’avancement :</label>
+                                <input class="form-control" style="width: 150px" id="tauxAvancement" type="number" min="0" max="100" [(ngModel)]="currentProjet.tauxAvancement" name="tauxAvancement" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()" />
                               </div>
 
                             </div>

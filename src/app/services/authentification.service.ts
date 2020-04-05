@@ -17,6 +17,8 @@ export class AuthenticationService {
     isCompression: false
   });
 
+
+
   private jwtToken = null;
   private roles: Array<any>;
   private rolesParsed: Array<string> = [];
@@ -39,7 +41,9 @@ export class AuthenticationService {
   saveToken(jwt: string) {
     this.jwtToken = jwt;
     console.log("jwt "+ jwt);
-    this.ls.set('token',jwt);
+    //sessionStorage.setItem('token',jwt);
+    sessionStorage.setItem('token',jwt);
+
     let jwtHelper = new JwtHelper();
     this.roles = jwtHelper.decodeToken(this.jwtToken).roles;
     this.name = jwtHelper.decodeToken(this.jwtToken).sub;
@@ -50,16 +54,16 @@ export class AuthenticationService {
       this.roles = jwtHelper.decodeToken(this.jwtToken).roles;
     //this.direction = jwtHelper.decodeToken(this.jwtToken).service.direction.name;
 
-    this.ls.set('name', this.name);
+    sessionStorage.setItem('name', this.name);
     this.roles.forEach(oneauthority => {
       this.rolesParsed.push(oneauthority.authority);
     });
-    this.ls.set('roles', JSON.stringify(this.rolesParsed));
-    this.ls.set('servName', this.servName);
-    this.ls.set('idService', this.idService);
-    this.ls.set('sigle', this.sigle);
-    this.ls.set('lastName', this.lastName);
-    this.ls.set('connected', true);
+    sessionStorage.setItem('roles', JSON.stringify(this.rolesParsed));
+    sessionStorage.setItem('servName', this.servName);
+    sessionStorage.setItem('idService', this.idService+"");
+    sessionStorage.setItem('sigle', this.sigle);
+    sessionStorage.setItem('lastName', this.lastName);
+    sessionStorage.setItem('connected', "true");
   }
 
   getUser(username: string) {
@@ -67,26 +71,26 @@ export class AuthenticationService {
   }
 
   loadToken() {
-    this.jwtToken = this.ls.get('token');
+    this.jwtToken = sessionStorage.getItem('token');
   }
 
   loadName() {
-    this.name = this.ls.get('name');
+    this.name = sessionStorage.getItem('name');
   }
 
   loadSigle() {
-    this.sigle = this.ls.get('sigle');
+    this.sigle = sessionStorage.getItem('sigle');
   }
   loadLastName() {
-    this.lastName = this.ls.get('lastName');
+    this.lastName = sessionStorage.getItem('lastName');
   }
 
   loadService() {
-    this.idService = +this.ls.get('idService');
+    this.idService = +sessionStorage.getItem('idService');
   }
 
   loadServName() {
-    this.servName = this.ls.get('servName');
+    this.servName = sessionStorage.getItem('servName');
   }
 
   getTasks() {
@@ -118,7 +122,7 @@ export class AuthenticationService {
   }
 
   isLogged() {
-    if (this.ls.get('connected')==true)
+    if (sessionStorage.getItem('connected')=="true")
       return true;
     else
       return false;
@@ -133,7 +137,7 @@ export class AuthenticationService {
     this.sigle=null;
     this.rolesParsed = [];
     this.roles = null;
-    this.ls.set('connected', false);
+    sessionStorage.setItem('connected', "false");
     this.ls.removeAll();
   }
 
@@ -145,8 +149,8 @@ export class AuthenticationService {
   }
 
   loadRoles() {
-    if (this.ls.get('roles')!='' && this.ls.get('roles')!=null)
-      this.rolesParsed = JSON.parse(this.ls.get('roles'));
+    if (sessionStorage.getItem('roles')!='' && sessionStorage.getItem('roles')!=null)
+      this.rolesParsed = JSON.parse(sessionStorage.getItem('roles'));
   }
 
   getRoles() {

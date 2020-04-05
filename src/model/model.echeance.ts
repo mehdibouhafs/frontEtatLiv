@@ -4,6 +4,7 @@ import {EtatProjet} from './model.etatProjet';
 import {User} from './model.user';
 import {EtatRecouvrement} from './model.etatRecouvrement';
 import {Employer} from './model.employer';
+import {CommentaireEcheance} from "./model.commentaireEcheance";
 
 
 export class Echeance {
@@ -28,7 +29,7 @@ export class Echeance {
 
   public factures2 : Array<String>;
 
-  public commentaire : string;
+  public commentaire : CommentaireEcheance;
 
 
 

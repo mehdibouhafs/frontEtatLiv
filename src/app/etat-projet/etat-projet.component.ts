@@ -599,7 +599,8 @@ export class EtatProjetComponent implements OnInit {
             p.datePvReceptionDefinitive = projet.datePvReceptionDefinitive;
             p.datePvReceptionProvisoire = projet.datePvReceptionProvisoire;
             p.syntheseProjet = projet.syntheseProjet;
-
+            p.statutProjet = projet.statutProjet;
+            p.tauxAvancement= projet.tauxAvancement;
 
             if (projet.commentaires != null && projet.commentaires.length > 0) {
               p.commentaires = projet.commentaires;
@@ -830,7 +831,6 @@ export class EtatProjetComponent implements OnInit {
       this.selectedBu = "undefined";
     }
 
-    this.selectedBu = "undefined";
     this.selectedStatut = "undefined";
     this.selectedCommercial = "undefined";
     this.selectedClient = null;
@@ -1070,6 +1070,13 @@ export class EtatProjetComponent implements OnInit {
     userUpdate.username = this.userAuthenticated;
     this.currentProjet.updatedBy = userUpdate;
 
+    if(this.updatedSituationActuelleByUser==true && !this.currentProjet.syntheseProjet.includes("@")){
+      this.currentProjet.syntheseProjet = moment().format('DD/MM/YYYY HH:mm')+"@"+ this.sigleUserAuthenticated+": "+this.currentProjet.syntheseProjet;
+    }
+
+    if(this.updatedRisqueByUser==true && !this.currentProjet.risque.includes("@")){
+      this.currentProjet.risque = moment().format('DD/MM/YYYY HH:mm')+"@"+ this.sigleUserAuthenticated+": "+this.currentProjet.risque;
+    }
 
     this.etatProjetService.updateProjet(this.currentProjet).subscribe((data: Projet) => {
       this.currentProjet.updated = false;
@@ -1204,6 +1211,23 @@ export class EtatProjetComponent implements OnInit {
     this.currentProjet.updated = true;
     this.ref.detectChanges();
  }
+
+  updatedSituationActuelleByUser : boolean;
+  updatedRisqueByUser :boolean;
+
+  updatedSituationActuelle(event){
+    event.preventDefault();
+    this.currentProjet.updated = true;
+    this.ref.detectChanges();
+    this.updatedSituationActuelleByUser= true;
+  }
+
+  updatedRisque(event){
+    event.preventDefault();
+    this.currentProjet.updated = true;
+    this.ref.detectChanges();
+    this.updatedRisqueByUser= true;
+  }
 
 
 

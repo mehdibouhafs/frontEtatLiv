@@ -24,5 +24,9 @@ export class EventService {
     return this.http.get(this.host+'/events?username='+username+'&lastConnectionDate='+lastConnectionDate,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
+  getAllEventsByService(username : string,lastConnectionDate : string,service : string){
+    return this.http.get(this.host+'/events?username='+username+'&lastConnectionDate='+lastConnectionDate+'&service='+service,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
 
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {Component, HostListener, OnInit, ViewEncapsulation} from '@angular/core';
 import {AuthenticationService} from './services/authentification.service';
 import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {Location} from "@angular/common";
@@ -33,6 +33,11 @@ export class AppComponent implements OnInit{
 
 
     });
+  }
+
+  @HostListener("window:onbeforeunload",["$event"])
+  clearLocalStorage(event){
+    this.authService.logout();
   }
 
   ngOnInit() {

@@ -192,7 +192,15 @@ export class DashboardComponent implements OnInit {
 
     this.userNameAuthenticated2 = this.authService.getUserName();
 
-    this.getAllEvents(this.userNameAuthenticated2,null);
+
+    if(this.roleReadAllProjects){
+      this.getAllEvents(this.userNameAuthenticated2,null);
+
+    }else{
+      this.getAllEventsByService(this.userNameAuthenticated2,null,this.service);
+    }
+
+
 
     this.getAllEmployeesByService("Intervenant");
 
@@ -348,6 +356,50 @@ export class DashboardComponent implements OnInit {
           console.log("eventsProjet "+ JSON.stringify( this.eventsProjet));
 
           this.refreshTables();
+
+
+          })
+
+
+        }
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+
+
+
+
+  }
+
+
+  getAllEventsByService(username:string,lastConnectionDate : string,service:string){
+
+    var events :Array<Event>;
+    this.eventService.getAllEventsByService(username,lastConnectionDate,service).subscribe(
+      (data: Array<Event>)=>{
+        events = data;
+        console.log("events " + JSON.stringify( events));
+        if(events.length>0){
+
+          events.forEach(event => {
+            if(event.projet) {
+              this.eventsProjet.push(event);
+            }
+
+            if(event.document) {
+              this.eventsDocument.push(event);
+            }
+
+            if(event.produit) {
+              this.eventsStock.push(event);
+            }
+
+            console.log("eventsProjet "+ JSON.stringify( this.eventsProjet));
+
+            this.refreshTables();
 
 
           })
