@@ -1,0 +1,48 @@
+<div class="row">
+
+  <div class="col-md-4">
+    <mat-form-field >
+
+      <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+      <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
+
+    </mat-form-field>
+  </div>
+  <div class="col-md-4"></div>
+  <div class="col-md-4"></div>
+</div>
+<table mat-table  #pieceContratTable
+       #pieceContratTableSort="matSort" [dataSource]="dataSourcePieceContrat" class="mat-elevation-z8" matSort>
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header>Nom du document </th>
+    <td mat-cell *matCellDef="let element"> {{element.name }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="type"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+    <td mat-cell *matCellDef="let element"> {{element.type}}   </td>
+  </ng-container>
+
+  <ng-container matColumnDef="option"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Option </th>
+    <td mat-cell *matCellDef="let element" (click)="getPiece($event,element.fullPath,element.name)">
+      <h6 style="cursor: pointer;text-decoration: underline"
+          (click)="getPiece($event,element.fullPath,element.name)">Télécharger </h6>  </td>
+  </ng-container>
+
+
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnPieceContrat; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumnPieceContrat;" ></tr>
+
+
+</table>
+<mat-paginator #pieceContratTablePaginator="matPaginator"  [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+
+

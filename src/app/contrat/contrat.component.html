@@ -1,0 +1,732 @@
+<div [hidden]="authorized==false">
+
+  <ngx-spinner
+    bdColor="rgba(51,51,51,0.8)"
+    size="medium"
+    color="#fff"
+    type="ball-scale-multiple"
+  >
+    <p style="font-size: 20px; color: white">Loading...</p>
+  </ngx-spinner>
+  <app-navigation-bar [contratNav]="true"></app-navigation-bar>
+
+  <div class="row" *ngIf="statistics" style="margin-right: 2px;">
+
+    <div class="col-md-2">
+
+      <label style="font-size: 11px;"> Total Montant Annuel: </label>
+      <br/>
+      <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalMontantAnnuel | currency:'DH':'symbol':undefined:'fr'}}</label>
+
+    </div>
+
+    <div class="col-md-2">
+
+      <label style="font-size: 11px;"> Total Montant Facturé: </label>
+      <br/>
+      <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalMontantFactureAn  | currency:'DH':'symbol':undefined:'fr'}}</label>
+
+    </div>
+
+    <div class="col-md-2">
+
+      <label style="font-size: 11px;"> Total montant à facturer: </label>
+      <br/>
+      <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalMontantAFactureAn  | currency:'DH':'symbol':undefined:'fr'}}</label>
+
+    </div>
+
+
+    <div class="col-md-2">
+      <label style="font-size: 11px;" for="clients"> Actualisation des données :</label>
+      <br/>
+      <button style="color: white;
+    background-color: #337ab7;font-size: 12px;
+    padding: 4px;" (click)="activeUpload()" ><i class="fa fa-refresh" aria-hidden="true"></i> Dernière MAJ: &nbsp; <span class="pull-right" style="margin-top: 2px;font-size: 11px;" *ngIf="lastUpdate"> {{lastUpdate  | date:'dd/MM/yyyy HH:mm'}}</span></button>
+    </div>
+
+    <div class="col-md-2">
+      <label style="font-size: 11px;" for="clients"> Export :</label>
+      <br/>
+        <button style="color: white;
+    background-color: #337ab7;font-size: 12px;
+    padding: 4px;" class="btn"  (click)="exportEtatContrat($event)" [disabled]="filtredData==null || filtredData.length ==0" id="btnXlsRpt"><i class="fa fa-download" aria-hidden="true"></i> Exporter l'état</button>
+
+
+    </div>
+
+
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-2">
+
+      <label style="margin-left: 8px;" for="numMarches">N° Marché :</label>
+      <br/>
+      <select style="margin-left: 5px;width: 175px;height: 34px;" id="numMarches" class="browser-default custom-select" name="numMarche"  [(ngModel)]="selectedNumMarche" (change)="getAllContratByFiltre()" >
+        <option value="null" selected>Filtrer par N° de marché </option>
+        <option *ngFor="let numMarche of numMarches"
+                [ngValue]="numMarche">{{numMarche}}</option>
+      </select>
+
+
+
+    </div>
+
+    <div class="col-md-2">
+
+      <label style="margin-left: 8px;" for="clients">Client :</label>
+      <br/>
+      <select style="margin-left: 5px;width: 175px;height: 34px;" id="clients" class="browser-default custom-select" name="contrats"  [(ngModel)]="selectedClient" (change)="getAllContratByFiltre()" >
+        <option value="null" selected>Filtrer par client </option>
+        <option *ngFor="let client of clients"
+                [ngValue]="client">{{client}}</option>
+      </select>
+
+    </div>
+
+    <div class="col-md-2">
+
+      <label style="margin-left: 8px;" for="clients">Pilote du Contrat :</label>
+      <br/>
+      <select style="margin-left: 5px;width: 175px;height: 34px;" id="pilote" class="browser-default custom-select" name="contrats"  [(ngModel)]="selectedPilote" (change)="getAllContratByFiltre()" >
+        <option value="null" selected>Filtrer par pilote du contrat </option>
+        <option *ngFor="let pilote of pilotes"
+                [ngValue]="pilote">{{pilote}}</option>
+      </select>
+
+    </div>
+
+    <div class="col-md-2">
+      <label style="margin-left: 8px;" for="clients">Contrat Sous-traité :</label>
+      <br/>
+      <select style="margin-left: 5px;width: 175px;height: 34px" id="sousTraiter" class="browser-default custom-select" name="sousTraiter" [(ngModel)]="selectedSousTraiter" (change)="getAllContratByFiltre()"  >
+        <option value="null"  selected>Filtrer par sous Traitance</option>
+        <option value="true">Oui</option>
+        <option value="false">Non</option>
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <label style="margin-left: 8px;" for="clients">Initialisation du filtre :</label>
+      <br/>
+      <button  id="raz" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i>  </button>
+
+    </div>
+
+
+
+
+  </div>
+
+
+  <mat-form-field >
+
+    <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
+
+  </mat-form-field>
+
+
+  <table mat-table (matSortChange)="sortChange($event)" [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+
+
+
+    <ng-container matColumnDef="option"  >
+      <th mat-header-cell *matHeaderCellDef >  &nbsp; </th>
+      <td mat-cell *matCellDef="let element" > <a style="  cursor:pointer;"  (click)="selectContrat(element,template)"><i class="fa fa-eye" aria-hidden="true"></i>
+      </a> </td>
+    </ng-container>
+
+    <ng-container matColumnDef="numMarche"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>  N° marché </th>
+      <td mat-cell *matCellDef="let element"> {{element.numMarche}}   </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="nomPartenaire">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Client </th>
+      <td mat-cell *matCellDef="let element"    > {{element.nomPartenaire}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="description"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>  Contrat </th>
+      <td mat-cell *matCellDef="let element"> {{element.description}}   </td>
+    </ng-container>
+
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="pilote">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Pilote  </th>
+      <td mat-cell *matCellDef="let element"  > {{element.pilote}}  </td>
+    </ng-container>
+
+    <ng-container matColumnDef="sousTraiter">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header>Contrat sous-traité  </th>
+      <td mat-cell *matCellDef="let element"> <div *ngIf="element.sousTraiter">Oui</div><div *ngIf="!element.sousTraiter">Non</div>  </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="periodeFacturationLabel"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Période de Facturation
+      <td mat-cell *matCellDef="let element"> {{element.periodeFacturationLabel}}  </td></ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="montantContrat"  >
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Annuel</th>
+      <td mat-cell *matCellDef="let element"> {{element.montantContrat | currency:'DH':'symbol':undefined:'fr'}}  </td>
+    </ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="montantFactureAn"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant Facturé / An
+      <td mat-cell *matCellDef="let element"> {{element.montantFactureAn | currency:'DH':'symbol':undefined:'fr'}}  </td></ng-container>
+
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="montantRestFactureAn"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant RAF / An
+      <td mat-cell *matCellDef="let element"> {{element.montantRestFactureAn | currency:'DH':'symbol':undefined:'fr'}}  </td></ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngStyle]= "(currentContrat!=null && currentContrat.numContrat==row.numContrat) && {'background-color':'#62a7fd3d'}"></tr>
+
+
+  </table>
+  <mat-paginator [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+
+
+
+  <ng-template #template style="width: 97%">
+    <div *ngIf="mode==1">
+      <form  #f="ngForm" (ngSubmit)="onEditContrat(template)">
+        <div class="modal-header" >
+          <button type="button" class="close pull-right" aria-label="Close" (click)="checkCanceled(thirdModal)">
+            <span style="font-size: 20px;" aria-hidden="true">&times;</span>
+          </button>
+          <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail  :
+            <strong style="font-size: 13px;
+    color: #337ab7;">{{currentContrat.numContrat}} / {{currentContrat.description}} /{{currentContrat.nomPartenaire}} / {{currentContrat.numMarche}} </strong>
+          </p>
+
+        </div>
+
+        <div class="modal-body" style="padding: 0px">
+
+          <div class="card mt-3 tab-card">
+            <div class="card-header tab-card-header">
+              <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                <li class="nav-item active">
+                  <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-handshake-o" aria-hidden="true"></i>  Contrat : {{currentContrat.numContrat}}</a>
+                </li>
+                <li class="nav-item">
+                  <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Echéances</a>
+                </li>
+                <li class="nav-item">
+                  <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="tree-tab" data-toggle="tab" href="#tree" role="tab" aria-controls="Tree" aria-selected="false" aria-expanded="false"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Commandes Fournisseurs</a>
+                </li>
+                <li class="nav-item">
+                  <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="fourth-tab" data-toggle="tab" href="#four" role="tab" aria-controls="Four" aria-selected="false" aria-expanded="false"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Factures</a>
+                </li>
+                <li class="nav-item">
+                  <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="five-tab" data-toggle="tab" href="#five" role="tab" aria-controls="Five" aria-selected="false" aria-expanded="false"><i class="fa fa-file" aria-hidden="true"></i>Pièces jointes</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="tab-content" id="myTabContent">
+              <div class="tab-pane active" id="one" role="tabpanel" aria-labelledby="one-tab">
+                <div class="row" style="padding: 2px">
+                  <div class="col-xs-12 col-md-6" style="padding-left: 20px;
+    padding-right: 0px;
+    margin-right: -10px;">
+                    <div class="panel-group">
+                      <div class="panel panel-primary">
+
+
+                        <div class="panel panel-info">
+
+                          <div class="panel-body" >
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-tag fa-lg"></i> Code Projet :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.codeProjet}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-comment fa-lg"></i> Déscription :</label>
+                                <span style="max-width: 130px;min-width: 100px;font-size: 12px"
+                                      class="labelModal" > {{currentContrat.description }}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-legal fa-lg"></i> Signé  :</label>
+                                <span style="max-width: 130px;min-width: 82px;"
+                                      class="labelModal"> <div *ngIf="currentContrat.contratSigne">Oui</div><div *ngIf="!currentContrat.contratSigne">Non</div></span>
+                              </div>
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calendar fa-lg"></i>  Du :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.du | date:'dd/MM/yyyy'}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calendar fa-lg"></i>  Au :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.au | date:'dd/MM/yyyy'}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i>  Montant annuel :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.montantAnnuel  | currency:'DH':'symbol':undefined:'fr'}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i>  Montant cablage  :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.montantCablage  | currency:'DH':'symbol':undefined:'fr'}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i>  Montant contrat :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.montantContrat  | currency:'DH':'symbol':undefined:'fr'}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i>  Montant Assistance N° :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.montantAssitanceAn  | currency:'DH':'symbol':undefined:'fr'}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i>  Montant value RS :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.montantValueRs  | currency:'DH':'symbol':undefined:'fr'}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i>  Montant value SI :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.montantValueSi}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-money fa-lg"></i> Montant value SW :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.montantValueSw}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-building fa-lg"></i>  Nom sous Traitant:</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.nomSousTraitant }}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-flag-o fa-lg"></i>  Num marché :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.numMarche}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calendar fa-lg"></i> Periode facturation :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.periodeFacturation}}</span>
+                              </div>
+
+
+                            </div>
+
+                            <div class="row">
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-user fa-lg"></i> Pilote du contrat :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.pilote}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-calculator fa-lg"></i>  Occurence facturation :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.occurenceFacturation}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label> <i class="fa fa-flag-checkered fa-lg"></i> Statut :</label>
+                                <span style="max-width: 108px;"
+                                      class="labelModal"> {{currentContrat.statut}}</span>
+                              </div>
+
+
+                            </div>
+
+
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+
+
+
+
+
+
+
+                  </div>
+
+                  <div class="col-xs-12 col-md-6">
+                    <div class="panel-group" >
+                      <div class="panel panel-primary">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse14"><i class="fa fa-commenting-o fa-lg"></i> Commentaires </a>
+                          </h4>
+                        </div>
+
+                        <div class="panel-group">
+                          <div class="panel panel-default">
+                            <div class="panel-body" style="min-height: 374px;max-height: 374px">
+
+
+                              <div class="row">
+                                <div class="form-group col-sm-6">
+
+                                  <label for="newEmployerId"><i class="fa fa-user-circle fa-lg"></i> Collaborateur :</label>
+
+                                  <input id="newEmployerId" class="form-control input-sm"
+                                         placeholder="saisir le collaborateur"
+                                         [(ngModel)]="newEmployerId" name="newEmployerId" (focusin)="blockedKey()" (focusout)="deBlockedKey()" >
+
+
+                                </div>
+
+                              </div>
+
+
+                              <textarea class="form-control input-sm" name="newContentComment" [(ngModel)]="newContentComment"  placeholder="Ecrire un commentaire.." rows="2"  (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
+                              <p></p>
+                              <button type="button" class="btn btn-info btn-xs pull-right" style="margin-top: 10px;" (click)="addComment()" [disabled]="!newContentComment"><i class="fa fa-plus" aria-hidden="true"></i> Ajouter</button>
+                              <div class="clearfix"></div>
+                              <hr>
+                              <ul class="media-list">
+
+                                <li class="media" *ngFor="let commentaire of pagedItems">
+                                  <a href="#" class="pull-left">
+
+                                    <span class="badge badge-success">{{commentaire.user.sigle}} :</span>
+
+                                  </a>
+                                  <div class="media-body">
+                                <span class="text-muted pull-right"   >
+                                    <small class="text-muted">{{commentaire.date | date:'dd/MM/yyyy HH:mm'}} </small>
+                                    <a *ngIf="!checkIFMorethanFifthMinuteAgo(commentaire) " style="cursor: pointer" (click)="deleteCommentaire(commentaire)"><i class="fa fa-times fa-lg"></i> </a>
+                                </span>
+
+                                    <span class="badge badge-info" *ngIf="commentaire.employer">@ {{commentaire.employer}}</span>
+                                    <p style="font-size: 11px;max-width: 500px;">
+                                      {{commentaire.content}}
+                                    </p>
+                                  </div>
+                                </li>
+
+
+                              </ul>
+
+                              <div class="row"  *ngIf="pager">
+                                <div class="form-group col-sm-3">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                  <!-- pager -->
+                                  <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
+
+                                    <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                      <a style="font-size: 11px;" (click)="setPage(pager.currentPage - 1)" >Précédant</a>
+                                    </li>
+                                    <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                      <a style="font-size: 11px;" (click)="setPage(page)">{{page}}</a>
+                                    </li>
+                                    <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                      <a style="font-size: 11px;" (click)="setPage(pager.currentPage + 1)"  >Suivant</a>
+                                    </li>
+
+                                  </ul>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                </div>
+
+                              </div>
+
+
+
+
+
+
+                            </div>
+                          </div>
+
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="two-tab">
+
+                <div class="panel-group" >
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">
+
+                    </div>
+
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                          <div class="row">
+
+                            <app-view-echeance [echeances]="currentContrat.echeances"> </app-view-echeance>
+
+                          </div>
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="tree" role="tabpanel" aria-labelledby="tree-tab">
+
+                <div class="panel-group" >
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">
+
+                    </div>
+
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                          <div class="row">
+
+                          <app-view-commandes-fournisseur  [commandesFournisseurs]="currentContrat.commandesFournisseurs" ></app-view-commandes-fournisseur>
+
+                          </div>
+
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="four" role="tabpanel" aria-labelledby="fourth-tab">
+
+                <div class="panel-group" >
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">
+
+                    </div>
+
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                          <div class="row">
+
+                            <app-view-factures (errorUpdate)="onErrorUpdate($event)" [factureEcheances]="currentContrat.factureEcheances" ></app-view-factures>
+
+                          </div>
+
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="five" role="tabpanel" aria-labelledby="five-tab">
+
+                <div class="panel-group" >
+                  <div class="panel panel-primary">
+                    <div class="panel-heading">
+
+                    </div>
+
+                    <div class="panel-group">
+                      <div class="panel panel-default">
+                        <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                          <div class="row">
+                          <app-view-pieces [piecesContrat]="currentContrat.pieces"></app-view-pieces>
+
+                          </div>
+
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+          <!-- First -->
+
+
+
+
+
+
+
+
+        </div>
+
+
+
+
+        <div class="modal-footer" style="padding: 0px">
+
+          <div class="row">
+
+            <div class="form-group col-xs-2 col-md-2">
+              <p></p>
+            </div>
+            <div class="form-group col-xs-3 col-md-2">
+              <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index-1>=0 ? '#337ab7' : 'black'}"  (click)="goToPrecedent(currentContrat.numContrat,secondModal)" ><i class="fa fa-backward fa-lg"></i> Précédant</a>
+            </div>
+            <div class="form-group col-xs-4 col-md-2">
+              <label style="padding: 3px;"><span style="color: #3875d7">{{index+1}}</span> /<span style="color: red">{{this.filtredData.length}}</span> </label>
+            </div>
+            <div class="form-group col-xs-4 col-md-2">
+              <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index+2<=this.filtredData.length ? '#337ab7' : 'black'}" (click)="goToSuivant(currentContrat.numContrat,secondModal)"> Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
+            </div>
+            <div class="form-group col-xs-3 col-md-4">
+
+              <a style="cursor: pointer;padding: 4px;
+    font-size: 10px;" class="btn btn-primary btn-sm " (click)="composeEmail(currentContrat)" target="_blank" ><i class="fa fa-share" aria-hidden="true"></i> Email</a>
+
+
+              <button  type="submit" class="btn btn-sm pull-right btn-primary" style="    margin-right: 10px;
+    height: 23px;
+    font-size: 10px;
+    padding: 1px;
+    width: 80px;
+}" [disabled]="!this.currentContrat.updated" ><i
+                class="fa fa-floppy-o"></i>
+                Modifier
+              </button>
+            </div>
+          </div>
+
+
+
+
+        </div>
+      </form>
+
+    </div>
+
+
+
+  </ng-template>
+
+  <ng-template #secondModal>
+    <div class="modal-header">
+      <button type="button" class="close pull-right" aria-label="Close" (click)="annulation()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body rejection-body">
+      <div class="body-title-container">
+        <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce Contrat ?</h5>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success btn-sm" (click)="annulation()">Annuler</button>
+      <button type="button" class="btn btn-danger btn-sm" (click)="annulationModificationContrat(currentContrat.numContrat,secondModal)">Ignorer</button>
+    </div>
+  </ng-template>
+
+  <ng-template #thirdModal>
+    <div class="modal-header">
+      <button type="button" class="close pull-right" aria-label="Close" (click)="annulation2()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body rejection-body">
+      <div class="body-title-container">
+        <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce Contrat ?</h5>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success btn-sm" (click)="annulation2()">Annuler</button>
+      <button type="button" class="btn btn-danger btn-sm" (click)="ignore2()">Ignorer</button>
+
+    </div>
+
+
+
+
+
+
+  </ng-template>
+</div>
+
+<div [hidden]="authorized==true">
+
+  <p> Erreur 403 vous n'etes pas autorisé à acceder à cette page</p>
+</div>
