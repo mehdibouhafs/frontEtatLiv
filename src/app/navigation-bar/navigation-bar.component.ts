@@ -35,6 +35,8 @@ export class NavigationBarComponent implements OnInit {
 
   @Input() stockNav:boolean;
 
+  @Input() stockPNav:boolean
+
   @Input() recouvNav:boolean;
 
   @Input() reunionNav:boolean;

@@ -37,6 +37,7 @@ import { ViewCommandesFournisseurComponent } from './view-commandes-fournisseur/
 import { NavigationBarComponent } from './navigation-bar/navigation-bar.component';
 import { ViewFacturesComponent } from './view-factures/view-factures.component';
 import { ViewPiecesComponent } from './view-pieces/view-pieces.component';
+import { EtatStockProjetComponent } from './etat-stock-projet/etat-stock-projet.component';
 registerLocaleData(localeFr, 'fr');
 
 
@@ -48,6 +49,7 @@ registerLocaleData(localeFr, 'fr');
     ReunionComponent,
     EtatRecouvrementComponent,
     EtatStockComponent,
+    EtatStockProjetComponent,
     DashboardComponent,
     ContratComponent,
     ViewEcheanceComponent,

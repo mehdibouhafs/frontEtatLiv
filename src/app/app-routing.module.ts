@@ -7,6 +7,8 @@ import {EtatRecouvrementComponent} from './etat-recouvrement/etat-recouvrement.c
 import {EtatStockComponent} from './etat-stock/etat-stock.component';
 import {DashboardComponent} from "./dashboard/dashboard.component";
 import {ContratComponent} from "./contrat/contrat.component";
+import {EtatStockProjetComponent} from './etat-stock-projet/etat-stock-projet.component';
+
 
 
 
@@ -21,6 +23,7 @@ const routes: Routes = [
   {path:"etatRecouvrementChefProjet/:chefProjet",component:EtatRecouvrementComponent},
   {path:"etatRecouvrementCodeProjet/:codeProjet",component:EtatRecouvrementComponent},
   {path:"etatStock",component:EtatStockComponent},
+  {path:"etatStockProjet",component:EtatStockProjetComponent},
   {path:"etatStockCodeProjet/:codeProjet",component:EtatStockComponent},
   {path:"login",component:AuthentificationComponent},
   {path:"consultReunions",component:ReunionComponent},
