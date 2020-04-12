@@ -66,6 +66,16 @@
     <td mat-cell *matCellDef="let element"> {{element.remarque }}  </td>
   </ng-container>
 
+  <ng-container matColumnDef="du"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Du</th>
+    <td mat-cell *matCellDef="let element"> {{element.du  | date:'dd/MM/yyyy' }}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="au"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Au</th>
+    <td mat-cell *matCellDef="let element"> {{element.au  | date:'dd/MM/yyyy'}}  </td>
+  </ng-container>
+
 
 
   <tr mat-header-row *matHeaderRowDef="displayedColumnsCommandeFournisseur; sticky: true"></tr>

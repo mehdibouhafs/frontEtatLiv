@@ -14,7 +14,7 @@ import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
 })
 export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
 
-  displayedColumnsCommandeFournisseur: string[] = ['numeroDocument','descriptionArticle','dateEnregistrement', 'fournisseur','totalCmd','montantRnf', 'montantFacture','remarque'];
+  displayedColumnsCommandeFournisseur: string[] = ['numeroDocument','descriptionArticle','dateEnregistrement', 'fournisseur','totalCmd','montantRnf', 'montantFacture','remarque','du','au'];
   public dataSourceCommandeFournisseur: MatTableDataSource<CommandeFournisseur>;
   @ViewChild('commandesTableSort', {static: true}) sortCommandeFournisseur: MatSort;
   @ViewChild('commandesTablePaginator', {static: true}) paginatorCommandeFournisseur: MatPaginator;

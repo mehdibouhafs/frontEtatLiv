@@ -37,6 +37,8 @@ export class CommandeFournisseur {
   public qteRnf:number;
   public montantRnf:number;
 
+  public du:Date;
 
+  public au : Date;
 
 }
