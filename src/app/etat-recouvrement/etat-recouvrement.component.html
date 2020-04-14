@@ -1,0 +1,1089 @@
+<div [hidden]="authorized==false">
+<ngx-spinner
+  bdColor="rgba(51,51,51,0.8)"
+  size="medium"
+  color="#fff"
+  type="ball-scale-multiple"
+>
+  <p style="font-size: 20px; color: white">Loading...</p>
+</ngx-spinner>
+  <app-navigation-bar [recouvNav]="true"></app-navigation-bar>
+
+
+
+<div *ngIf="viewUpload" class="container" style="padding: 5px;">
+  <div *ngIf="currentFileUpload" class="progress">
+    <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" attr.aria-valuenow="{{progress.percentage}}"
+         aria-valuemin="0" aria-valuemax="100" [ngStyle]="{width:progress.percentage+'%'}">
+      {{progress.percentage}}%</div>
+  </div>
+
+  <label class="btn btn-default">
+    <input type="file" (change)="selectFile($event)">
+  </label>
+
+  <button class="btn pull-right" style="color: white;
+    background-color: #337ab7;font-size: 12px;
+    padding: 4px;"(click)="cancelUpload()">Annuler la mise à jour</button>
+
+  <button class="btn " style="color: white;
+    background-color: #337ab7;font-size: 12px;
+    padding: 4px;" [disabled]="!selectedFiles" (click)="upload()"><i class="fa fa-upload" aria-hidden="true"></i> Upload</button>
+
+
+
+
+
+</div>
+
+<div class="row"  style="margin-right: 2px;" *ngIf="statistics">
+
+  <div class="col-md-2" >
+    <label style="font-size: 11px;"> Total 3M : </label>
+    <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalLowerThan3month | currency:'DH':'symbol':undefined:'fr'}}</label>
+
+
+
+  </div>
+  <div class="col-md-2">
+    <label style="font-size: 11px;">Total 6M : </label>
+    <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalLowerThan6month | currency:'DH':'symbol':undefined:'fr'}}</label>
+  </div>
+  <div class="col-md-2" >
+    <label style="font-size: 11px;">Total A12M : </label>
+    <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalAfter6month | currency:'DH':'symbol':undefined:'fr'}}</label>
+  </div>
+  <div class="col-md-2" >
+    <label style="font-size: 11px;">Total SUP.12M : </label>
+    <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalAfter12month | currency:'DH':'symbol':undefined:'fr'}}</label>
+  </div>
+
+
+  <div class="col-md-2" >
+    <label style="font-size: 11px;">Total : </label>
+    <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.total | currency:'DH':'symbol':undefined:'fr'}}</label>
+
+
+  </div>
+
+  <div class="col-md-2">
+
+  </div>
+</div>
+<div class="row" style="margin-right: 2px;" *ngIf="statistics">
+
+
+  <div class="col-md-2">
+    <label style="font-size: 11px;">Total Facture : </label>
+
+    <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalFacture | currency:'DH':'symbol':undefined:'fr'}}</label>
+  </div>
+
+  <div class="col-md-2">
+    <label style="font-size: 11px;">Total Retenue garantie  : </label>
+    <label style="color: #ff0824;
+      font-size: 11px;padding-left: 5px;">{{statistics.totalRetenuGarantie  | currency:'DH':'symbol':undefined:'fr' }}</label>
+  </div>
+  <div class="col-md-4">
+    <label style="font-size: 11px;">Total Retenue Garantie échue : </label>
+    <label style="color: #ff0824;
+    font-size: 11px;padding-left: 5px;">{{statistics.totalRetenueGarantieIssue  | currency:'DH':'symbol':undefined:'fr' }}</label>
+
+  </div>
+  <div class="col-md-2">
+
+  </div>
+
+  <div class="col-md-2">
+    <div><button style="color: white;
+    background-color: #337ab7;font-size: 11px;
+    padding: 4px;" class="btn pull-right" (click)="activeUpload()" *ngIf="!viewUpload " [disabled]="!roleReadAllRecouvrement"><i class="fa fa-refresh" aria-hidden="true"></i> Mise à jour</button>
+    </div>
+
+    <div>
+      <button style="color: white;
+    background-color: #337ab7;font-size: 11px;
+    padding: 4px;" class="btn "  (click)="exportEtatDocument($event)" [disabled]="this.filtredData==null || this.filtredData.length ==0" id="btnXlsRpt"><i class="fa fa-download" aria-hidden="true"></i> Exporter l'état</button>
+    </div>
+
+    <span class="pull-right" style="margin-top: 2px;font-size: 11px;" *ngIf="etatRecouvrement"> {{etatRecouvrement.lastUpdate  | date:'dd/MM/yyyy HH:mm'}}</span>
+  </div>
+
+</div>
+
+<div class="row" style="margin-right: 2px;margin-top: 0px">
+
+  <div class="col-md-2" *ngIf="roleReadAllRecouvrement" >
+    <label for="chargerRecouvrement">Chargé de Recouvrement :</label>
+    <br/>
+    <select  style="margin-left: 5px;width: 175px;height: 26px;" id="chargerRecouvrement" class="browser-default custom-select" name="selectChargeRecouv" [(ngModel)]="selectedChargeRecouvrement" (change)="selectFiltre()" >
+      <option value="undefined" selected>Filtrer par Chargé de recouvrement </option>
+      <option *ngFor="let employe of chargeRecouvrements"
+              [ngValue]="employe">{{employe}}</option>
+    </select>
+  </div>
+
+
+
+  <div class="col-md-2" >
+
+    <label for="chefProjet" >Chef de Projet :</label>
+    <br/>
+    <select style="margin-left: 5px;width: 175px;height: 26px;" id="chefProjet" class="browser-default custom-select" name="chefProjet"  [(ngModel)]="selectedChefProjet" (change)="selectFiltre()" >
+      <option value="undefined" selected>Filtrer par chef de projet </option>
+      <option *ngFor="let chefProjet of chefProjets"
+              [ngValue]="chefProjet">{{chefProjet}}</option>
+    </select>
+
+  </div>
+
+
+
+  <div class="col-md-2">
+
+    <label for="filtrerStatut">Statut :</label>
+    <br/>
+    <select style="margin-left: 5px;width: 175px;height: 26px;" id="filtrerStatut" class="browser-default custom-select" name="selectStatut" [(ngModel)]="selectedStatut" (change)="selectFiltre()" >
+      <option value="undefined" selected>Filtrer par Statut </option>
+      <option value="Non Traitée par CR">Non Traitée par CR</option>
+      <option value="Non Deposée">Non Déposée</option>
+      <option value="Bloquée">Bloquée</option>
+      <option value="Validée par client">Validée par client</option>
+      <option value="En Cours de paiement">En Cours de paiement</option>
+      <option value="Payée">Payée</option>
+      <option value="Litige">Litige</option>
+      <option value="Retenue Garantie">Retenue Garantie</option>
+      <option value="Avoir à faire">Avoir à faire</option>
+      <option value="En cours de validation">En cours de validation</option>
+    </select>
+
+  </div>
+
+
+
+
+  <div class="col-md-2">
+    <label for="client">Client :</label>
+    <br/>
+
+    <select style="margin-left: 5px;width: 175px;height: 26px;" id="client" class="browser-default custom-select" name="client"  [(ngModel)]="selectedClient" (change)="selectFiltre()" >
+      <option value="undefined" selected>Filtrer par client </option>
+      <option *ngFor="let client of clients"
+              [ngValue]="client">{{client}}</option>
+    </select>
+  </div>
+
+  <div class="col-md-2" [hidden]="service=='Commercial'">
+    <label for="com">Commercial :</label>
+    <br/>
+    <select style="margin-left: 5px;width: 175px;height: 26px;" id="com" class="browser-default custom-select" name="com"  [(ngModel)]="selectedCommercial" (change)="selectFiltre()" >
+      <option value="undefined" selected>Filtrer par commercial </option>
+      <option *ngFor="let com of commercials"
+              [ngValue]="com">{{com}}</option>
+    </select>
+  </div>
+
+  <div class="col-md-2">
+
+    <label for="annee">Année  :</label>
+    <br/>
+    <select style="margin-left: 5px;width: 175px;height: 26px;" id="annee" class="browser-default custom-select" name="com"  [(ngModel)]="selectedAnneePiece" (change)="selectFiltre()" >
+      <option value="undefined" selected>Filtrer par année </option>
+      <option *ngFor="let annee of anneesPieces"
+              [ngValue]="annee">{{annee}}</option>
+    </select>
+
+  </div>
+
+  <div class="col-md-2">
+    <label for="raz" style="margin-top: 8px;">RAZ  :</label>
+    <br/>
+    <button  id="raz" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i>  </button>
+
+  </div>
+
+  <div class="col-md-2" >
+    <label for="downloadSituationPrevu" style="margin-top: 8px;">Télècharger l'état des encaissements prévu   :</label>
+    <br/>
+    <button  id="downloadSituationPrevu" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="getEncaissementPrevu($event)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
+  </div>
+
+
+  <div class="col-md-2" *ngIf="selectedClient!='undefined'">
+    <label for="downloadReleve" style="margin-top: 8px;">Télècharger le relevé client :</label>
+    <br/>
+    <button  id="downloadReleve" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="getReleveClient($event)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
+  </div>
+
+  <div class="col-md-2" *ngIf="selectedClient!='undefined'" >
+    <label for="downloadSituation" style="margin-top: 8px;">Télècharger la situation par statut   :</label>
+    <br/>
+    <button  id="downloadSituation" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="getCountSumDocumentsByClient($event)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
+  </div>
+
+  <div class="col-md-2" *ngIf="selectedClient!='undefined' && checkEncaissement()">
+    <label for="downloadSituationEncaissment" style="margin-top: 8px;">Télècharger les encaissements par mois    :</label>
+    <br/>
+    <button  id="downloadSituationEncaissment" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)=" showSituationDownloadModal(situationDownload)" ><i class="fa fa-download" aria-hidden="true"></i>  </button>
+  </div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<mat-form-field >
+
+  <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+  <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
+
+</mat-form-field>
+
+
+
+<table mat-table (matSortChange)="sortChange($event)" [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+
+  <ng-container matColumnDef="option"  >
+    <th mat-header-cell *matHeaderCellDef >  &nbsp; </th>
+    <td mat-cell *matCellDef="let element" > <a style="  cursor:pointer;"  (click)="selectDocument(element,template)"><i class="fa fa-eye" aria-hidden="true"></i>
+    </a> </td>
+  </ng-container>
+
+  <ng-container matColumnDef="numPiece"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> N° document </th>
+    <td mat-cell *matCellDef="let element"> {{element.numPiece}}   </td>
+  </ng-container>
+
+  <ng-container matColumnDef="typeDocument"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Type document </th>
+    <td mat-cell *matCellDef="let element"> {{element.typeDocument}}   </td>
+  </ng-container>
+
+  <ng-container matColumnDef="agePiece"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Age document </th>
+    <td mat-cell *matCellDef="let element">
+
+      <div *ngIf="element.isLessThanOneMonth"><span class="filled-circle-isLessThanOneMonth"s>{{element.agePiece}}</span></div>
+      <div *ngIf="element.isLessThanTwoMonth"><span class="filled-circle-isLessThanOneMonth">{{element.agePiece}}</span></div>
+      <div *ngIf="element.isLessThanTreeMonth"><span class="filled-circle-isLessThanTreeMonth">{{element.agePiece}}</span></div>
+      <div *ngIf="element.isMoreThanTreeMonthAndLessThanTweleveMonth"><span class="filled-circle-isMoreThanTreeMonthAndLessThanTweleveMonth">{{element.agePiece}}</span></div>
+      <div *ngIf="element.isMoreThanTwelveMonth"><span class="filled-circle-isMoreThanTwelveMonth">{{element.agePiece}}</span></div>
+      <div *ngIf="element.isGris"><span class="filled-circle-isGris">{{element.agePiece}}</span></div>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="datePiece"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date document </th>
+    <td mat-cell *matCellDef="let element"> {{element.datePiece | date:'dd/MM/yyyy'}}   </td>
+  </ng-container>
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="client">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Client  </th>
+    <td mat-cell *matCellDef="let element"> {{element.client}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="codeProjet">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Code Projet  </th>
+    <td mat-cell *matCellDef="let element"> {{element.codeProjet}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="projet">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Projet  </th>
+    <td mat-cell *matCellDef="let element"> {{element.projet}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="commercial">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Commercial  </th>
+    <td mat-cell *matCellDef="let element"> {{element.commercial}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="chefProjet">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Chef Projet  </th>
+    <td mat-cell *matCellDef="let element"> {{element.chefProjet}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="montantPiece">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Pièce  </th>
+    <td mat-cell *matCellDef="let element"> {{element.montantPiece| currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="montantOuvert">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Ouvert  </th>
+    <td mat-cell *matCellDef="let element"> {{element.montantOuvert| currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="age">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Age  </th>
+    <td mat-cell *matCellDef="let element"> {{element.age}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="chargerRecouvrement">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Chargé recouv </th>
+    <td mat-cell *matCellDef="let element"> {{element.chargerRecouvrement}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="ageDepot">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Age dépôt (Mois)  </th>
+    <td mat-cell *matCellDef="let element">
+      <div *ngIf="element.ageDepot<=1"><span class="filled-circle-isLessThanOneMonth"style="margin-left: 40px;">{{element.ageDepot | number : '1.'}}</span></div>
+      <div *ngIf="element.ageDepot>1 && element.ageDepot<=2"><span class="filled-circle-isLessThanOneMonth"style="margin-left: 40px;">{{element.ageDepot | number : '1.'}}</span></div>
+      <div *ngIf="element.ageDepot>2 && element.ageDepot<=3"><span class="filled-circle-isLessThanTreeMonth" style="margin-left: 40px;">{{element.ageDepot| number : '1.'}}</span></div>
+      <div *ngIf="element.ageDepot>3 && element.ageDepot<=12"><span class="filled-circle-isMoreThanTreeMonthAndLessThanTweleveMonth" style="margin-left: 40px;">{{element.ageDepot | number : '2.'}}</span></div>
+      <div *ngIf="element.ageDepot>12"><span class="filled-circle-isMoreThanTwelveMonth" style="margin-left: 40px;">{{element.ageDepot | number : '1.'}}</span></div>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngStyle]= "(currentDocument!=null && currentDocument.codePiece==row.codePiece) && {'background-color':'#62a7fd3d'}"></tr>
+
+
+</table>
+<mat-paginator [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+<!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>-->
+<!--<button (click)="openModal()">open the modal</button>-->
+<!--<button type="button" class="btn btn-primary" (click)="openModal(template)">Create template modal</button>-->
+
+<ng-template #template style="width: 95%">
+  <div *ngIf="mode==1">
+    <form  #f="ngForm" (ngSubmit)="onEditDocument(template)">
+      <div class="modal-header" [ngStyle]=" {'background-color' : currentDocument.isExpiredEcheance == true && currentDocument.typeDocument == 'Facture'  ? '#FF000F' : currentDocument.typeDocument == 'Facture'  ? '#4dff03' : '#CED3D0'}">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="checkCanceled(thirdModal)">
+          <span style="font-size: 20px;" aria-hidden="true">&times;</span>
+        </button>
+        <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail du Document :
+          <strong style="font-size: 13px;
+    color: #337ab7;">{{currentDocument.numPiece}} / {{currentDocument.projet}} </strong>
+        </p>
+
+
+      </div>
+
+
+      <div class="modal-body" style="padding: 0px">
+
+        <div *ngIf="errorUpdate" id="errorUpdate" class="alert alert-danger" style="text-align: center;font-size: 14px;margin: 0px;height: 10px;line-height: 2px;">
+          <strong style="font-size: 14px">Erreur!</strong> Problème d'envoi de donnée au serveur ! Merci de contacter l'administrateur
+        </div>
+
+        <div class="card mt-3 tab-card">
+          <div class="card-header tab-card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+              <li class="nav-item active">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-newspaper-o" aria-hidden="true"></i> Client Facturé : {{currentDocument.client}}</a>
+              </li>
+              <li class="nav-item">
+                <a style="    background-color: #337ab7;
+    color: white;" class="nav-link" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-plus" aria-hidden="true"></i> Plus d'informations</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane active" id="one" role="tabpanel" aria-labelledby="one-tab">
+              <div class="row" style="padding: 2px">
+                <div class="col-xs-12 col-md-6" style="padding-left: 20px;
+    padding-right: 0px;
+    margin-right: -10px;">
+                  <div class="panel-group">
+                    <div class="panel panel-primary">
+
+
+                      <div class="panel panel-info">
+
+                        <div class="panel-body" >
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-bars fa-lg"></i> Type document :</label>
+                              <span style="max-width: 110px;"
+                                    class="labelModal"> {{currentDocument.typeDocument}}</span>
+                            </div>
+
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-handshake-o fa-lg"></i> Commercial :</label>
+                              <span style="max-width: 110px;"
+                                    class="labelModal"> {{currentDocument.commercial}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-user fa-lg"></i> Chef Projet :</label>
+                              <span style="max-width: 110px;"
+                                    class="labelModal"> {{currentDocument.chefProjet}}</span>
+                            </div>
+
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-tag fa-lg"></i> Ref Client :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.refClient}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-money fa-lg"></i> Montant Pièce:</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentDocument.montantPiece | currency:'DH':'symbol':undefined:'fr'}}</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-money fa-lg"></i> Montant Ouvert:</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentDocument.montantOuvert | currency:'DH':'symbol':undefined:'fr'}}</span>
+
+
+                            </div>
+
+                          </div>
+
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-flag fa-lg"></i> Catégorie :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.categorie }}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i> Date facture  :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.datePiece | date:'dd/MM/yyyy' }}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i> Date Echeance :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.dateEcheance | date:'dd/MM/yyyy'  }}</span>
+                            </div>
+
+                          </div>
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-user fa-lg"></i> Chargé Recouvrement :</label>
+
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.chargerRecouvrement}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-calendar fa-lg"></i> Age Piéce:</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.agePiece}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-money fa-lg"></i> Montant Payé :</label>
+                              <span style="max-width: 130px;min-width: 82px;"
+                                    class="labelModal"> {{currentDocument.montantPayer | currency:'DH':'symbol':undefined:'fr'}}</span>
+                            </div>
+
+
+                          </div>
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label><i class="fa fa-sticky-note fa-lg"></i> Condition de paiement :</label>
+                              <span style="max-width: 130px;"
+                                    class="labelModal"> {{currentDocument.conditionDePaiement}}</span>
+
+                            </div>
+
+
+
+
+
+                          </div>
+
+
+
+
+
+
+
+
+                          <!--other new details -->
+                          <div class="row" *ngIf="currentDocument.details!= null && currentDocument.details.length >0">
+                            <div class="panel-group">
+                              <div class="panel panel-info">
+                                <div class="panel-heading">
+                                  <h4 class="panel-title">
+                                    <a data-toggle="collapse" href="#collapse11"> <i class="fa fa-camera-retro fa-lg"></i> Plus de details</a>
+                                  </h4>
+                                </div>
+                                <div id="collapse11" class="panel-collapse collapse">
+                                  <div class="panel-body"><div *ngFor="let detail of currentDocument.details; let i = index">
+
+                                    <div class="form-group col-sm-3">
+                                      {{detail.key}} :
+                                      <label >{{detail.value}}</label>
+                                    </div>
+
+                                  </div></div>
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+
+
+                          <!-- modifiable -->
+                          <div style="background-color: #337ab7;
+    color: white;
+    margin-top: -1px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    height: 15px;
+    font-size: 10px;"> <a style="color: white;  font-size: 9px;"> <i class="fa fa-info fa-lg"></i> Information du Document</a></div>
+
+
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+
+                              <label for="statut" class="control-label  "><i class="fa fa-flag fa-lg"></i> Statut :</label>
+
+                              <select style="margin-left: 5px;width: 175px;" id="statut" class="browser-default custom-select" name="statut" [(ngModel)]="currentDocument.statut" (change)="updatedStatut($event)" >
+                                <option value="Non Traitée par CR">Non Traitée par CR</option>
+                                <option value="Non Deposée">Non Déposée</option>
+                                <option value="Bloquée">Bloquée</option>
+                                <option value="Validée par client">Validée par client</option>
+                                <option value="En Cours de paiement">En Cours de paiement</option>
+                                <option value="Payée">Payée</option>
+                                <option value="Litige">Litige</option>
+                                <option value="Retenue Garantie">Retenue Garantie</option>
+                                <option value="Avoir à faire">Avoir à faire</option>
+                                <option value="En cours de validation">En cours de validation</option>
+                              </select>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label for="typeBloquage"><i class="fa fa-arrows  fa-lg"></i> Type de blocage :</label>
+                              <select style="margin-left: 5px;width: 175px;" id="typeBloquage" class="browser-default custom-select" name="typeBloquage" [(ngModel)]="currentDocument.typeBloquage" (change)="updatedTypeBloquage($event)" [disabled]="checkingCurrentStatut('Bloquée')" >
+                                <option></option>
+                                <option value="Opérationnel">Opérationnel</option>
+                                <option value="Administratif">Administratif</option>
+                                <option value="Opérationnel&Administratif">Opérationnel & Administratif</option>
+                               </select>
+                              <span *ngIf="typdeBloquageRequired" style="color:red">Veuillez sélectionner un  type de bloquage</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+
+                              <label for="motif"><i class="fa fa-sticky-note fa-lg"></i> Motif :</label>
+                              <textarea id="motif" name ="motif" class="form-control input-sm" [(ngModel)]="currentDocument.motif" placeholder="saisissez le motif"   rows="2" (change)="updatedMotif($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                              <span *ngIf="motifRequired" style="color:red">Veuillez saisir le motif</span>
+
+
+                            </div>
+
+
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label for="dateDepot"><i class="fa fa-user fa-lg"></i> Date de dépot :</label>
+
+                              <input id="dateDepot" name="dateDepot"  type="date" class="form-control input-sm" [ngModel]="currentDocument.dateDepot | date:'yyyy-MM-dd'" (ngModelChange)="currentDocument.dateDepot = $event"
+                                     [value]="currentDocument.dateDepot | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updatedDateDepot($event,fourthModal)" >
+
+
+                            </div>
+
+                            <div class="form-group col-sm-8">
+
+                              <label for="motifChangementDate"><i class="fa fa-gavel fa-lg"></i> Motif changement de date :</label>
+
+                              <textarea id="motifChangementDate" name ="motifChangementDate" class="form-control input-sm" [(ngModel)]="currentDocument.motifChangementDate" placeholder="saisissez le motif changement de date"  rows="2" (change)="updatedMotifChangementDateRecep($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
+                              <span *ngIf="motifChangementDeDateRequired" style="color:red">Veuillez saisir le motif de changement de date</span>
+
+
+                            </div>
+
+
+                          </div>
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4"[hidden]="checkingCurrentStatut('Retenue Garantie')" >
+
+                              <label for="montantGarantie"><i class="fa fa-money  fa-lg"></i> Montant Retenue Garantie :</label>
+
+                              <input id="montantGarantie" class="form-control input-sm"
+                                     placeholder="saisir le montant garantie" type="number" min="0" step="any"
+                                     [(ngModel)]="currentDocument.montantGarantie" name="montantGarantie"  (change)="updatedMontantRetenueGarantie($event)" [disabled]="checkingCurrentStatut('Retenue Garantie')" >
+
+                              <span *ngIf="montantRetenuGarantieRequired" style="color:red">Veuillez saisir le montant Retenu Garantie</span>
+                            </div>
+
+
+
+
+
+                            <div class="form-group col-sm-4" [hidden]="checkingCurrentStatut('Retenue Garantie')">
+
+                              <label for="dateFinGarantie"><i class="fa fa-calendar-plus-o fa-lg"></i> Date fin garantie :</label>
+                              <input id="dateFinGarantie" name="dateFinGarantie"  type="date" class="form-control input-sm" [ngModel]="currentDocument.dateFinGarantie | date:'yyyy-MM-dd'" (ngModelChange)="currentDocument.dateFinGarantie  = $event"
+                                     [value]="currentDocument.dateFinGarantie | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updatedDateFinGarentie($event)" [disabled]="checkingCurrentStatut('Retenue Garantie')" >
+
+                              <span *ngIf="dateFinGarentieRequired" style="color:red">Veuillez saisir la date fin de garantie</span>
+
+                            </div>
+
+                            <div class="form-group col-sm-4">
+
+                              <label for="datePrevuEncaissement"><i class="fa fa-calendar-check-o fa-lg"></i> Date prévue encaissement :</label>
+
+                              <input id="datePrevuEncaissement" name="datePrevuEncaissement"  type="date" class="form-control input-sm" [ngModel]="currentDocument.datePrevuEncaissement | date:'yyyy-MM-dd'" (ngModelChange)="currentDocument.datePrevuEncaissement = $event"
+                                     [value]="currentDocument.datePrevuEncaissement | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="  updatedDatePrevuEncaissement($event,fourthModal)" >
+
+
+
+                            </div>
+
+
+                          </div>
+
+
+
+
+
+                          <div class="row">
+
+
+
+
+
+
+
+
+
+
+
+                          </div>
+
+
+
+
+
+                          <div class="row">
+
+
+
+
+                          </div>
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+
+                            </div>
+                            <div class="form-group col-sm-4"></div>
+                            <div class="form-group col-sm-4">
+
+
+                            </div>
+
+                          </div>
+
+
+
+
+
+
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+
+
+
+
+
+
+
+                </div>
+
+                <div class="col-xs-12 col-md-6">
+                  <div class="panel-group" >
+                    <div class="panel panel-primary">
+                      <div class="panel-heading">
+                        <h4 class="panel-title">
+                          <a data-toggle="collapse" href="#collapse14"><i class="fa fa-commenting-o fa-lg"></i> Commentaires </a>
+                        </h4>
+                      </div>
+
+                      <div class="panel-group">
+                        <div class="panel panel-default">
+                          <div class="panel-body" style="min-height: 674px;max-height: 674px">
+
+
+                            <div class="row">
+                              <div class="form-group col-sm-6">
+
+                                <label for="newEmployerId"><i class="fa fa-user-circle fa-lg"></i> Collaborateur :</label>
+
+                                <input id="newEmployerId" class="form-control input-sm"
+                                       placeholder="saisir le collaborateur"
+                                       [(ngModel)]="newEmployerId" name="newEmployerId"  (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+
+
+                              </div>
+
+                            </div>
+
+
+                            <textarea class="form-control input-sm" name="newContentComment" [(ngModel)]="newContentComment"  placeholder="Ecrire un commentaire.." rows="2"  (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
+                            <p></p>
+                            <button type="button" class="btn btn-info btn-xs pull-right" style="margin-top: 10px;" (click)="addComment()" [disabled]="!newContentComment"><i class="fa fa-plus" aria-hidden="true"></i> Ajouter</button>
+                            <div class="clearfix"></div>
+                            <hr>
+                            <ul class="media-list">
+
+                              <li class="media" *ngFor="let commentaire of pagedItems">
+                                <a href="#" class="pull-left">
+
+                                  <span class="badge badge-success">{{commentaire.user.sigle}} :</span>
+
+                                </a>
+                                <div class="media-body">
+                                <span class="text-muted pull-right">
+                                    <small class="text-muted">{{commentaire.date | date:'dd/MM/yyyy HH:mm'}} </small>
+                                    <a *ngIf="!checkIFMorethanFifthMinuteAgo(commentaire)" style="cursor: pointer" (click)="deleteCommentaire(commentaire)"><i class="fa fa-times fa-lg"></i> </a>
+                                </span>
+
+                                  <span class="badge badge-info" *ngIf="commentaire.employer">avec {{commentaire.employer}}</span>
+                                  <p style="font-size: 11px;max-width: 500px;">
+                                    {{commentaire.content}}
+                                  </p>
+                                </div>
+                              </li>
+
+
+                            </ul>
+
+                            <div class="row"  *ngIf="pager">
+                              <div class="form-group col-sm-3">
+                              </div>
+                              <div class="form-group col-sm-6">
+                                <!-- pager -->
+                                <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
+
+                                  <li [ngClass]="{disabled:pager.currentPage === 1}">
+                                    <a style="font-size: 11px;" (click)="setPage(pager.currentPage - 1)" >Précédant</a>
+                                  </li>
+                                  <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
+                                    <a style="font-size: 11px;" (click)="setPage(page)">{{page}}</a>
+                                  </li>
+                                  <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
+                                    <a style="font-size: 11px;" (click)="setPage(pager.currentPage + 1)"  >Suivant</a>
+                                  </li>
+
+                                </ul>
+                              </div>
+                              <div class="form-group col-sm-3">
+                              </div>
+
+                            </div>
+
+
+
+
+
+
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="tab-pane fade" id="two" role="tabpanel" aria-labelledby="two-tab">
+
+              <div class="panel-group" >
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+
+                  </div>
+
+                  <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-body" style="min-height: 598px;max-height: 598px">
+                        <div class="row">
+
+                          <div class="col-md-12">
+
+                            <label for="info1"><i class="fa fa-building  fa-lg"></i> Info Client :</label>
+
+                            <textarea style="    margin-bottom: 30px;"  id="info1" name ="info1" class="form-control input-sm" [(ngModel)]="currentDocument.infoClient" placeholder="saisissez des informations du client"   rows="7" (change)="updated($event)"  (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="info2"><i class="fa fa-truck  fa-lg"></i> Info Chef de projet / Commercial :</label>
+
+                            <textarea style="    margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentDocument.infoChefProjetOrCommercial" placeholder="saisissez des informations du fournisseurs"   rows="7" (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="info3"><i class="fa fa-briefcase  fa-lg"></i> Info Document :</label>
+
+                            <textarea style="    margin-bottom: 30px;"  id="info3" name ="info3" class="form-control input-sm" [(ngModel)]="currentDocument.infoProjet" placeholder="saisissez des informations du projet"   rows="7" (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+
+        <!-- First -->
+
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+      <div class="modal-footer" style="padding: 0px">
+
+        <div class="row">
+
+          <div class="form-group col-xs-2 col-md-2">
+            <p></p>
+          </div>
+          <div class="form-group col-xs-3 col-md-2">
+            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index-1>=0 ? '#337ab7' : 'black'}" (click)="goToPrecedent(currentDocument.codePiece,secondModal)" ><i class="fa fa-backward fa-lg"></i> Précédant</a>
+          </div>
+          <div class="form-group col-xs-4 col-md-2">
+            <label style="padding: 3px;"><span style="color: #3875d7">{{index+1}}</span> /<span style="color: red">{{filtredData.length}}</span> </label>
+          </div>
+          <div class="form-group col-xs-4 col-md-2">
+            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index+2<=filtredData.length ? '#337ab7' : 'black'}"  (click)="goToSuivant(currentDocument.codePiece,secondModal)" > Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
+          </div>
+          <div class="form-group col-xs-3 col-md-4">
+
+            <a style="cursor: pointer;padding: 4px;
+    font-size: 10px;" class="btn btn-primary btn-sm " (click)="composeEmail(currentDocument)" target="_blank"><i class="fa fa-share" aria-hidden="true"></i> Email </a>
+
+            <button  type="submit" class="btn btn-sm pull-right btn-primary" style="    margin-right: 10px;
+    height: 23px;
+    font-size: 10px;
+    padding: 1px;
+    width: 80px;
+" [disabled]="!currentDocument.updated || typdeBloquageRequired || motifRequired || motifChangementDeDateRequired || montantRetenuGarantieRequired ||dateFinGarentieRequired" ><i
+              class="fa fa-floppy-o"></i>
+              Modifier
+            </button>
+          </div>
+        </div>
+
+
+
+
+      </div>
+    </form>
+
+  </div>
+
+
+
+</ng-template>
+
+
+<!--plain HTML code for first Modal-->
+
+<ng-template #secondModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulation()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce Document ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="annulation()">Annuler</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulationModificationDocument(currentDocument.numPiece,secondModal)">Ignorer</button>
+
+  </div>
+</ng-template>
+
+
+<ng-template #thirdModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulation2()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce Document ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="annulation2()">Annuler</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="ignore2()">Ignorer</button>
+
+  </div>
+
+
+
+
+
+
+</ng-template>
+
+
+<ng-template #fourthModal>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulation3()">
+      <span aria-hidden="true">X</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+      <label for="motif2"><i class="fa fa-sticky-note fa-lg"></i> Motif :</label>
+      <textarea id="motif2" name ="motif2" class="form-control input-sm" [(ngModel)]="motifAction" required placeholder="saisissez le motif"   rows="2" required ></textarea>
+
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulation3()">Annuler</button>
+    <button class="btn btn-primary btn-sm " *ngIf="actionModal == 'udateDatePrevuEncaissement' || actionModal == 'updateDateDepot' "  [disabled]="(motifAction==null || motifAction == ''||  motifAction.length <0 ) " (click)="addCommentSystem(motifAction)" target="_blank"><i class="fa fa-share" aria-hidden="true"></i> Valider </button>
+    <button class="btn btn-primary btn-sm " *ngIf="actionModal == 'escalader'"  [disabled]="(motifAction==null || motifAction == ''||  motifAction.length <0 ) " (click)="composeEmail(currentDocument)" target="_blank"><i class="fa fa-share" aria-hidden="true"></i> Escalader </button>
+
+  </div>
+
+
+
+
+
+
+</ng-template>
+
+
+
+  <ng-template #situationDownload style="width: 55%">
+    <div class="modal-header">
+      <h4>Télécharge la situation client par date </h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="annulationSituationDownload()">
+        <span aria-hidden="true">X</span>
+      </button>
+    </div>
+    <div class="modal-body rejection-body">
+      <div class="row">
+
+        <div class="form-group col-sm-12">
+      <div class="body-title-container">
+        <label for="dateDownloadSituation"><i class="fa fa-calendar fa-lg"></i> Date :</label>
+
+        <input id="dateDownloadSituation" name="dateDownloadSituation" type="month"  class="form-control input-sm" [(ngModel)]="dateDownloadSituation"
+                 >
+
+
+      </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger btn-sm" (click)="annulationSituationDownload()">Annuler</button>
+      <button class="btn btn-primary btn-sm " (click)="getDocumentByClientOnDate($event)" [disabled]="!dateDownloadSituation" ><i class="fa fa-download" aria-hidden="true"></i>Télécharger </button>
+    </div>
+
+
+
+
+
+
+  </ng-template>
+
+</div>
+
+<div [hidden]="authorized==true">
+
+  <p> Erreur 403 vous n'etes pas autorisé à acceder à cette page</p>
+</div>
+
+<script>
+    $(".modal-dialog").css("width", "90%");
+
+</script>
+
+
+

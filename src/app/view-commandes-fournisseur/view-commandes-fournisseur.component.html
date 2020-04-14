@@ -1,0 +1,86 @@
+<div class="row">
+
+  <div class="col-md-4">
+  <mat-form-field >
+
+    <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
+
+  </mat-form-field>
+  </div>
+  <div class="col-md-4"></div>
+  <div class="col-md-4"></div>
+</div>
+
+
+<table mat-table  #commandesTable
+       #commandesTableSort="matSort"  [dataSource]="dataSourceCommandeFournisseur" class="mat-elevation-z8" matSort>
+
+
+  <!-- Name Column -->
+  <ng-container matColumnDef="numeroDocument">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> N° Document </th>
+    <td mat-cell *matCellDef="let element"    > {{element.numeroDocument}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="dateEnregistrement"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+    <td mat-cell *matCellDef="let element"> {{element.dateEnregistrement | date:'dd/MM/yyyy'}}   </td>
+  </ng-container>
+
+  <ng-container matColumnDef="descriptionArticle">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Description </th>
+    <td mat-cell *matCellDef="let element"    > {{element.descriptionArticle}} </td>
+  </ng-container>
+
+
+
+  <ng-container matColumnDef="fournisseur"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Fournisseur </th>
+    <td mat-cell *matCellDef="let element"> {{element.fournisseur}}   </td>
+  </ng-container>
+
+  <ng-container matColumnDef="totalCmd"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant Cmd</th>
+    <td mat-cell *matCellDef="let element"> {{element.totalCmd | currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="montantRnf"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant RNF</th>
+    <td mat-cell *matCellDef="let element"> {{element.montantRnf | currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="montantFacture">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Facturé  </th>
+    <td mat-cell *matCellDef="let element"  > {{element.montantFacture | currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+
+
+
+
+
+  <ng-container matColumnDef="remarque"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Remarque</th>
+    <td mat-cell *matCellDef="let element"> {{element.remarque }}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="du"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Date Du</th>
+    <td mat-cell *matCellDef="let element"> {{element.du  | date:'dd/MM/yyyy' }}  </td>
+  </ng-container>
+
+  <ng-container matColumnDef="au"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Au</th>
+    <td mat-cell *matCellDef="let element"> {{element.au  | date:'dd/MM/yyyy'}}  </td>
+  </ng-container>
+
+
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnsCommandeFournisseur; sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumnsCommandeFournisseur;" ></tr>
+
+
+</table>
+<mat-paginator #commandesTablePaginator="matPaginator" [pageSizeOptions]="[10, 15,20]"></mat-paginator>
