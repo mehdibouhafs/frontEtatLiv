@@ -54,9 +54,10 @@ export class EtatStockProjetComponent implements OnInit {
   
   selectedYearTMP : any;
 
-  commercials: Array<String>;
+  commercial: Array<String>;
 
   selectedCommercial: any;
+  selectedCommercialTMP: any;
 
 
   chefProjets: Array<String>;
@@ -92,8 +93,8 @@ export class EtatStockProjetComponent implements OnInit {
   suivant: boolean;
 
   index: any;
-
-
+  Totalnatures : string[];
+montantNat:any;
   statitics: StatiticsStock;
 
   modalOption: NgbModalOptions = {};
@@ -112,7 +113,6 @@ export class EtatStockProjetComponent implements OnInit {
   selectedLot: string;
   selectedLotTMP: any;
   selectedMagasinTMP:any;
-  selectedCommercialTMP;any;
   selectedMagasin: string;
 
 
@@ -203,7 +203,7 @@ export class EtatStockProjetComponent implements OnInit {
 
       }
 
-      if(authority== 'BU_RESEAU_SECURITE'){
+      if(authority== 'BU_REAU_SECURITE'){
         this.roleBuReseauSecurite = true;
         this.authorized = false;
 
@@ -304,10 +304,7 @@ export class EtatStockProjetComponent implements OnInit {
 
 
   sortAll(){
-    this.natures.sort();
-    this.sousNatures.sort();
-    this.domaines.sort();
-    this.sousDomaines.sort();
+    this.commercial.sort();
     this.numsLots.sort();
     this.clients.sort();
     this.magasins.sort();
@@ -380,6 +377,10 @@ export class EtatStockProjetComponent implements OnInit {
                  .filter((value, index, self) => self.indexOf(value) === index)
                 this.lot = this.pageProduit
                  .map(item => item.numLot)
+                 .filter((value, index, self) => self.indexOf(value) === index)
+
+                 this.commercial = this.pageProduit
+                 .map(item => ((!item.commercial)? "AUCUN COMM": item.commercial))
                  .filter((value, index, self) => self.indexOf(value) === index)
                  
 
@@ -586,6 +587,7 @@ export class EtatStockProjetComponent implements OnInit {
     this.selectedLot =  null;
     this.selectedMagasin =  null;
     this.selectedYear= null;
+    this.selectedCommercial = null;
 
     this.dataSource.filter = null;
     this.currentFilter="";
@@ -674,7 +676,16 @@ export class EtatStockProjetComponent implements OnInit {
       var precedIndex = index - 1;
 
       this.index = precedIndex;
-
+        //this.showDialog();
+        //this.showAnnulationModificationModal(template);
+        this.onEditProduit(null);
+        //this.suivant = false;
+        if (precedIndex != null && precedIndex >= 0 && precedIndex < this.filtredData.length) {
+          this.currentProduit = this.filtredData[precedIndex];
+          this.setPage(1);
+          this.mode = 1;
+        }
+      
 
 
     }
@@ -752,6 +763,14 @@ export class EtatStockProjetComponent implements OnInit {
     }else{
       this.selectedClientTMP = this.selectedClient;
     }
+
+
+    if(this.selectedCommercial == null){
+      this.selectedCommercialTMP = "undefined";
+    }else{
+      this.selectedCommercialTMP = this.selectedCommercial;
+    }
+
     if(this.selectedLot == null){
       this.selectedLotTMP = "undefined";
     }else{
@@ -782,7 +801,7 @@ export class EtatStockProjetComponent implements OnInit {
     }
 
 
-    this.etatStockService.getAllStockProjetByFiltre(this.selectedYearTMP,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasinTMP).subscribe(
+    this.etatStockService.getAllStockProjetByFiltre(this.selectedYearTMP,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasinTMP,this.selectedCommercialTMP).subscribe(
       data => {
         this.pageProduit = data;
       console.log("HELLO FILTER"+this.selectedMagasinTMP+ " client "+this.selectedClient)
@@ -790,7 +809,6 @@ export class EtatStockProjetComponent implements OnInit {
           this.produits = new Array<StockProjet>();
           this.pageProduit.forEach(produit => {
             let p = new StockProjet();
-            p.id_stock = produit.id;
 
             p.id_stock = produit.id_stock;
             p.num_lot = produit.numLot;
@@ -799,9 +817,10 @@ export class EtatStockProjetComponent implements OnInit {
             p.montant = produit.montant;
             p.annee = produit.annee;
             p.chef_projet = produit.chefProjet;
-            p.magasin = produit.magasin;
-            p.date_rec = produit.date_rec;
-            p.nom_lot = produit.nom_lot;
+              p.commentaires = produit.commentaires;
+              p.magasin = produit.magasin;
+              p.date_rec = produit.dateRec;
+              p.nom_lot = produit.nomLot;
 
             if(produit.commentaires != null && produit.commentaires.length>0){
               p.commentaires = produit.commentaires;
@@ -850,6 +869,7 @@ export class EtatStockProjetComponent implements OnInit {
   selectProduit(produit : StockProjet,comm: CommentaireStock,row:any,template: TemplateRef<any>){
     this.currentProduit = produit;
 
+
     console.log("this.currentstock comm" + produit.id_stock);
     this.setPage(1);
     this.mode = 1;
@@ -881,7 +901,34 @@ export class EtatStockProjetComponent implements OnInit {
 
   setPage(page: number) {
 
+    this.montantNat = null;
+
     this.pagedItems = [];
+
+    this.Totalnatures = [];
+
+    this.etatStockService.getMontantByNature(this.currentProduit.num_lot).subscribe(
+      data=>{
+
+        
+        this.montantNat = data;
+        this.montantNat.forEach(nat => {
+          this.Totalnatures.push(nat);
+        }    
+
+
+
+
+        );
+
+        
+        console.log("NTAURE "+JSON.stringify(data))
+      },
+      err=>{
+        console.log(err);
+      }
+    )
+
     console.log("this.currentProjet.commentaires " + this.currentProduit.commentaires);
 
     if(this.currentProduit.commentaires == null ||  this.currentProduit.commentaires.length==0) {
@@ -1038,7 +1085,7 @@ export class EtatStockProjetComponent implements OnInit {
 
   goToSuivant(id,template){
 
-
+this.montantNat = null;
     var index = this.getIndexFromFiltrerdList(id);
 
 
@@ -1049,13 +1096,6 @@ export class EtatStockProjetComponent implements OnInit {
       //this.showAnnulationModificationModal(template);
       this.onEditProduit(null);
 
-      if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-        console.log("here");
-        this.index = suivantIndex;
-        this.currentProduit = this.filtredData[suivantIndex];
-        this.setPage(1);
-        this.mode=1;
-      }
 
       //this.suivant = true;
     

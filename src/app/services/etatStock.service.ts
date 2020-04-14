@@ -42,7 +42,7 @@ export class EtatStockService {
       },
     );
   }
-
+//new teste
   exportEtatStock(stock : Array<StockProjet>) {
     return this.http.post(this.host + '/exportStockExcel', stock, {
         responseType: 'blob' as 'json',
@@ -72,9 +72,9 @@ export class EtatStockService {
   }
 
 
-  getAllStockProjetByFiltre(annee:string,numLot:string, client:string,magasin:string){
+  getAllStockProjetByFiltre(annee:string,numLot:string, client:string,magasin:string,comm:string){
     console.log("TEST MAG "+magasin);
-    return this.http.get(this.host+"/getAllStockProjetByFiltre?numLot="+numLot+"&client="+client+"&annee="+annee+"&magasin="+magasin,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.get(this.host+"/getAllStockProjetByFiltre?numLot="+numLot+"&client="+client+"&annee="+annee+"&magasin="+magasin+"&com="+comm,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
 
@@ -87,6 +87,12 @@ saveCommentaireProjet(commentaire: any,projet:any,id:any,user:any){
 getCommentaireParStockProjet(projet:string){
   console.log("TOKEN "+this.authenticationService.getToken())
   return this.http.get(this.host+"/getCommentaireParStockProjet?projet="+projet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+}
+
+getMontantByNature(numLot:string){
+
+  return this.http.get(this.host+"/getMontantByNature?numLot="+numLot,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
 }
 
 

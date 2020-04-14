@@ -1,5 +1,28 @@
 <div [hidden]="authorized==false">
 
+<style>
+.mat-column-magasin {
+    width: 10%;
+}
+
+.mat-column-client {
+    width: 20% !important;
+}
+
+.mat-column-numLot {
+    width: 20% !important;
+}
+
+.mat-column-commercial {
+    width: 15% !important;
+}
+
+.mat-column-chef_projet {
+    width: 15% !important;
+}
+
+</style>
+
 <ngx-spinner
   bdColor="rgba(51,51,51,0.8)"
   size="medium"
@@ -9,7 +32,6 @@
   <p style="font-size: 20px; color: white">Loading...</p>
 </ngx-spinner>
   <app-navigation-bar [stockPNav]="true"></app-navigation-bar>
-
 
 <div class="row" *ngIf="statitics" style="margin-right: 2px;">
 
@@ -99,14 +121,14 @@
 
 
   <div class="col-md-2">
-    <label style="margin-left: 8px;" for="numsLots">Num lot :</label>
+    <label style="margin-left: 8px;" for="numsLots">Code Projet :</label>
     <br/>
 
     <ng-select id="numsLots"
                [clearable]="true"
                name="numsLot"
                [items]="lot"
-               placeholder="Filtrer par lot"
+               placeholder="Filtrer par code projet"
                [(ngModel)]="selectedLot"
                (change)="selectFiltre()"
                class="custom"
@@ -126,6 +148,25 @@
     [items]="clients"
     placeholder="Filtrer par client"
     [(ngModel)]="selectedClient"
+    (change)="selectFiltre()"
+    class="custom"
+>
+
+</ng-select>
+
+
+  </div>
+
+  <div class="col-md-2">
+
+    <label for="com">Commercial :</label>
+    <br/>
+    <ng-select id="commercial"
+    [clearable]="true"
+    name="commercial"
+    [items]="commercial"
+    placeholder="Filtrer par commercial"
+    [(ngModel)]="selectedCommercial"
     (change)="selectFiltre()"
     class="custom"
 >
@@ -215,7 +256,7 @@
 
       <!-- Weight Column -->
   <ng-container matColumnDef="numLot"  >
-    <th mat-header-cell *matHeaderCellDef  mat-sort-header> N°Lot</th>
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Code Projet</th>
     <td mat-cell *matCellDef="let element">{{element.num_lot}}  </td>
   </ng-container>
 
@@ -279,7 +320,7 @@
             <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
               <li class="nav-item active">
                 <a style="    background-color: #337ab7;
-    color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-newspaper-o" aria-hidden="true"></i>  Stock : {{currentProduit.id_stock}}</a>
+    color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-newspaper-o" aria-hidden="true"></i>  Stock : </a>
               </li>
 
             </ul>
@@ -288,7 +329,8 @@
           <div class="tab-content" id="myTabContent">
             <div class="tab-pane active" id="one" role="tabpanel" aria-labelledby="one-tab">
               <div class="row" style="padding: 2px">
-                <div class="col-xs-12 col-md-6" style="padding-left: 20px;
+                <div class="col-xs-12 col-md-6">
+                <div class="col-xs-12 col-md-12" style="padding-left: 20px;
     padding-right: 0px;
     margin-right: -10px;">
                   <div class="panel-group">
@@ -333,7 +375,7 @@
                           </div>
                           <div class="row">
                               <div class="form-group col-sm-6">
-                              <label> <i class="fa fa-cubes fa-lg"></i>  N°Lot :</label>
+                              <label> <i class="fa fa-cubes fa-lg"></i>  Code Projet :</label>
                               <span style="overflow: unset !important;"
                                     class="labelModal"> {{currentProduit.num_lot}}</span>
                             </div>
@@ -396,6 +438,63 @@
 
 
 
+                </div>
+
+                <div class="card-header tab-card-header">
+                  <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                    <li class="nav-item active">
+                      <a style="    background-color: #337ab7;
+          color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-money" aria-hidden="true"></i>  Montant par nature : </a>
+                    </li>
+      
+                  </ul>
+                </div>
+                <div class="col-xs-12 col-md-12" style="padding-left: 20px;
+                padding-right: 0px;
+                margin-right: -10px;">
+                              <div class="panel-group">
+                                <div class="panel panel-primary">
+            
+            
+                                  <div class="panel panel-info">
+            
+                                    <div class="panel-body" >
+            
+                                        <div *ngFor="let nat of Totalnatures; let i = index" class="row">
+            
+                                            <div class="form-group col-sm-6">
+                                              <label> <i class="fa fa-money"></i>  {{nat.replace(","," : ")}} DH</label>
+                                             
+                                            </div>
+            
+
+            
+                                          </div>
+            
+ 
+
+            
+            
+            
+
+                        
+            
+            
+            
+                                    </div>
+                                  </div>
+            
+                                </div>
+                              </div>
+            
+            
+            
+            
+            
+            
+            
+            
+                            </div>
                 </div>
 
                 <div class="col-xs-12 col-md-6">
@@ -493,6 +592,9 @@
                     </div>
                   </div>
                 </div>
+
+
+                
 
               </div>
             </div>
