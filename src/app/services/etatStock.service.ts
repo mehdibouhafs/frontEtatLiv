@@ -42,7 +42,7 @@ export class EtatStockService {
       },
     );
   }
-
+//new teste
   exportEtatStock(stock : Array<StockProjet>) {
     return this.http.post(this.host + '/exportStockExcel', stock, {
         responseType: 'blob' as 'json',
