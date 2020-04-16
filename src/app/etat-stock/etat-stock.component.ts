@@ -157,6 +157,8 @@ export class EtatStockComponent implements OnInit {
   roleBuVolume:any;
   roleBuCommercial:any;
 
+  codeProjet : string;
+
 
   constructor(private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
     this.service = this.authService.getServName();
@@ -254,11 +256,11 @@ export class EtatStockComponent implements OnInit {
 
     this.sigleUserAuthenticated = this.authService.getSigle();
 
-    const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
-    if(codeProjet!=null){
+     this.codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+    if(this.codeProjet!=null){
 
-      this.selectedLot = codeProjet;
-      this.selectedLotTMP = codeProjet;
+      this.selectedLot = this.codeProjet;
+      this.selectedLotTMP = this.codeProjet;
       this.selectFiltre();
     }else{
 
@@ -784,6 +786,16 @@ export class EtatStockComponent implements OnInit {
 
             if (produit.commentaires != null && produit.commentaires.length > 0) {
               p.commentaires = produit.commentaires;
+            }
+
+            if(this.codeProjet!=null) {
+              this.addToArray(p.client, 'client');
+              this.addToArray(p.nature, 'nature');
+              this.addToArray(p.sousNature, 'sousNature');
+              this.addToArray(p.domaine, 'domaine');
+              this.addToArray(p.sousDomaine, 'sousDomaine');
+              this.addToArray(p.numLot, 'numLot');
+              this.addToArray(p.nomMagasin, 'magasin');
             }
 
             this.produits.push(p);

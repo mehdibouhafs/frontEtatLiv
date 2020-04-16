@@ -77,7 +77,7 @@ export class EtatStockProjetComponent implements OnInit {
 
   actionModal: string;
 
-  displayedColumns: string[] = ['option','magasin','client', 'numLot', 'commercial','chef_projet', 'montant','annee'];
+  displayedColumns: string[] = ['option','magasin','client', 'num_lot', 'commercial','chef_projet', 'montant','annee'];
   public dataSource: MatTableDataSource<StockProjet>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -907,7 +907,7 @@ montantNat:any;
 
     this.Totalnatures = [];
 
-    this.etatStockService.getMontantByNature(this.currentProduit.num_lot).subscribe(
+    this.etatStockService.getMontantByNature(this.currentProduit.num_lot,this.currentProduit.magasin).subscribe(
       data=>{
 
         
@@ -1026,7 +1026,7 @@ montantNat:any;
       +"Ce message concerne le stock pour le projet "+ produit.nom_lot +" et dont le détail est ci-après :%0A"
       + "N° Lot: "+(produit.num_lot  == null ? "": produit.num_lot ) +"%0A"+
       "Client: "+(produit.client  == null ? "": produit.client ) +"%0A"+
-      + "Commercial: "+(produit.commercial  == null ? "": produit.commercial ) +"%0A"+
+      "Commercial: "+(produit.commercial  == null ? "": produit.commercial ) +"%0A"+
       "Chef projet: "+ (produit.chef_projet  == null ? "": produit.chef_projet ) +"%0A"+
       "Date 1ère réception: "+ (produit.date_rec  == null ? "": produit.date_rec ) +"%0A"+
       "Année de Commande: "+produit.annee  +"%0A"+
@@ -1169,9 +1169,13 @@ this.montantNat = null;
     this.dataSource.sortData(this.dataSource.filteredData,this.dataSource.sort);
     // console.log("this.before [0] " + this.filtredData[0].codeProjet);
     // console.log("sorting table");
-    //this.filtredData = this.dataSource.filteredData;
+    this.filtredData = this.dataSource.filteredData;
 
     // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
+
+  ConvertString(value){
+    return parseFloat(value)
+    }
 }

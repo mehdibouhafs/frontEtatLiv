@@ -2,7 +2,8 @@ export class Statitics {
 
  public totalRal : number;
  public totalLnf :number;
- public totalLnfRalSevenMonth :number;
+  public totalRalBeforeSevenMonth :number;
+ public totalLnfBeforeSevenMonth :number;
 
  public totalLowerThan3month : number;
 

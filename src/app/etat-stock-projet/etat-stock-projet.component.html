@@ -255,7 +255,7 @@
     <td mat-cell *matCellDef="let element"> {{element.client}}  </td></ng-container>
 
       <!-- Weight Column -->
-  <ng-container matColumnDef="numLot"  >
+  <ng-container matColumnDef="num_lot"  >
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Code Projet</th>
     <td mat-cell *matCellDef="let element">{{element.num_lot}}  </td>
   </ng-container>
@@ -368,7 +368,7 @@
 
                             <div class="form-group col-sm-6">
                               <label> <i class="fa fa-cubes fa-lg"></i>  Nom Projet :</label>
-                              <span style="overflow: unset !important;"
+                              <span style="overflow: unset !important;display: contents !important;white-space: pre-line;"
                                     class="labelModal"> {{currentProduit.nom_lot}}</span>
                             </div>
 
@@ -463,7 +463,9 @@
                                         <div *ngFor="let nat of Totalnatures; let i = index" class="row">
             
                                             <div class="form-group col-sm-6">
-                                              <label> <i class="fa fa-money"></i>  {{nat.replace(","," : ")}} DH</label>
+                                              <label> <i class="fa fa-money"></i> 
+                                                {{nat.split(",", 2)[0].replace(" "," : ")}} : 
+                                                {{ nat.split(",", 2)[1] }} DH</label>
                                              
                                             </div>
             

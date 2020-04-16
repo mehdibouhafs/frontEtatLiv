@@ -368,14 +368,16 @@ export class EtatProjetComponent implements OnInit {
     this.filtredData = this.dataSource.filteredData;
     let totalRal = 0;
     let totalLnf = 0;
-    let totalRalLnfBeforeSevenMonth = 0;
+    let totalRalBeforeSevenMonth = 0;
+    let totalLnfBeforeSevenMonth=0
 
     this.filtredData.forEach(element=>{
       totalRal = totalRal + element.restAlivrer;
       totalLnf = totalLnf + element.livrerNonFacture;
 
       if( moment(element.dateCmd)  <=  moment(this.addMonths(new Date(), -7))){
-        totalRalLnfBeforeSevenMonth = totalRalLnfBeforeSevenMonth + element.restAlivrer + element.livrerNonFacture;
+        totalRalBeforeSevenMonth = totalRalBeforeSevenMonth + element.restAlivrer;
+        totalLnfBeforeSevenMonth = totalLnfBeforeSevenMonth +  + element.livrerNonFacture;
       }
 
 
@@ -387,7 +389,8 @@ export class EtatProjetComponent implements OnInit {
     this.statitics = new Statitics();
     this.statitics.totalRal = totalRal;
     this.statitics.totalLnf  = totalLnf;
-    this.statitics.totalLnfRalSevenMonth = totalRalLnfBeforeSevenMonth;
+    this.statitics.totalRalBeforeSevenMonth = totalRalBeforeSevenMonth;
+    this.statitics.totalLnfBeforeSevenMonth = totalLnfBeforeSevenMonth;
   }
 
   getAllEmployeesAvantVente(){
@@ -1392,16 +1395,16 @@ export class EtatProjetComponent implements OnInit {
       if(lastCommentaire1){
         email = email+ "%0A";
 
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
       }
        let lastCommentaire2 = new Commentaire();
       lastCommentaire2= projet.commentaires[1];
       if(lastCommentaire2)
-      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire2.content)+"%0A";
+      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= projet.commentaires[2];
       if(lastCommentaire3)
-      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire3.content)+"%0A";
+      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
     }
     console.log("email " + email);
 

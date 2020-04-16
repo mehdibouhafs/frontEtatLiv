@@ -1,3 +1,4 @@
+    "template-no-negated-async": true,
 {
  // "extends": "tslint:recommended",
   "rules": {

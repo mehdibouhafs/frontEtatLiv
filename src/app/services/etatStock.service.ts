@@ -89,9 +89,9 @@ getCommentaireParStockProjet(projet:string){
   return this.http.get(this.host+"/getCommentaireParStockProjet?projet="+projet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 }
 
-getMontantByNature(numLot:string){
+getMontantByNature(numLot:string,magasin:string){
 
-  return this.http.get(this.host+"/getMontantByNature?numLot="+numLot,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  return this.http.get(this.host+"/getMontantByNature?numLot="+numLot+"&magasin="+magasin,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
 }
 
