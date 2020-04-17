@@ -25,7 +25,7 @@ import { CommentaireStock } from 'src/model/model.commentaireStock';
   selector: 'app-etat-stock-projet',
   templateUrl: './etat-stock-projet.component.html',
   styleUrls: ['./etat-stock-projet.component.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.Emulated
 })
 export class EtatStockProjetComponent implements OnInit {
 
@@ -51,7 +51,7 @@ export class EtatStockProjetComponent implements OnInit {
   selectedClientTMP: any;
 
   selectedYear : any;
-  
+
   selectedYearTMP : any;
 
   commercial: Array<String>;
@@ -366,8 +366,8 @@ montantNat:any;
               p.date_rec = produit.dateRec;
               p.nom_lot = produit.nomLot;
 
-            
-      
+
+
                  this.years = this.pageProduit
                  .map(item => item.annee)
                  .filter((value, index, self) => self.indexOf(value) === index)
@@ -382,10 +382,10 @@ montantNat:any;
                  this.commercial = this.pageProduit
                  .map(item => ((!item.commercial)? "AUCUN COMM": item.commercial))
                  .filter((value, index, self) => self.indexOf(value) === index)
-                 
 
 
-          
+
+
 
 
 
@@ -519,7 +519,7 @@ montantNat:any;
 
     this.filtredData.forEach(element=>{
 
-      
+
       if(element.magasin == 'Stock commercial' || element.magasin == 'Rabat - stock commercial' ){
         totalCom = totalCom + element.montant;
       }
@@ -655,7 +655,7 @@ montantNat:any;
 
 
       this.setPage(1);
-      
+
       this.newContentComment = null;
       //this.newEmployerId = null;
       this.newDatePlannifier = null;
@@ -685,7 +685,7 @@ montantNat:any;
           this.setPage(1);
           this.mode = 1;
         }
-      
+
 
 
     }
@@ -711,7 +711,7 @@ montantNat:any;
 
     this.currentProduit.commentaires = this.currentProduit.commentaires.filter(item => item !== comment);
 
-    
+
     this.etatStockService.deleteCommentaire(commentaire).subscribe(
       data=>{
 
@@ -825,7 +825,7 @@ montantNat:any;
             if(produit.commentaires != null && produit.commentaires.length>0){
               p.commentaires = produit.commentaires;
             }
-        
+
 
             this.produits.push(p);
 
@@ -894,8 +894,8 @@ montantNat:any;
     this.modalOption.keyboard = false;
 
 
-    
-    
+
+
     this.modalRef = this.modalService.show(template,this.modalOption );
   }
 
@@ -910,18 +910,18 @@ montantNat:any;
     this.etatStockService.getMontantByNature(this.currentProduit.num_lot,this.currentProduit.magasin).subscribe(
       data=>{
 
-        
+
         this.montantNat = data;
         this.montantNat.forEach(nat => {
           this.Totalnatures.push(nat);
-        }    
+        }
 
 
 
 
         );
 
-        
+
         console.log("NTAURE "+JSON.stringify(data))
       },
       err=>{
@@ -1017,7 +1017,7 @@ montantNat:any;
   composeEmail(produit : StockProjet){
 
     console.log("compose Email");
-    
+
 
     var projet = produit.num_lot;
     var mnt = produit.montant;
@@ -1098,7 +1098,7 @@ this.montantNat = null;
 
 
       //this.suivant = true;
-    
+
 
     if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
       console.log("here");
@@ -1115,7 +1115,7 @@ this.montantNat = null;
 
 
 
-  
+
   annulation(){
     this.nestedModalRef.hide();
   }
@@ -1138,7 +1138,7 @@ this.montantNat = null;
 
 
       this.modalRef.hide();
-    
+
   }
 
   errorUpdate:boolean;
@@ -1151,7 +1151,7 @@ this.montantNat = null;
 
     if(this.newContentComment != null ){
       console.log("here newContentComment");
-      
+
       this.addComment(this.currentProduit.num_lot,this.currentProduit.id_stock);
     }
 
@@ -1159,7 +1159,7 @@ this.montantNat = null;
     userUpdate.username = this.authService.getUserName();
 
 
-  
+
 
   }
 
