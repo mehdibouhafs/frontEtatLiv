@@ -27,6 +27,10 @@ export class NavigationBarComponent implements OnInit {
 
   roleReadProjectRs:boolean;
 
+  roleReadMyContrats:boolean;
+
+  roleReadAllContrats:boolean;
+
   @Input() projetNav :boolean;
 
   @Input() notifNav:boolean;
@@ -121,10 +125,21 @@ export class NavigationBarComponent implements OnInit {
       }
       if (authority == 'READ_MY_RECOUVREMENT') {
         this.roleReadMyRecouvrement = true;
+      }
 
-
+      if (authority == 'READ_MY_CONTRATS') {
+        this.roleReadMyContrats = true;
+        this.authorized = true;
 
       }
+
+      if (authority == 'READ_ALL_CONTRATS') {
+        this.roleReadAllContrats = true;
+        this.authorized = true;
+
+      }
+
+
     });
   }
 
