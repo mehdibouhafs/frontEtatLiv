@@ -187,6 +187,8 @@ export class EtatRecouvrementComponent implements OnInit {
       if(authority== 'BU_CHEF_PROJET'){
         this.roleBuChefProjet = true;
         this.authorized = false;
+        if(this.service=="Chef Projet")
+        this.selectedStatut = "Bloquée";
 
       }
 
@@ -363,7 +365,7 @@ export class EtatRecouvrementComponent implements OnInit {
       }else{
         if(this.service == "Chef Projet"){
           this.selectedChargeRecouvrement = "undefined";
-          this.selectedStatut = "undefined";
+          this.selectedStatut = "Bloquée";
 
           this.selectedCommercial = "undefined";
           this.selectedClient = "undefined";
@@ -838,7 +840,7 @@ export class EtatRecouvrementComponent implements OnInit {
       }else{
         if(this.service == "Chef Projet"){
           this.selectedChargeRecouvrement = "undefined";
-          this.selectedStatut = "undefined";
+          this.selectedStatut = "Bloquée";
 
           this.selectedCommercial = "undefined";
           this.selectedClient = "undefined";
@@ -1000,7 +1002,7 @@ export class EtatRecouvrementComponent implements OnInit {
       newCommentaire.user.username = this.userAuthenticated;
       console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
-      newCommentaire.content = this.newContentComment;
+      newCommentaire.content = this.newContentComment.split("\n").join("<br>");
 
       if (this.newEmployerId != null ) {
         console.log("this.newEmployerId" + this.newEmployerId)
@@ -1625,17 +1627,17 @@ export class EtatRecouvrementComponent implements OnInit {
         email = email+ "%0A";
 
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": this.removeAnd(lastCommentaire1.user.sigle))+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": this.removeAnd(lastCommentaire1.content)  ) +"%0A";
+        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": this.removeAnd(lastCommentaire1.user.sigle))+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content)  ) +"%0A";
 
       }
         let lastCommentaire2 = new Commentaire();
       lastCommentaire2= currentDocument.commentaires[1];
       if(lastCommentaire2)
-        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": this.removeAnd(lastCommentaire2.user.sigle))+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": this.removeAnd(lastCommentaire2.content)  ) +"%0A";
+        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": this.removeAnd(lastCommentaire2.user.sigle))+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content)  ) +"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= currentDocument.commentaires[2];
       if(lastCommentaire3)
-        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": this.removeAnd(lastCommentaire3.user.sigle))+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": this.removeAnd(lastCommentaire3.content)  ) +"%0A";
+        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": this.removeAnd(lastCommentaire3.user.sigle))+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content)  ) +"%0A";
     }
 
 

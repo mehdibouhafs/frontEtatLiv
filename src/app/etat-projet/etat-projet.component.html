@@ -805,9 +805,8 @@
                                 </span>
 
                                     <span class="badge badge-info" *ngIf="commentaire.employer">@ {{commentaire.employer}}</span>
-                                    <p style="font-size: 11px;max-width: 500px;">
-                                      {{commentaire.content}}
-                                    </p>
+                                    <p style="font-size: 11px;max-width: 500px" [innerHtml]="commentaire.content"></p>
+
                                   </div>
                                 </li>
 

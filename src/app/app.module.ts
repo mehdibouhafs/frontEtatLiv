@@ -19,7 +19,6 @@ import {ModalModule} from 'ngx-bootstrap';
 import { ReunionComponent } from './reunion/reunion.component';
 import {ReunionService} from './services/reunion.service';
 import {PagerService} from './services/pager.service';
-
 import {CurrencyPipe, HashLocationStrategy, LocationStrategy, registerLocaleData} from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { EtatRecouvrementComponent } from './etat-recouvrement/etat-recouvrement.component';
@@ -39,6 +38,7 @@ import { ViewFacturesComponent } from './view-factures/view-factures.component';
 import { ViewPiecesComponent } from './view-pieces/view-pieces.component';
 import { EtatStockProjetComponent } from './etat-stock-projet/etat-stock-projet.component';
 registerLocaleData(localeFr, 'fr');
+
 
 
 @NgModule({
@@ -76,7 +76,6 @@ registerLocaleData(localeFr, 'fr');
     ReactiveFormsModule,
     NgxSpinnerModule,
     NgSelectModule
-
   ],
   providers: [ContratService,EventService,CurrencyPipe,AuthenticationService,EtatProjetService,EtatRecouvrementService,EtatStockService,UserService,ReunionService,PagerService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],

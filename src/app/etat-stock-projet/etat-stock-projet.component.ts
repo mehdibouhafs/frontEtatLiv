@@ -609,7 +609,7 @@ montantNat:any;
 
       newCommentaire.date = new Date();
       // newCommentaire.user.username = "test";
-      newCommentaire.content = this.newContentComment;
+      newCommentaire.content = this.newContentComment.split("\n").join("<br>");
       newCommentaire.user_username = new User();
       newCommentaire.user_username.username = this.authService.getUserName();
       newCommentaire.user_username.sigle = this.authService.getSigle();
@@ -1044,16 +1044,16 @@ montantNat:any;
         email = email+ "%0A";
         email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+"  : "+(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) +" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+"  : "+(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) +" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
       }
       let lastCommentaire2 = new CommentaireStock();
       lastCommentaire2= produit.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+": " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " "+(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+": " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " "+(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
       let lastCommentaire3 = new CommentaireStock();
       lastCommentaire3= produit.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" : " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" : " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
     }
     console.log("email " + email);
 

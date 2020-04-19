@@ -31,6 +31,7 @@ import {CurrencyPipe} from '@angular/common';
 import {AuthenticationService} from '../services/authentification.service';
 import {User} from '../../model/model.user';
 import {host} from "../services/host";
+import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 
 
 @Component({
@@ -949,12 +950,14 @@ export class EtatProjetComponent implements OnInit {
 
   addComment(){
 
+    console.log("newContentComment " + this.newContentComment);
+
     if(this.newContentComment.length != 0) {
       let newCommentaire = new Commentaire();
 
       newCommentaire.date = new Date();
       // newCommentaire.user.username = "test";
-      newCommentaire.content = this.newContentComment;
+      newCommentaire.content = this.newContentComment.split("\n").join("<br>");
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
       console.log("this.authService.getSigle "+ this.authService.getSigle());
@@ -1637,7 +1640,6 @@ export class EtatProjetComponent implements OnInit {
    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
-
 
 
 }

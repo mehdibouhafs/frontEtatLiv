@@ -645,16 +645,16 @@ export class DashboardComponent implements OnInit {
       if(lastCommentaire1){
         email = email+ "%0A";
 
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+lastCommentaire1.content+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= projet.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+lastCommentaire2.content+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= projet.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+lastCommentaire3.content+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
     }
     console.log("email " + email);
 
@@ -692,7 +692,7 @@ export class DashboardComponent implements OnInit {
 
       newCommentaire.date = new Date();
       // newCommentaire.user.username = "test";
-      newCommentaire.content = this.newContentCommentProjet;
+      newCommentaire.content = this.newContentCommentProjet.split("\n").join("<br>");;
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
       console.log("this.authService.getSigle "+ this.authService.getSigle());
@@ -996,7 +996,7 @@ export class DashboardComponent implements OnInit {
       newCommentaire.user.username = this.authService.getUserName();
       console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
-      newCommentaire.content = this.newContentCommentDocument;
+      newCommentaire.content = this.newContentCommentDocument.split("\n").join("<br>");
 
       if (this.newEmployerIdDocument != null ) {
         console.log("this.newEmployerId" + this.newEmployerIdDocument);
@@ -1382,17 +1382,17 @@ export class DashboardComponent implements OnInit {
         email = email+ "%0A";
 
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": lastCommentaire1.user.sigle)+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": lastCommentaire1.content  ) +"%0A";
+        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": lastCommentaire1.user.sigle)+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content)  ) +"%0A";
 
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= currentDocument.commentaires[1];
       if(lastCommentaire2)
-        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": lastCommentaire2.user.sigle)+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": lastCommentaire2.content  ) +"%0A";
+        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": lastCommentaire2.user.sigle)+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content)  ) +"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= currentDocument.commentaires[2];
       if(lastCommentaire3)
-        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": lastCommentaire3.user.sigle)+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": lastCommentaire3.content  ) +"%0A";
+        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": lastCommentaire3.user.sigle)+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content) ) +"%0A";
     }
 
 
@@ -1565,7 +1565,7 @@ export class DashboardComponent implements OnInit {
 
       newCommentaire.date = new Date();
       // newCommentaire.user.username = "test";
-      newCommentaire.content = this.newContentCommentProduit;
+      newCommentaire.content = this.newContentCommentProduit.split("\n").join("<br>");;
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
       console.log("this.authService.getSigle "+ this.authService.getSigle());
@@ -1665,16 +1665,16 @@ export class DashboardComponent implements OnInit {
         email = email+ "%0A";
         email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+lastCommentaire1.content+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= produit.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+lastCommentaire2.content+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= produit.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+lastCommentaire3.content+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
     }
     console.log("email " + email);
 

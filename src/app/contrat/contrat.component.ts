@@ -415,7 +415,7 @@ export class ContratComponent implements OnInit {
 
       newCommentaire.date = new Date();
       // newCommentaire.user.username = "test";
-      newCommentaire.content = this.newContentComment;
+      newCommentaire.content = this.newContentComment.split("\n").join("<br>");
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
       console.log("this.authService.getSigle "+ this.authService.getSigle());
@@ -664,16 +664,16 @@ export class ContratComponent implements OnInit {
         email = email+ "%0A";
         email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= contrat.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= contrat.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
     }
     console.log("email " + email);
 

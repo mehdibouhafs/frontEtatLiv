@@ -446,7 +446,7 @@
                       <a style="    background-color: #337ab7;
           color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-money" aria-hidden="true"></i>  Montant par nature : </a>
                     </li>
-      
+
                   </ul>
                 </div>
                 <div class="col-xs-12 col-md-12" style="padding-left: 20px;
@@ -454,48 +454,48 @@
                 margin-right: -10px;">
                               <div class="panel-group">
                                 <div class="panel panel-primary">
-            
-            
+
+
                                   <div class="panel panel-info">
-            
+
                                     <div class="panel-body" >
-            
+
                                         <div *ngFor="let nat of Totalnatures; let i = index" class="row">
-            
+
                                             <div class="form-group col-sm-6">
-                                              <label> <i class="fa fa-money"></i> 
-                                                {{nat.split(",", 2)[0].replace(" "," : ")}} : 
+                                              <label> <i class="fa fa-money"></i>
+                                                {{nat.split(",", 2)[0].replace(" "," : ")}} :
                                                 {{ nat.split(",", 2)[1] }} DH</label>
-                                             
+
                                             </div>
-            
 
-            
+
+
                                           </div>
-            
- 
 
-            
-            
-            
 
-                        
-            
-            
-            
+
+
+
+
+
+
+
+
+
                                     </div>
                                   </div>
-            
+
                                 </div>
                               </div>
-            
-            
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
+
+
                             </div>
                 </div>
 
@@ -548,8 +548,7 @@
                                 </span>
 
                                   <span class="badge badge-info" *ngIf="commentaire.employer">@ {{commentaire.employer}}</span>
-                                  <p style="font-size: 11px;max-width: 500px;">
-                                    {{commentaire.content}}
+                                  <p style="font-size: 11px;max-width: 500px;" [innerHtml]="commentaire.content">
                                   </p>
                                 </div>
                               </li>
@@ -596,7 +595,7 @@
                 </div>
 
 
-                
+
 
               </div>
             </div>
