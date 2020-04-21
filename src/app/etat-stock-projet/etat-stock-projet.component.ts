@@ -12,7 +12,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {EtatStockService} from '../services/etatStock.service';
 import {PagerService} from '../services/pager.service';
 import {NgxSpinnerService} from 'ngx-spinner';
-import {CurrencyPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe} from '@angular/common';
 import {AuthenticationService} from '../services/authentification.service';
 import {Commentaire} from '../../model/model.commentaire';
 import * as moment from 'moment';
@@ -25,7 +25,7 @@ import { CommentaireStock } from 'src/model/model.commentaireStock';
   selector: 'app-etat-stock-projet',
   templateUrl: './etat-stock-projet.component.html',
   styleUrls: ['./etat-stock-projet.component.css'],
-  encapsulation: ViewEncapsulation.Emulated
+  encapsulation: ViewEncapsulation.None
 })
 export class EtatStockProjetComponent implements OnInit {
 
@@ -185,9 +185,10 @@ montantNat:any;
   lot: any;
   comments: any;
   commentsListe: any;
+  selectedChefProjetTMP: any;
 
 
-  constructor(private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
+  constructor(public datepipe: DatePipe,private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
     this.service = this.authService.getServName();
 
     this.userInSession = this.authService.getLastName();
@@ -308,6 +309,7 @@ montantNat:any;
     this.numsLots.sort();
     this.clients.sort();
     this.magasins.sort();
+    this.chefProjets.sort();
   }
 
   ngOnInit() {
@@ -384,8 +386,15 @@ montantNat:any;
                  .filter((value, index, self) => self.indexOf(value) === index)
 
 
+                 this.chefProjets = this.pageProduit
+                 .map(item => ((!item.chefProjet)? "AUCUN CDP": item.chefProjet))
+                 .filter((value, index, self) => self.indexOf(value) === index)
 
+                 this.chefProjets = this.chefProjets.filter(item => item !== "AUCUN CDP");
 
+                 this.commercial = this.commercial.filter(item => item !== "AUCUN COMM");
+
+                 this.client = this.client.filter(item => item !== "AUCUN CLIENT");
 
 
 
@@ -400,6 +409,7 @@ montantNat:any;
 
           });
         }
+
 
 
         this.sortAllArrays();
@@ -480,6 +490,8 @@ montantNat:any;
 
   sortAllArrays(){
     this.clients.sort();
+    this.commercial.sort();
+    this.chefProjets.sort();
     this.magasins.sort();
     this.numsLots.sort();
     this.natures.sort();
@@ -609,7 +621,7 @@ montantNat:any;
 
       newCommentaire.date = new Date();
       // newCommentaire.user.username = "test";
-      newCommentaire.content = this.newContentComment.split("\n").join("<br>");
+      newCommentaire.content = this.newContentComment;
       newCommentaire.user_username = new User();
       newCommentaire.user_username.username = this.authService.getUserName();
       newCommentaire.user_username.sigle = this.authService.getSigle();
@@ -800,8 +812,14 @@ montantNat:any;
       this.selectedMagasinTMP = this.selectedMagasin;
     }
 
+    if(this.selectedChefProjet == null || this.selectedChefProjet==""){
+      this.selectedChefProjetTMP = "undefined";
+    }else{
+      this.selectedChefProjetTMP = this.selectedChefProjet;
+    }
 
-    this.etatStockService.getAllStockProjetByFiltre(this.selectedYearTMP,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasinTMP,this.selectedCommercialTMP).subscribe(
+
+    this.etatStockService.getAllStockProjetByFiltre(this.selectedYearTMP,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasinTMP,this.selectedCommercialTMP,this.selectedChefProjetTMP).subscribe(
       data => {
         this.pageProduit = data;
       console.log("HELLO FILTER"+this.selectedMagasinTMP+ " client "+this.selectedClient)
@@ -1017,23 +1035,22 @@ montantNat:any;
   composeEmail(produit : StockProjet){
 
     console.log("compose Email");
-
+    
 
     var projet = produit.num_lot;
     var mnt = produit.montant;
 
-    var email="mailto:?subject="+this.removeAnd(produit.client)+" / "+ this.removeAnd(projet)+ "&body= Bonjour,%0A"
-      +"Ce message concerne le stock pour le projet "+ produit.nom_lot +" et dont le détail est ci-après :%0A"
-      + "N° Lot: "+(produit.num_lot  == null ? "": produit.num_lot ) +"%0A"+
-      "Client: "+(produit.client  == null ? "": produit.client ) +"%0A"+
-      "Commercial: "+(produit.commercial  == null ? "": produit.commercial ) +"%0A"+
-      "Chef projet: "+ (produit.chef_projet  == null ? "": produit.chef_projet ) +"%0A"+
-      "Date 1ère réception: "+ (produit.date_rec  == null ? "": produit.date_rec ) +"%0A"+
-      "Année de Commande: "+produit.annee  +"%0A"+
-      "Magasin: "+produit.magasin  +"%0A"+
-      "Montant : "+(produit.montant  == null ? "": produit.montant +" DH")+"%0A"+" %0A"+" %0A";
+    var email="mailto:?subject= Stock : "+this.removeAnd(produit.client)+" / "+ this.removeAnd(projet)+ "&body= Bonjour,%0A %0A"
+      +"Je vous prie de lire les  commentaires en bas en relation avec le  stock du projet cité en objet : %0A %0A"
+      +"Account Manager : "+(produit.commercial  == null ? "": produit.commercial ) +"%0A"+
+      "Chef de projet: "+ (produit.chef_projet  == null ? "": produit.chef_projet ) +"%0A"+
+      "Désignation du projet : "+produit.nom_lot  +"%0A"+
+      "Date 1ère réception : "+ (produit.date_rec  == null ? "": this.datepipe.transform(produit.date_rec, 'dd-MM-yyyy') ) +"%0A"+
+      "Magasin : "+produit.magasin  +"%0A"+
+      "Prix de revient en dirhams : "+(produit.montant  == null ? "": produit.montant.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") +" DH")+"%0A"+" %0A"+" %0A";
+      
 
-
+      
 
 
     if(produit.commentaires!=null){
@@ -1041,19 +1058,16 @@ montantNat:any;
       let lastCommentaire1 = new CommentaireStock();
       lastCommentaire1= produit.commentaires[0];
       if(lastCommentaire1){
-        email = email+ "%0A";
-        email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
-        email = email + "%0A";
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+"  : "+(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) +" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+"  : "+(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) +" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire1.content)+"%0A";
       }
       let lastCommentaire2 = new CommentaireStock();
       lastCommentaire2= produit.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+": " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " "+(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+": " +(lastCommentaire2.user_username.sigle == null ? "": "  @"+lastCommentaire2.user_username.sigle) + " "+(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+this.removeAnd(lastCommentaire2.content)+"%0A";
       let lastCommentaire3 = new CommentaireStock();
       lastCommentaire3= produit.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" : " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" : " +(lastCommentaire3.user_username.sigle == null ? "": "  @"+lastCommentaire3.user_username.sigle) + " " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+this.removeAnd(lastCommentaire3.content)+"%0A";
     }
     console.log("email " + email);
 
@@ -1068,6 +1082,8 @@ montantNat:any;
 
 
   }
+
+
 
   annulationModificationProduit(id,secondModal: TemplateRef<any>){
     this.nestedModalRef.hide();

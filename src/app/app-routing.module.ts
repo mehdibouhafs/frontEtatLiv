@@ -25,6 +25,7 @@ const routes: Routes = [
   {path:"etatStock",component:EtatStockComponent},
   {path:"etatStockProjet",component:EtatStockProjetComponent},
   {path:"etatStockCodeProjet/:codeProjet",component:EtatStockComponent},
+  {path:"etatStockNature/:codeProjet/:nature",component:EtatStockComponent},
   {path:"login",component:AuthentificationComponent},
   {path:"consultReunions",component:ReunionComponent},
   {path:"contrats",component:ContratComponent},

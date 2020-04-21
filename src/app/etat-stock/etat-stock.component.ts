@@ -158,6 +158,8 @@ export class EtatStockComponent implements OnInit {
   roleBuCommercial:any;
 
   codeProjet : string;
+  nature : string;
+  selectedNatureTMP: string;
 
 
   constructor(private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
@@ -257,15 +259,35 @@ export class EtatStockComponent implements OnInit {
     this.sigleUserAuthenticated = this.authService.getSigle();
 
      this.codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
-    if(this.codeProjet!=null){
 
+     this.nature = this.activatedRoute.snapshot.params['nature'];
+
+     if(this.nature!=null && this.codeProjet!=null){
+      console.log("test filtre nature ok"+this.nature)
+      this.selectedNature = this.nature;
+      this.selectedNatureTMP = this.nature;
       this.selectedLot = this.codeProjet;
       this.selectedLotTMP = this.codeProjet;
       this.selectFiltre();
     }else{
 
-      this.getAllProduits();
+      if(this.codeProjet!=null){
+
+        this.selectedLot = this.codeProjet;
+        this.selectedLotTMP = this.codeProjet;
+        this.selectFiltre();
+      }else{
+        this.getAllProduits();
+      }
+
+      
     }
+
+   
+
+
+    
+
 
     this.getAllClients();
     this.getDistinctLot();
@@ -740,7 +762,14 @@ export class EtatStockComponent implements OnInit {
       this.selectedLotTMP = this.selectedLot;
     }
 
-    this.etatStockService.getAllStockByFiltre(this.selectedNature,this.selectedSousNature,this.selectedDomaine,this.selectedSousDomaine,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasin).subscribe(
+    if(this.selectedNature == null){
+      this.selectedNatureTMP = "undefined";
+    }else{
+      this.selectedNatureTMP = this.selectedNature;
+    }
+
+    console.log("selectedNatureTMP "+this.selectedNatureTMP );
+    this.etatStockService.getAllStockByFiltre(this.selectedNatureTMP,this.selectedSousNature,this.selectedDomaine,this.selectedSousDomaine,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasin).subscribe(
       data => {
         this.pageProduit = data;
 
@@ -969,7 +998,7 @@ export class EtatStockComponent implements OnInit {
 
     var mnt = produit.montant;
 
-    var email="mailto:?subject="+this.removeAnd(produit.client)+" / "+ this.removeAnd(refProd)+" / " + this.removeAnd(nomProdut)+ "&body= Bonjour,%0A"
+    var email="mailto:?subject="+"Stock : "+this.removeAnd(produit.client)+" / "+ this.removeAnd(refProd)+" / " + this.removeAnd(nomProdut)+ "&body= Bonjour,%0A"
       +"Ce message concerne le produit cité en objet pour le projet .. et dont le détail est ci-après :%0A"
       + "Commercial: "+(produit.commercial  == null ? "": produit.commercial ) +"%0A"+
       "Chef projet: "+ (produit.chefProjet  == null ? "": produit.chefProjet ) +"%0A"+

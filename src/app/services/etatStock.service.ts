@@ -72,9 +72,9 @@ export class EtatStockService {
   }
 
 
-  getAllStockProjetByFiltre(annee:string,numLot:string, client:string,magasin:string,comm:string){
+  getAllStockProjetByFiltre(annee:string,numLot:string, client:string,magasin:string,comm:string,cp:string){
     console.log("TEST MAG "+magasin);
-    return this.http.get(this.host+"/getAllStockProjetByFiltre?numLot="+numLot+"&client="+client+"&annee="+annee+"&magasin="+magasin+"&com="+comm,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.get(this.host+"/getAllStockProjetByFiltre?numLot="+numLot+"&client="+client+"&annee="+annee+"&magasin="+magasin+"&com="+comm+"&cp="+cp,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
 
