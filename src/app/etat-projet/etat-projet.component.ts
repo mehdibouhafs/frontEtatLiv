@@ -175,6 +175,7 @@ export class EtatProjetComponent implements OnInit {
   roleBuChefProjet;
   roleBuVolume;
   roleBuCommercial;
+  roleBuValueSoftware;
 
   constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
 
@@ -224,6 +225,13 @@ export class EtatProjetComponent implements OnInit {
         this.authorized = true;
 
       }
+
+    if(authority== 'BU_VALUE_SOFTWARE'){
+      this.roleBuValueSoftware = true;
+      this.bu1 = "VALUE_SW";
+      this.selectedBu = "VALUE_SW";
+      this.authorized = true;
+    }
 
 
       if (authority == 'READ_ALL_PROJECTS') {
@@ -829,7 +837,7 @@ export class EtatProjetComponent implements OnInit {
 
   initFilter(){
 
-    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite){
+    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite || this.roleBuValueSoftware){
 
     }else{
       this.selectedBu = "undefined";

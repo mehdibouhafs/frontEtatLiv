@@ -163,6 +163,7 @@ export class ContratComponent implements OnInit {
       }
       if (authority == 'READ_MY_CONTRATS') {
         this.roleReadMyContrats = true;
+        this.authorized = true;
         if (this.authService.getLastName() != null) {
           this.userNameAuthenticated = this.authService.getLastName();
           this.selectedPilote = this.userNameAuthenticated;
