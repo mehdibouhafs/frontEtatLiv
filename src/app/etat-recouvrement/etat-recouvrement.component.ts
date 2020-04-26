@@ -158,150 +158,6 @@ export class EtatRecouvrementComponent implements OnInit {
               private activatedRoute:ActivatedRoute) {
 
 
-    this.service = this.authService.getServName();
-
-    console.log("service "+ this.service);
-
-    this.userAuthenticated = this.authService.getUserName();
-
-    this.userInSession = this.authService.getLastName();
-
-    console.log(" this.authService.getRoles() " +  this.authService.getRoles());
-
-    this.authService.getRoles().forEach(authority => {
-
-      if(authority== 'BU_COMMERCIAL'){
-        // this.roleBuCommercial = true;
-        //this.service = 'Commercial';
-        this.authorized = false;
-
-      }
-
-
-      if(authority== 'BU_RESEAU_SECURITE'){
-        this.roleBuReseauSecurite = true;
-        this.authorized = false;
-
-      }
-
-      if(authority== 'BU_CHEF_PROJET'){
-        this.roleBuChefProjet = true;
-        this.authorized = false;
-        if(this.service=="Chef Projet")
-        this.selectedStatut = "Bloquée";
-
-      }
-
-      if(authority== 'BU_SYSTEM'){
-        this.roleBuSystem = true;
-        this.authorized = false;
-
-      }
-      if(authority== 'BU_VOLUME'){
-        this.roleBuVolume = true;
-        this.authorized = false;
-
-      }
-
-
-      if (authority == 'READ_ALL_PROJECTS') {
-        this.roleReadAllProjects = true;
-        this.authorized = true;
-
-      }
-      if (authority == 'READ_MY_PROJECTS') {
-        this.roleReadMyProjects = true;
-        this.authorized = true;
-        if(this.authService.getLastName()!=null){
-          this.userNameAuthenticated = this.authService.getLastName();
-        }else{
-          this.userNameAuthenticated ="undefined";
-        }
-
-      }
-
-      if (authority == 'READ_ALL_RECOUVREMENTS') {
-        this.roleReadAllRecouvrement = true;
-        this.authorized = true;
-
-      }
-      if (authority == 'READ_MY_RECOUVREMENT') {
-        this.roleReadMyRecouvrement = true;
-        this.authorized = true;
-
-        if(this.authService.getLastName()!=null){
-          this.userNameAuthenticated = this.authService.getLastName();
-        }else{
-          this.userNameAuthenticated ="undefined";
-        }
-        this.selectedChargeRecouvrement = this.userNameAuthenticated;
-
-
-      }
-    });
-
-    this.sigleUserAuthenticated = this.authService.getSigle();
-
-
-    const codeCommercial = this.activatedRoute.snapshot.params['codeCommercial'];
-    console.log("codeCommercial " + codeCommercial);
-    const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
-    console.log("codeProjet " + codeProjet);
-
-    const chefProjet = this.activatedRoute.snapshot.params['chefProjet'];
-    console.log("chefProjet " + chefProjet);
-    const codeClient = this.activatedRoute.snapshot.params['codeClient'];
-    console.log("codeClient " + codeClient);
-
-    const numDocument = this.activatedRoute.snapshot.params['numDocument'];
-    if(numDocument!=null){
-      console.log("numDocument");
-      this.getDocumentsByNumDocument(false,numDocument);
-    }else
-    if(codeCommercial!=null){
-      console.log("filtredByCOmm " + codeCommercial);
-      this.getDocumentsByCommercial(this.documentCloture,codeCommercial);
-    }else{
-
-      if(codeProjet!=null ){
-        this.getDocumentsByCodeProjet(this.documentCloture,codeProjet);
-      }else{
-        if(codeClient!=null){
-          this.getDocumentsByClient(this.documentCloture,codeClient);
-        }else{
-          if(chefProjet != null){
-            this.getDocumentsByChefProjet(this.documentCloture,chefProjet);
-          }else{
-            if(this.roleReadMyProjects){
-              console.log("all doc");
-              this.getDocumentsByCommercialOrChefProjet(this.documentCloture,this.userNameAuthenticated);
-            }else{
-              if(this.roleReadAllRecouvrement){
-                this.getAllDocument(false,null);
-              }else{
-                console.log("this.userNameAuthenticated " + this.userNameAuthenticated);
-                this.getAllDocument(false,this.userNameAuthenticated);
-              }
-            }
-
-          }
-        }
-
-      }
-
-
-    }
-
-
-
-    this.getAllEmployees();
-
-
-    this.getEtatRecouvrement();
-
-    this.sortAllArrays();
-
-
   }
 
   addToArray(value : string ,type:string){
@@ -826,7 +682,151 @@ export class EtatRecouvrementComponent implements OnInit {
 
   ngOnInit() {
 
-   // this.selectedChargeRecouvrement = "undefined";
+
+
+    this.service = this.authService.getServName();
+
+    console.log("service "+ this.service);
+
+    this.userAuthenticated = this.authService.getUserName();
+
+    this.userInSession = this.authService.getLastName();
+
+    console.log(" this.authService.getRoles() " +  this.authService.getRoles());
+
+    this.authService.getRoles().forEach(authority => {
+
+      if(authority== 'BU_COMMERCIAL'){
+        // this.roleBuCommercial = true;
+        //this.service = 'Commercial';
+        this.authorized = false;
+
+      }
+
+
+      if(authority== 'BU_RESEAU_SECURITE'){
+        this.roleBuReseauSecurite = true;
+        this.authorized = false;
+
+      }
+
+      if(authority== 'BU_CHEF_PROJET'){
+        this.roleBuChefProjet = true;
+        this.authorized = false;
+        if(this.service=="Chef Projet")
+          this.selectedStatut = "Bloquée";
+
+      }
+
+      if(authority== 'BU_SYSTEM'){
+        this.roleBuSystem = true;
+        this.authorized = false;
+
+      }
+      if(authority== 'BU_VOLUME'){
+        this.roleBuVolume = true;
+        this.authorized = false;
+
+      }
+
+
+      if (authority == 'READ_ALL_PROJECTS') {
+        this.roleReadAllProjects = true;
+        this.authorized = true;
+
+      }
+      if (authority == 'READ_MY_PROJECTS') {
+        this.roleReadMyProjects = true;
+        this.authorized = true;
+        if(this.authService.getLastName()!=null){
+          this.userNameAuthenticated = this.authService.getLastName();
+        }else{
+          this.userNameAuthenticated ="undefined";
+        }
+
+      }
+
+      if (authority == 'READ_ALL_RECOUVREMENTS') {
+        this.roleReadAllRecouvrement = true;
+        this.authorized = true;
+
+      }
+      if (authority == 'READ_MY_RECOUVREMENT') {
+        this.roleReadMyRecouvrement = true;
+        this.authorized = true;
+
+        if(this.authService.getLastName()!=null){
+          this.userNameAuthenticated = this.authService.getLastName();
+        }else{
+          this.userNameAuthenticated ="undefined";
+        }
+        this.selectedChargeRecouvrement = this.userNameAuthenticated;
+
+
+      }
+    });
+
+    this.sigleUserAuthenticated = this.authService.getSigle();
+
+
+    const codeCommercial = this.activatedRoute.snapshot.params['codeCommercial'];
+    console.log("codeCommercial " + codeCommercial);
+    const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+    console.log("codeProjet " + codeProjet);
+
+    const chefProjet = this.activatedRoute.snapshot.params['chefProjet'];
+    console.log("chefProjet " + chefProjet);
+    const codeClient = this.activatedRoute.snapshot.params['codeClient'];
+    console.log("codeClient " + codeClient);
+
+    const numDocument = this.activatedRoute.snapshot.params['numDocument'];
+    if(numDocument!=null){
+      console.log("numDocument");
+      this.getDocumentsByNumDocument(false,numDocument);
+    }else
+    if(codeCommercial!=null){
+      console.log("filtredByCOmm " + codeCommercial);
+      this.getDocumentsByCommercial(this.documentCloture,codeCommercial);
+    }else{
+
+      if(codeProjet!=null ){
+        this.getDocumentsByCodeProjet(this.documentCloture,codeProjet);
+      }else{
+        if(codeClient!=null){
+          this.getDocumentsByClient(this.documentCloture,codeClient);
+        }else{
+          if(chefProjet != null){
+            this.getDocumentsByChefProjet(this.documentCloture,chefProjet);
+          }else{
+            if(this.roleReadMyProjects){
+              console.log("all doc");
+              this.getDocumentsByCommercialOrChefProjet(this.documentCloture,this.userNameAuthenticated);
+            }else{
+              if(this.roleReadAllRecouvrement){
+                this.getAllDocument(false,null);
+              }else{
+                console.log("this.userNameAuthenticated " + this.userNameAuthenticated);
+                this.getAllDocument(false,this.userNameAuthenticated);
+              }
+            }
+
+          }
+        }
+
+      }
+
+
+    }
+
+
+
+    this.getAllEmployees();
+
+
+    this.getEtatRecouvrement();
+
+    this.sortAllArrays();
+
 
     if(this.roleReadMyRecouvrement){
       if(this.service=="Commercial"){
@@ -1627,17 +1627,17 @@ export class EtatRecouvrementComponent implements OnInit {
         email = email+ "%0A";
 
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": this.removeAnd(lastCommentaire1.user.sigle))+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content)  ) +"%0A";
+        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": this.removeAnd(lastCommentaire1.user.sigle))+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))  ) +"%0A";
 
       }
         let lastCommentaire2 = new Commentaire();
       lastCommentaire2= currentDocument.commentaires[1];
       if(lastCommentaire2)
-        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": this.removeAnd(lastCommentaire2.user.sigle))+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content)  ) +"%0A";
+        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": this.removeAnd(lastCommentaire2.user.sigle))+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))  ) +"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= currentDocument.commentaires[2];
       if(lastCommentaire3)
-        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": this.removeAnd(lastCommentaire3.user.sigle))+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content)  ) +"%0A";
+        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": this.removeAnd(lastCommentaire3.user.sigle))+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))  ) +"%0A";
     }
 
 
@@ -1676,7 +1676,7 @@ export class EtatRecouvrementComponent implements OnInit {
         this.keys.push("codeDocument");
         if(this.pageDocument[0] !=null && this.pageDocument[0].detaills !=null ){
           this.pageDocument[0].details.forEach(element => {
-            console.log(element.header.label);
+            //console.log(element.header.label);
             let a :string;
             a = element.header.label;
             this.keys.push(a);

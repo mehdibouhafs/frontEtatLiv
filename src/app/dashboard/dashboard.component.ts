@@ -109,6 +109,10 @@ export class DashboardComponent implements OnInit {
 
 
   constructor(private etatStockService:EtatStockService, private eventService : EventService, private authService:AuthenticationService,private currency :CurrencyPipe,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService,private etatRecouvrementService:EtatRecouvrementService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef) {
+
+  }
+
+  ngOnInit() {
     this.service = this.authService.getServName();
 
     this.userInSession = this.authService.getLastName();
@@ -175,7 +179,7 @@ export class DashboardComponent implements OnInit {
       if (authority == 'READ_MY_PROJECTS') {
         this.roleReadMyProjects = true;
         this.authorized = true;
-        console.log("heee");
+        ////console.log("heee");
         if(this.authService.getLastName()!=null){
           this.userNameAuthenticated = this.authService.getLastName();
 
@@ -200,8 +204,6 @@ export class DashboardComponent implements OnInit {
       this.getAllEventsByService(this.userNameAuthenticated2,null,this.service);
     }
 
-
-
     this.getAllEmployeesByService("Intervenant");
 
     this.getAllEmployeesAvantVente();
@@ -213,34 +215,31 @@ export class DashboardComponent implements OnInit {
     this.getAllCommericals();
   }
 
-  ngOnInit() {
-  }
-
 
 
   updatedProjet(event){
-    console.log("updated");
+    ////console.log("updated");
     this.currentProjet.updated = true;
 
   }
 
   updatedDocument(event){
-    console.log("updated");
+    ////console.log("updated");
     this.currentDocument.updated = true;
 
   }
   updatedProduit(event){
-    console.log("updated");
+    ////console.log("updated");
     this.currentProduit.updated = true;
 
   }
 
   setPageProjet(page: number) {
 
-    console.log("this.currentProjet.commentaires " + this.currentProjet.commentaires);
+    ////console.log("this.currentProjet.commentaires " + this.currentProjet.commentaires);
 
     if(this.currentProjet.commentaires == null ||  this.currentProjet.commentaires.length==0) {
-      console.log("null");
+      ////console.log("null");
       this.pagerProjet = null;
       this.pagedItemsProjet = null;
       return;
@@ -259,8 +258,8 @@ export class DashboardComponent implements OnInit {
     }
 
 
-    console.log("page " +  page );
-    console.log("this.pager.totalPages " + this.pagerProjet.totalPages);
+    ////console.log("page " +  page );
+    ////console.log("this.pager.totalPages " + this.pagerProjet.totalPages);
 
     // get pager object from service
     this.pagerProjet = this.pagerService.getPager(this.currentProjet.commentaires.length, page);
@@ -277,7 +276,7 @@ export class DashboardComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        ////console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -290,7 +289,7 @@ export class DashboardComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        ////console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -302,7 +301,7 @@ export class DashboardComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        ////console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -314,7 +313,7 @@ export class DashboardComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        ////console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -326,7 +325,7 @@ export class DashboardComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        ////console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -337,7 +336,7 @@ export class DashboardComponent implements OnInit {
     this.eventService.getAllEvents(username,lastConnectionDate).subscribe(
       (data: Array<Event>)=>{
         events = data;
-        console.log("events " + JSON.stringify( events));
+        ////console.log("events " + JSON.stringify( events));
         if(events.length>0){
 
           events.forEach(event => {
@@ -353,7 +352,7 @@ export class DashboardComponent implements OnInit {
               this.eventsStock.push(event);
             }
 
-          console.log("eventsProjet "+ JSON.stringify( this.eventsProjet));
+          ////console.log("eventsProjet "+ JSON.stringify( this.eventsProjet));
 
           this.refreshTables();
 
@@ -365,7 +364,7 @@ export class DashboardComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        ////console.log("error "  +JSON.stringify(error));
       }
     )
 
@@ -381,7 +380,7 @@ export class DashboardComponent implements OnInit {
     this.eventService.getAllEventsByService(username,lastConnectionDate,service).subscribe(
       (data: Array<Event>)=>{
         events = data;
-        console.log("events " + JSON.stringify( events));
+        ////console.log("events " + JSON.stringify( events));
         if(events.length>0){
 
           events.forEach(event => {
@@ -397,7 +396,7 @@ export class DashboardComponent implements OnInit {
               this.eventsStock.push(event);
             }
 
-            console.log("eventsProjet "+ JSON.stringify( this.eventsProjet));
+            ////console.log("eventsProjet "+ JSON.stringify( this.eventsProjet));
 
             this.refreshTables();
 
@@ -409,7 +408,7 @@ export class DashboardComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        ////console.log("error "  +JSON.stringify(error));
       }
     )
 
@@ -432,7 +431,7 @@ export class DashboardComponent implements OnInit {
       this.dataSourceEventsProjet.paginator = this.paginatorEventsProjet;
       this.dataSourceEventsProjet.sort = this.sortEventsProjet;
       if(this.currentFilterEventsProjet!=null){
-        console.log("(this.currentFilterEventsProjet!=null");
+        ////console.log("(this.currentFilterEventsProjet!=null");
         this.applyFilterEventsProjet(this.currentFilterEventsProjet);
       }
 
@@ -440,7 +439,7 @@ export class DashboardComponent implements OnInit {
 
 
     if(this.eventsDocument.length>=0) {
-      console.log("eventsDocument " + JSON.stringify(this.eventsDocument));
+      ////console.log("eventsDocument " + JSON.stringify(this.eventsDocument));
       this.dataSourceEventsDocument = new MatTableDataSource(this.eventsDocument);
       /*  this.dataSourceEventsProjet.filterPredicate = function(data, filter: string): boolean {
 
@@ -453,14 +452,14 @@ export class DashboardComponent implements OnInit {
       this.dataSourceEventsDocument.paginator = this.paginatorEventsDocument;
       this.dataSourceEventsDocument.sort = this.sortEventsDocument;
       if (this.currentFilterEventsDocument != null){
-        console.log("(this.currentFilterEventsDoculent!=null");
+        ////console.log("(this.currentFilterEventsDoculent!=null");
         this.applyFilterEventsDocument(this.currentFilterEventsDocument);
       }
 
     }
 
     if(this.eventsStock.length>=0) {
-      console.log("eventsProduuit " + JSON.stringify(this.eventsStock));
+      ////console.log("eventsProduuit " + JSON.stringify(this.eventsStock));
       this.dataSourceEventsProduit = new MatTableDataSource(this.eventsStock);
       /*  this.dataSourceEventsProjet.filterPredicate = function(data, filter: string): boolean {
 
@@ -473,7 +472,7 @@ export class DashboardComponent implements OnInit {
       this.dataSourceEventsProduit.paginator = this.paginatorEventsProduit;
       this.dataSourceEventsProduit.sort = this.sortEventsProduit;
       if (this.currentFilterEventsProduit != null){
-        console.log("currentFilterEventsProduit");
+        ////console.log("currentFilterEventsProduit");
         this.applyFilterEventsProduit(this.currentFilterEventsProduit);
       }
 
@@ -490,7 +489,7 @@ export class DashboardComponent implements OnInit {
 
     switch(type)
     {
-      case 'codeProjet':console.log("codeProjet "+ value);
+      case 'codeProjet':////console.log("codeProjet "+ value);
 
         let url = '/#/etatStockCodeProjet/'+value;
 
@@ -513,10 +512,10 @@ export class DashboardComponent implements OnInit {
       //this.modalRef.hide();
     }, err => {
       this.currentProjet.updated = true;
-      console.log(JSON.stringify(err));
+      ////console.log(JSON.stringify(err));
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      ////console.log("error "  +JSON.stringify(err));
 
     });
   }
@@ -532,10 +531,10 @@ export class DashboardComponent implements OnInit {
       //this.modalRef.hide();
     }, err => {
       this.currentProjet.updated = true;
-      console.log(JSON.stringify(err));;
+      ////console.log(JSON.stringify(err));;
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      ////console.log("error "  +JSON.stringify(err));
 
     });
 
@@ -577,7 +576,7 @@ export class DashboardComponent implements OnInit {
 
     this.filtredDataEventsProjet = this.dataSourceEventsProjet.filteredData;
 
-    console.log("current Projet " + JSON.stringify(this.currentProjet));
+    ////console.log("current Projet " + JSON.stringify(this.currentProjet));
 
     this.modalOption.backdrop = 'static';
     this.modalOption.keyboard = false;
@@ -594,7 +593,7 @@ export class DashboardComponent implements OnInit {
 
 
     this.eventService.updateStatutEvent(event.id,event).subscribe((data: Event) => {
-      console.log("update event");
+      ////console.log("update event");
       this.eventsDocument = this.eventsDocument.filter(item => item !== event);
       this.eventsProjet = this.eventsProjet.filter(item => item !== event);
       this.eventsStock = this.eventsStock.filter(item => item !== event);
@@ -603,7 +602,7 @@ export class DashboardComponent implements OnInit {
 
     }, err => {
 
-      console.log(JSON.stringify(err));
+      ////console.log(JSON.stringify(err));
       this.authService.logout();
       this.router.navigateByUrl('/login');
 
@@ -613,7 +612,7 @@ export class DashboardComponent implements OnInit {
 
   composeEmailProjet(projet : Projet){
 
-    console.log("compose Email");
+    ////console.log("compose Email");
 
     var codeProjet = projet.codeProjet;
 
@@ -645,18 +644,18 @@ export class DashboardComponent implements OnInit {
       if(lastCommentaire1){
         email = email+ "%0A";
 
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= projet.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= projet.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
     }
-    console.log("email " + email);
+    ////console.log("email " + email);
 
     /*Insert commentaire ssytem with motif*/
 
@@ -695,13 +694,13 @@ export class DashboardComponent implements OnInit {
       newCommentaire.content = this.newContentCommentProjet.split("\n").join("<br>");;
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
-      console.log("this.authService.getSigle "+ this.authService.getSigle());
+      ////console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
 
 
 
       if (this.newEmployerIdProjet != null ) {
-        console.log("this.newEmployerId" + this.newEmployerIdProjet)
+        ////console.log("this.newEmployerId" + this.newEmployerIdProjet)
         newCommentaire.employer = this.newEmployerIdProjet;
 
       }
@@ -719,7 +718,7 @@ export class DashboardComponent implements OnInit {
 
 
 
-      console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
+      ////console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
 
       this.currentProjet.updated = true;
       this.setPageProjet(1);
@@ -761,7 +760,7 @@ export class DashboardComponent implements OnInit {
 
 
 
-      console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
+      ////console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
 
       this.currentProjet.updated = true;
 
@@ -776,10 +775,10 @@ export class DashboardComponent implements OnInit {
 
       }, err => {
         this.currentProjet.updated = true;
-        console.log(JSON.stringify(err));
+        ////console.log(JSON.stringify(err));
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(err));
+        ////console.log("error "  +JSON.stringify(err));
 
       });
 
@@ -792,13 +791,13 @@ export class DashboardComponent implements OnInit {
 
   onEditProjet(template: TemplateRef<any>) {
 
-    //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
+    //////console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
 
-    //console.log("new projet to send " + JSON.stringify(this.currentProjet));
+    //////console.log("new projet to send " + JSON.stringify(this.currentProjet));
 
 
     if(this.newContentCommentProjet != null ){
-      console.log("here newContentComment");
+      ////console.log("here newContentComment");
       this.addCommentProjet();
     }
 
@@ -814,11 +813,11 @@ export class DashboardComponent implements OnInit {
       //this.modalRef.hide();
     }, err => {
       this.currentProjet.updated = true;
-      console.log(JSON.stringify(err));
+      ////console.log(JSON.stringify(err));
 
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      ////console.log("error "  +JSON.stringify(err));
 
     });
 
@@ -832,7 +831,7 @@ export class DashboardComponent implements OnInit {
 
 
   deleteCommentaireProjet(commentaire : any){
-    console.log("delete comment");
+    ////console.log("delete comment");
 
     this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
     this.currentProjet.updated = true;
@@ -910,7 +909,7 @@ export class DashboardComponent implements OnInit {
   }
 
   deleteCommentaireDocument(commentaire : any){
-    console.log("delete comment");
+    ////console.log("delete comment");
 
     this.currentDocument.commentaires = this.currentDocument.commentaires.filter(item => item !== commentaire);
     this.currentDocument.updated = true;
@@ -923,7 +922,7 @@ export class DashboardComponent implements OnInit {
 
 
     if(this.currentDocument.commentaires == null ||  this.currentDocument.commentaires.length==0) {
-      console.log("null");
+      ////console.log("null");
       this.pagerDocument = null;
       this.pagedItemsDocument = null;
       return;
@@ -941,8 +940,8 @@ export class DashboardComponent implements OnInit {
 
     }
 
-    console.log("page " +  page );
-    console.log("this.pager.totalPages " + this.pagerDocument.totalPages);
+    ////console.log("page " +  page );
+    ////console.log("this.pager.totalPages " + this.pagerDocument.totalPages);
 
     // get pager object from service
     this.pagerDocument = this.pagerService.getPager(this.currentDocument.commentaires.length, page);
@@ -955,13 +954,13 @@ export class DashboardComponent implements OnInit {
 
   onEditDocument(template: TemplateRef<any>) {
 
-    console.log("this.currentDocument "  + JSON.stringify(this.currentDocument));
+    ////console.log("this.currentDocument "  + JSON.stringify(this.currentDocument));
 
-    console.log("new Document to send " + JSON.stringify(this.currentDocument));
+    ////console.log("new Document to send " + JSON.stringify(this.currentDocument));
 
 
     if(this.newContentCommentDocument != null ){
-      console.log("here newContentComment");
+      ////console.log("here newContentComment");
       this.addCommentDocument();
     }
 
@@ -977,10 +976,10 @@ export class DashboardComponent implements OnInit {
 
     }, err => {
       this.currentDocument.updated = true;
-      console.log(JSON.stringify(err));
+      ////console.log(JSON.stringify(err));
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      ////console.log("error "  +JSON.stringify(err));
     });
 
   }
@@ -994,12 +993,12 @@ export class DashboardComponent implements OnInit {
       newCommentaire.date = new Date();
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
-      console.log("this.authService.getSigle "+ this.authService.getSigle());
+      ////console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
       newCommentaire.content = this.newContentCommentDocument.split("\n").join("<br>");
 
       if (this.newEmployerIdDocument != null ) {
-        console.log("this.newEmployerId" + this.newEmployerIdDocument);
+        ////console.log("this.newEmployerId" + this.newEmployerIdDocument);
         newCommentaire.employer = this.newEmployerIdDocument;
       }
 
@@ -1013,7 +1012,7 @@ export class DashboardComponent implements OnInit {
         return <any> new Date(b.date) - <any> new Date(a.date);
       });
 
-      console.log(" this.currentDocument.commentaires " + this.currentDocument.commentaires);
+      ////console.log(" this.currentDocument.commentaires " + this.currentDocument.commentaires);
 
       this.currentDocument.updated = true;
       this.setPageDocument(1);
@@ -1066,7 +1065,7 @@ export class DashboardComponent implements OnInit {
 
 
 
-      console.log(" this.currentProjet.commentaires " + this.currentDocument.commentaires);
+      ////console.log(" this.currentProjet.commentaires " + this.currentDocument.commentaires);
 
       this.currentDocument.updated = true;
 
@@ -1080,10 +1079,10 @@ export class DashboardComponent implements OnInit {
         //this.modalRef.hide();
       }, err => {
         this.currentDocument.updated = true;
-        console.log(JSON.stringify(err));
+        ////console.log(JSON.stringify(err));
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(err));
+        ////console.log("error "  +JSON.stringify(err));
       });
 
     }
@@ -1106,10 +1105,10 @@ export class DashboardComponent implements OnInit {
       }
 
       if(this.currentDocument.statut!=null && this.currentDocument.statut== 'Bloquée' && (this.currentDocument.typeBloquage==null || this.currentDocument.typeBloquage=="")){
-        console.log("type blo null"  );
+        ////console.log("type blo null"  );
         this.typdeBloquageRequired = true;
       }else{
-        console.log("type blo not null"  );
+        ////console.log("type blo not null"  );
         this.typdeBloquageRequired = false;
       }
 
@@ -1144,16 +1143,16 @@ export class DashboardComponent implements OnInit {
       this.ref.detectChanges();
     }
     if(this.currentDocument.statut == "Bloquée"){
-      console.log("changed this is last " + this.currentDocmentClone.motif);
+      ////console.log("changed this is last " + this.currentDocmentClone.motif);
       if(this.currentDocmentClone.motif!=null && this.currentDocmentClone.motif.length>=0){
-        console.log("motif avant nest pas vide");
+        ////console.log("motif avant nest pas vide");
         if(this.currentDocument.motif == null || this.currentDocument.motif.length==0){
-          console.log(" Motif apres vide");
+          ////console.log(" Motif apres vide");
           this.motifRequired = true;
         }
       }
     }*/
-    console.log("teste motif");
+    ////console.log("teste motif");
     if(this.currentDocument.motif!=null&&  this.currentDocument.motif != "" && this.currentDocument.motif.length>0){
       this.motifRequired = false;
     }
@@ -1178,16 +1177,16 @@ export class DashboardComponent implements OnInit {
       this.ref.detectChanges();
     }
     if(this.currentDocument.statut == "Bloquée"){
-      console.log("changed this is last " + this.currentDocmentClone.motif);
+      ////console.log("changed this is last " + this.currentDocmentClone.motif);
       if(this.currentDocmentClone.motif!=null && this.currentDocmentClone.motif.length>=0){
-        console.log("motif avant nest pas vide");
+        ////console.log("motif avant nest pas vide");
         if(this.currentDocument.motif == null || this.currentDocument.motif.length==0){
-          console.log(" Motif apres vide");
+          ////console.log(" Motif apres vide");
           this.motifRequired = true;
         }
       }
     }*/
-    console.log("teste motif");
+    ////console.log("teste motif");
     if(this.currentDocument.typeBloquage!=null){
       this.typdeBloquageRequired = false;
     }
@@ -1249,7 +1248,7 @@ export class DashboardComponent implements OnInit {
   }
 
   updatedDatePrevuEncaissement(event,template){
-    //console.log("updated last val "+  this.currentDocmentClone.datePrevuEncaissement);
+    //////console.log("updated last val "+  this.currentDocmentClone.datePrevuEncaissement);
 
     if(this.currentDocument.typeDocument == 'Facture' &&
       this.currentDocmentClone.datePrevuEncaissement!= this.currentDocument.datePrevuEncaissement ){
@@ -1277,7 +1276,7 @@ export class DashboardComponent implements OnInit {
   }
 
   updatedMotifChangementDateRecep(event){
-    console.log("changed updatedMotifChangementDateRecep");
+    ////console.log("changed updatedMotifChangementDateRecep");
     if(this.motifChangementDeDateRequired){
       if(this.currentDocument.motifChangementDate !=null && this.currentDocument.motifChangementDate != "" && this.currentDocument.motifChangementDate.length>0){
 
@@ -1292,14 +1291,14 @@ export class DashboardComponent implements OnInit {
 
     if(this.currentDocument.typeDocument == 'Facture' && this.currentDocument.dateDepot &&
       this.currentDocument.dateDepot!= this.currentDocument.datePiece ) {
-      console.log("changed this is last " + this.currentDocmentClone.motifChangementDate);
+      ////console.log("changed this is last " + this.currentDocmentClone.motifChangementDate);
       if (this.currentDocument.motifChangementDate != null && this.currentDocument.motifChangementDate.length >= 0) {
         this.motifChangementDeDateRequired = false;
 
       }
 
       if (this.currentDocument.motifChangementDate == null || this.currentDocument.motifChangementDate.length == 0) {
-        console.log(" MotifChangementDate courrant a ete envoyé");
+        ////console.log(" MotifChangementDate courrant a ete envoyé");
         this.motifChangementDeDateRequired = true;
       }
     }
@@ -1315,7 +1314,7 @@ export class DashboardComponent implements OnInit {
 
   annulationDocument3(){
     if(this.actionModalDocument=="udateDatePrevuEncaissement"){
-      console.log("anciencce date prevu enc "+ this.currentDocmentClone.datePrevuEncaissement);
+      ////console.log("anciencce date prevu enc "+ this.currentDocmentClone.datePrevuEncaissement);
       this.currentDocument.datePrevuEncaissement = this.currentDocmentClone.datePrevuEncaissement;
     }
 
@@ -1325,7 +1324,7 @@ export class DashboardComponent implements OnInit {
 
   composeEmailDocument(currentDocument : Document) {
 
-    console.log("compose Email");
+    ////console.log("compose Email");
 
     var numPiece = currentDocument.numPiece;
 
@@ -1371,7 +1370,7 @@ export class DashboardComponent implements OnInit {
         "Date lib%C3%A9ration caution: " +  (currentDocument.dateLiberationCaution  == null ? "": moment(currentDocument.dateLiberationCaution).format('DD/MM/YYYY') )   + "%0A" + "%0A" + "%0A";
     }
 
-    //console.log("email "+ email);
+    //////console.log("email "+ email);
 
 
     if(currentDocument.commentaires!=null){
@@ -1382,17 +1381,17 @@ export class DashboardComponent implements OnInit {
         email = email+ "%0A";
 
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": lastCommentaire1.user.sigle)+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content)  ) +"%0A";
+        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": lastCommentaire1.user.sigle)+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))  ) +"%0A";
 
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= currentDocument.commentaires[1];
       if(lastCommentaire2)
-        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": lastCommentaire2.user.sigle)+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content)  ) +"%0A";
+        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": lastCommentaire2.user.sigle)+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))  ) +"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= currentDocument.commentaires[2];
       if(lastCommentaire3)
-        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": lastCommentaire3.user.sigle)+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content) ) +"%0A";
+        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": lastCommentaire3.user.sigle)+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A")) ) +"%0A";
     }
 
 
@@ -1408,18 +1407,18 @@ export class DashboardComponent implements OnInit {
 
 
   updatedDateDepot(event,template){
-    console.log("changed");
+    ////console.log("changed");
     if(this.currentDocument !=null && this.currentDocument.typeDocument=='Facture') {
       if ( this.currentDocument.dateDepot && moment(this.currentDocument.datePiece) != moment(this.currentDocument.dateDepot)) {
-        console.log("la " + this.currentDocument.motifChangementDate);
-        //console.log("this.currentDocument.motifChangementDate "+ this.currentDocument.motifChangementDate);
-        // console.log("this.currentDocument.motifChangementDate.length "+this.currentDocument.motifChangementDate.length);
+        ////console.log("la " + this.currentDocument.motifChangementDate);
+        //////console.log("this.currentDocument.motifChangementDate "+ this.currentDocument.motifChangementDate);
+        // ////console.log("this.currentDocument.motifChangementDate.length "+this.currentDocument.motifChangementDate.length);
         if (!this.currentDocument.motifChangementDate ) {
           this.motifChangementDeDateRequired = true;
         }
       } else {
         if(!this.currentDocument.dateDepot && this.currentDocument.typeDocument=='Facture'){
-          console.log("ici");
+          ////console.log("ici");
           this.currentDocument.dateDepot = this.currentDocument.datePiece;
           this.motifChangementDeDateRequired = false;
         }
@@ -1506,13 +1505,13 @@ export class DashboardComponent implements OnInit {
 
   onEditProduit(template: TemplateRef<any>) {
 
-    //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
+    //////console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
 
-    //console.log("new projet to send " + JSON.stringify(this.currentProjet));
+    //////console.log("new projet to send " + JSON.stringify(this.currentProjet));
 
 
     if(this.newContentCommentProduit != null ){
-      console.log("here newContentComment");
+      ////console.log("here newContentComment");
       this.addCommentProduit();
     }
 
@@ -1529,10 +1528,10 @@ export class DashboardComponent implements OnInit {
       //this.modalRef.hide();
     }, err => {
       this.currentProduit.updated = true;
-      console.log(JSON.stringify(err));
+      ////console.log(JSON.stringify(err));
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      ////console.log("error "  +JSON.stringify(err));
 
     });
 
@@ -1543,7 +1542,7 @@ export class DashboardComponent implements OnInit {
     this.currentProduit = event.produit;
     this.setPageProduit(1);
 
-    //console.log("this.currentProjet suivre" + this.currentProduit.suivre);
+    //////console.log("this.currentProjet suivre" + this.currentProduit.suivre);
     this.mode = 1;
 
     this.filtredDataEventsProduit = this.dataSourceEventsProduit.filteredData;
@@ -1568,7 +1567,7 @@ export class DashboardComponent implements OnInit {
       newCommentaire.content = this.newContentCommentProduit.split("\n").join("<br>");;
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
-      console.log("this.authService.getSigle "+ this.authService.getSigle());
+      ////console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
 
       if (this.newEmployerIdProduit != null ) {
@@ -1587,7 +1586,7 @@ export class DashboardComponent implements OnInit {
         return <any> new Date(b.date) - <any> new Date(a.date);
       });
 
-      console.log(" this.currentProjet.commentaires " + this.currentProduit.commentaires);
+      ////console.log(" this.currentProjet.commentaires " + this.currentProduit.commentaires);
 
       this.currentProduit.updated = true;
       this.setPageProduit(1);
@@ -1637,7 +1636,7 @@ export class DashboardComponent implements OnInit {
 
   composeEmailProduit(produit : Produit){
 
-    console.log("compose Email");
+    ////console.log("compose Email");
 
     var refProd = produit.itemCode;
 
@@ -1665,18 +1664,18 @@ export class DashboardComponent implements OnInit {
         email = email+ "%0A";
         email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= produit.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= produit.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
     }
-    console.log("email " + email);
+    ////console.log("email " + email);
 
     /*Insert commentaire ssytem with motif*/
 
@@ -1695,10 +1694,10 @@ export class DashboardComponent implements OnInit {
 
   setPageProduit(page: number) {
 
-    console.log("this.currentProjet.commentaires " + this.currentProduit.commentaires);
+    ////console.log("this.currentProjet.commentaires " + this.currentProduit.commentaires);
 
     if(this.currentProduit.commentaires == null ||  this.currentProduit.commentaires.length==0) {
-      console.log("null");
+      ////console.log("null");
       this.pagerProduit = null;
       this.pagedItemsProduit = null;
       return;
@@ -1717,8 +1716,8 @@ export class DashboardComponent implements OnInit {
     }
 
 
-    console.log("page " +  page );
-    console.log("this.pager.totalPages " + this.pagerProduit.totalPages);
+    ////console.log("page " +  page );
+    ////console.log("this.pager.totalPages " + this.pagerProduit.totalPages);
 
     // get pager object from service
     this.pagerProduit = this.pagerService.getPager(this.currentProduit.commentaires.length, page);
@@ -1728,7 +1727,7 @@ export class DashboardComponent implements OnInit {
   }
 
   deleteCommentaireProduit(commentaire : any){
-    console.log("delete comment");
+    ////console.log("delete comment");
 
     this.currentProduit.commentaires = this.currentProduit.commentaires.filter(item => item !== commentaire);
     this.currentProduit.updated = true;
@@ -1760,34 +1759,34 @@ export class DashboardComponent implements OnInit {
 
 
 
-    console.log("index found " + index);
+    ////console.log("index found " + index);
     if (index - 1 >= 0) {
       var precedIndex = index - 1;
-  console.log("preced " + precedIndex);
+  ////console.log("preced " + precedIndex);
       this.indexProjet = precedIndex;
 
         //this.suivant = false;
         if (precedIndex != null && precedIndex >= 0 && precedIndex < this.filtredDataEventsProjet.length) {
-        console.log("preced projet "+   this.filtredDataEventsProjet[precedIndex].projet );
+        ////console.log("preced projet "+   this.filtredDataEventsProjet[precedIndex].projet );
           this.currentProjet = this.filtredDataEventsProjet[precedIndex].projet;
           this.setPageProjet(1);
-          console.log("here");
+          ////console.log("here");
           this.mode = 1;
         }
     }
   }
 
   goToSuivantProjet(eventId){
-     console.log("eventId " + eventId);
-     console.log("this.filtredDataEventsProjet.length "+ this.filtredDataEventsProjet.length);
+     ////console.log("eventId " + eventId);
+     ////console.log("this.filtredDataEventsProjet.length "+ this.filtredDataEventsProjet.length);
       var index = this.getIndexFromFiltrerdListProjet(eventId);
-      console.log("index " + index);
+      ////console.log("index " + index);
 
       var suivantIndex = index + 1;
-      console.log("index suivantIndex " + suivantIndex);
+      ////console.log("index suivantIndex " + suivantIndex);
 
         if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredDataEventsProjet.length){
-          console.log("here");
+          ////console.log("here");
           this.indexProjet = suivantIndex;
           this.currentProjet = this.filtredDataEventsProjet[suivantIndex].projet;
           this.setPageProjet(1);
@@ -1801,19 +1800,19 @@ export class DashboardComponent implements OnInit {
 
   getIndexFromFiltrerdListProjet(id){
     for(var i=0;i<this.filtredDataEventsProjet.length;i++){
-      console.log("this.filtredDataEventsProjet[i].projet.codeProjet " + this.filtredDataEventsProjet[i].projet.codeProjet);
-      console.log("id " + id);
+      ////console.log("this.filtredDataEventsProjet[i].projet.codeProjet " + this.filtredDataEventsProjet[i].projet.codeProjet);
+      ////console.log("id " + id);
       if(this.filtredDataEventsProjet[i].projet.codeProjet == id){
-        console.log("pos " + i);
+        ////console.log("pos " + i);
         return i;
         break;
       }
     }
   }
   getIndexFromFiltrerdListDocument(id) {
-    console.log("this.filtredData.size " + this.filtredDataEventsDocument.length);
+    ////console.log("this.filtredData.size " + this.filtredDataEventsDocument.length);
     for (var i = 0; i < this.filtredDataEventsDocument.length; i++) {
-      console.log("this.filtredData[i] " + this.filtredDataEventsDocument[i].id);
+      ////console.log("this.filtredData[i] " + this.filtredDataEventsDocument[i].id);
       if (this.filtredDataEventsDocument[i].document.codePiece == id) {
         return i;
         break;
@@ -1822,7 +1821,7 @@ export class DashboardComponent implements OnInit {
   }
 
   getIndexFromFiltrerdListProduit(id) {
-    console.log("this.filtredData.size " + this.filtredDataEventsProduit.length);
+    ////console.log("this.filtredData.size " + this.filtredDataEventsProduit.length);
     for (var i = 0; i < this.filtredDataEventsProduit.length; i++) {
       if (this.filtredDataEventsProduit[i].produit.id == id) {
         return i;
@@ -1835,7 +1834,7 @@ export class DashboardComponent implements OnInit {
 
     var index = this.getIndexFromFiltrerdListDocument(codePiece);
 
-    console.log("index found " + index);
+    ////console.log("index found " + index);
     if (index - 1 >= 0) {
       var precedIndex = index - 1;
       this.indexDocument = precedIndex;
@@ -1852,13 +1851,13 @@ export class DashboardComponent implements OnInit {
   indexDocument;
   goToSuivantDocument(eventId){
     var index = this.getIndexFromFiltrerdListDocument(eventId);
-    console.log("index " + index);
+    ////console.log("index " + index);
 
     var suivantIndex = index + 1;
-    console.log("index suivantIndex " + suivantIndex);
+    ////console.log("index suivantIndex " + suivantIndex);
 
     if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredDataEventsDocument.length){
-      console.log("here");
+      ////console.log("here");
       this.indexDocument = suivantIndex;
       //this.ref.detectChanges();
     }
@@ -1872,7 +1871,7 @@ export class DashboardComponent implements OnInit {
 
     var index = this.getIndexFromFiltrerdListProduit(id);
 
-    console.log("index found " + index);
+    ////console.log("index found " + index);
     if (index - 1 >= 0) {
       var precedIndex = index - 1;
       this.indexProduit = precedIndex;
@@ -1889,13 +1888,13 @@ export class DashboardComponent implements OnInit {
   indexProduit;
   goToSuivantProduit(eventId){
     var index = this.getIndexFromFiltrerdListProduit(eventId);
-    console.log("index " + index);
+    ////console.log("index " + index);
 
     var suivantIndex = index + 1;
-    console.log("index suivantIndex " + suivantIndex);
+    ////console.log("index suivantIndex " + suivantIndex);
 
     if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredDataEventsProduit.length){
-      console.log("here");
+      ////console.log("here");
       this.indexProduit = suivantIndex;
     //  this.ref.detectChanges();
     }
@@ -1916,7 +1915,7 @@ export class DashboardComponent implements OnInit {
     let template:any;
 
     if (event.keyCode === this.RIGHT_ARROW ) {
-      console.log("right");
+      ////console.log("right");
 
       switch(this.currentModal){
         case "PROJET": this.goToSuivantProjet(this.currentProjet.codeProjet); break;

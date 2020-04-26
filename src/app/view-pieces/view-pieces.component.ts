@@ -25,7 +25,7 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
   constructor(private contratService:ContratService) { }
 
   ngOnInit() {
-    console.log("PieceOnInit" + this.piecesContrat);
+    //console.log("PieceOnInit" + this.piecesContrat);
     this.dataSourcePieceContrat = new MatTableDataSource(this.piecesContrat);
     this.dataSourcePieceContrat.filterPredicate = function(data, filter: string): boolean {
 
@@ -53,7 +53,7 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log("PieceOnInit" + this.piecesContrat);
+    //console.log("PieceOnInit" + this.piecesContrat);
     this.dataSourcePieceContrat = new MatTableDataSource(this.piecesContrat);
     this.dataSourcePieceContrat.filterPredicate = function(data, filter: string): boolean {
 
@@ -71,11 +71,11 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
   sortChange(e) {
     // save cookie with table sort data here
     this.dataSourcePieceContrat.sortData(this.dataSourcePieceContrat.filteredData,this.dataSourcePieceContrat.sort);
-    // console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // console.log("sorting table");
+    // //console.log("this.before [0] " + this.filtredData[0].codeProjet);
+    // //console.log("sorting table");
     //this.filtredData = this.dataSource.filteredData;
 
-    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
 

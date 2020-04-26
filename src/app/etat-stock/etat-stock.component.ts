@@ -161,6 +161,25 @@ export class EtatStockComponent implements OnInit {
 
 
   constructor(private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
+
+
+
+
+
+  }
+
+
+  sortAll(){
+    this.natures.sort();
+    this.sousNatures.sort();
+    this.domaines.sort();
+    this.sousDomaines.sort();
+    this.numsLots.sort();
+    this.clients.sort();
+    this.magasins.sort();
+  }
+
+  ngOnInit() {
     this.service = this.authService.getServName();
 
     this.userInSession = this.authService.getLastName();
@@ -170,7 +189,7 @@ export class EtatStockComponent implements OnInit {
     this.authService.getRoles().forEach(authority => {
 
       if(authority== 'BU_COMMERCIAL'){
-       this.roleBuCommercial = true;
+        this.roleBuCommercial = true;
         //this.service = 'Commercial';
         this.authorized = true;
 
@@ -208,7 +227,7 @@ export class EtatStockComponent implements OnInit {
       if (authority == 'READ_MY_PROJECTS') {
         this.roleReadMyProjects = true;
         this.authorized = true;
-        console.log("heee");
+        //console.log("heee");
         if (this.authService.getLastName() != null) {
           this.userNameAuthenticated = this.authService.getLastName();
           if (this.service == 'Commercial') {
@@ -256,7 +275,7 @@ export class EtatStockComponent implements OnInit {
 
     this.sigleUserAuthenticated = this.authService.getSigle();
 
-     this.codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+    this.codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
     if(this.codeProjet!=null){
 
       this.selectedLot = this.codeProjet;
@@ -269,24 +288,6 @@ export class EtatStockComponent implements OnInit {
 
     this.getAllClients();
     this.getDistinctLot();
-
-
-
-
-  }
-
-
-  sortAll(){
-    this.natures.sort();
-    this.sousNatures.sort();
-    this.domaines.sort();
-    this.sousDomaines.sort();
-    this.numsLots.sort();
-    this.clients.sort();
-    this.magasins.sort();
-  }
-
-  ngOnInit() {
   }
 
   getDistinctLot(){
@@ -296,7 +297,7 @@ export class EtatStockComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -308,7 +309,7 @@ export class EtatStockComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -339,7 +340,7 @@ export class EtatStockComponent implements OnInit {
 
 
             p.nomMagasin = produit.nomMagasin;
-            console.log("numLot"+p.nomMagasin);
+            //console.log("numLot"+p.nomMagasin);
             p.itemCode = produit.itemCode;
             p.itemName = produit.itemName;
             p.gerePar = produit.gerePar;
@@ -389,7 +390,7 @@ export class EtatStockComponent implements OnInit {
         this.sortAllArrays();
         this.clientsList = this.clients;
 
-        console.log("clients " + this.clients);
+        //console.log("clients " + this.clients);
         this.ref.detectChanges()
 
         this.dataSource = new MatTableDataSource(this.produits);
@@ -423,7 +424,7 @@ export class EtatStockComponent implements OnInit {
         // alert("erreur " + err);
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error " + JSON.stringify(err));
+        //console.log("error " + JSON.stringify(err));
       }
     )
 
@@ -563,7 +564,7 @@ export class EtatStockComponent implements OnInit {
     let template:any;
 
     if (event.keyCode === this.RIGHT_ARROW && !this.blockedKey1) {
-      console.log("right");
+      //console.log("right");
       this.goToSuivant(this.currentProduit.id,template);
     }
 
@@ -605,13 +606,13 @@ export class EtatStockComponent implements OnInit {
       newCommentaire.content = this.newContentComment.split("\n").join("<br>");
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
-      console.log("this.authService.getSigle "+ this.authService.getSigle());
+      //console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
 
 
 
       if (this.newEmployerId != null ) {
-        console.log("this.newEmployerId" + this.newEmployerId)
+        //console.log("this.newEmployerId" + this.newEmployerId)
         newCommentaire.employer = this.newEmployerId;
 
       }
@@ -629,7 +630,7 @@ export class EtatStockComponent implements OnInit {
 
 
 
-      console.log(" this.currentProjet.commentaires " + this.currentProduit.commentaires);
+      //console.log(" this.currentProjet.commentaires " + this.currentProduit.commentaires);
 
       this.currentProduit.updated = true;
       this.setPage(1);
@@ -648,7 +649,7 @@ export class EtatStockComponent implements OnInit {
 
     var index = this.getIndexFromFiltrerdList(id);
 
-    console.log("index found " + index);
+    //console.log("index found " + index);
     if(index-1 >=0) {
       var precedIndex = index - 1;
 
@@ -689,7 +690,7 @@ export class EtatStockComponent implements OnInit {
   }
 
   deleteCommentaire(commentaire : any){
-    console.log("delete comment");
+    //console.log("delete comment");
 
     this.currentProduit.commentaires = this.currentProduit.commentaires.filter(item => item !== commentaire);
     this.currentProduit.updated = true;
@@ -710,7 +711,7 @@ export class EtatStockComponent implements OnInit {
   }
 
   updated(event){
-    console.log("updated");
+    //console.log("updated");
     this.currentProduit.updated = true;
     this.ref.detectChanges();
   }
@@ -728,7 +729,7 @@ export class EtatStockComponent implements OnInit {
   }
 
   selectFiltre(){
-    console.log("filter ");
+    //console.log("filter ");
     if(this.selectedClient == null){
       this.selectedClientTMP = "undefined";
     }else{
@@ -836,7 +837,7 @@ export class EtatStockComponent implements OnInit {
         // alert("erreur " + err);
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error " + JSON.stringify(err));
+        //console.log("error " + JSON.stringify(err));
       })
 
     this.sortAll();
@@ -847,7 +848,7 @@ export class EtatStockComponent implements OnInit {
     this.currentProduit = produit;
     this.setPage(1);
 
-    //console.log("this.currentProjet suivre" + this.currentProduit.suivre);
+    ////console.log("this.currentProjet suivre" + this.currentProduit.suivre);
     this.mode = 1;
 
     this.filtredData = this.dataSource.filteredData;
@@ -855,10 +856,10 @@ export class EtatStockComponent implements OnInit {
     var index = this.getIndexFromFiltrerdList(this.currentProduit.id);
     this.index = index;
 
-    //console.log("this.filtredData  " + JSON.stringify(this.filtredData ));
+    ////console.log("this.filtredData  " + JSON.stringify(this.filtredData ));
 
-    // console.log("this.filtredData size  " + this.filtredData.length );
-    console.log("current Produit " + JSON.stringify(this.currentProduit));
+    // //console.log("this.filtredData size  " + this.filtredData.length );
+    //console.log("current Produit " + JSON.stringify(this.currentProduit));
 
     /*if(this.currentProjet.firstCommentaire != null && this.currentProjet.secondCommentaire != null){
       this.isShowTextComment = false;
@@ -874,10 +875,10 @@ export class EtatStockComponent implements OnInit {
 
   setPage(page: number) {
 
-    console.log("this.currentProjet.commentaires " + this.currentProduit.commentaires);
+    //console.log("this.currentProjet.commentaires " + this.currentProduit.commentaires);
 
     if(this.currentProduit.commentaires == null ||  this.currentProduit.commentaires.length==0) {
-      console.log("null");
+      //console.log("null");
       this.pager = null;
       this.pagedItems = null;
       return;
@@ -896,8 +897,8 @@ export class EtatStockComponent implements OnInit {
     }
 
 
-    console.log("page " +  page );
-    console.log("this.pager.totalPages " + this.pager.totalPages);
+    //console.log("page " +  page );
+    //console.log("this.pager.totalPages " + this.pager.totalPages);
 
     // get pager object from service
     this.pager = this.pagerService.getPager(this.currentProduit.commentaires.length, page);
@@ -907,9 +908,9 @@ export class EtatStockComponent implements OnInit {
   }
 
   getIndexFromFiltrerdList(id){
-    console.log("this.filtredData.size " + this.filtredData.length);
+    //console.log("this.filtredData.size " + this.filtredData.length);
     for(var i=0;i<this.filtredData.length;i++){
-      console.log("this.filtredData[i] " + this.filtredData[i].id);
+      //console.log("this.filtredData[i] " + this.filtredData[i].id);
       if(this.filtredData[i].id == id){
         return i;
         break;
@@ -924,10 +925,10 @@ export class EtatStockComponent implements OnInit {
 
         this.getAllProduits();
         this.spinner.hide();
-        console.log("data "+ data);
+        //console.log("data "+ data);
       },
       err=>{
-        console.log("error "+ JSON.stringify(err));
+        //console.log("error "+ JSON.stringify(err));
         this.getAllProduits();
         this.spinner.hide();
       }
@@ -938,12 +939,12 @@ export class EtatStockComponent implements OnInit {
     $event.stopPropagation();
     $event.preventDefault();
 
-    console.log("filtre "+ this.dataSource.filter);
+    //console.log("filtre "+ this.dataSource.filter);
     var result= this.etatStockService.exportEtatProduit(this.filtredData);
 
     var d = new Date();
 
-    console.log("day " + d.getDay());
+    //console.log("day " + d.getDay());
     var fileName = "EtatStock-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
 
     result.subscribe((response: any) => {
@@ -961,7 +962,7 @@ export class EtatStockComponent implements OnInit {
 
   composeEmail(produit : Produit){
 
-    console.log("compose Email");
+    //console.log("compose Email");
 
     var refProd = produit.itemCode;
 
@@ -989,18 +990,18 @@ export class EtatStockComponent implements OnInit {
         email = email+ "%0A";
         email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= produit.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= produit.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
     }
-    console.log("email " + email);
+    //console.log("email " + email);
 
     /*Insert commentaire ssytem with motif*/
 
@@ -1019,7 +1020,7 @@ export class EtatStockComponent implements OnInit {
     this.nestedModalRef.hide();
     this.currentProduit.updated = false;
     if(this.suivant){
-      console.log("here");
+      //console.log("here");
       this.goToSuivant(id,secondModal);
     }else{
       this.goToPrecedent(id,secondModal);
@@ -1037,7 +1038,7 @@ export class EtatStockComponent implements OnInit {
 
 
     var suivantIndex = index + 1;
-    console.log("index suivantIndex " + suivantIndex);
+    //console.log("index suivantIndex " + suivantIndex);
 
     if(this.currentProduit.updated){
       //this.showDialog();
@@ -1045,7 +1046,7 @@ export class EtatStockComponent implements OnInit {
       this.onEditProduit(null);
 
       if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-        console.log("here");
+        //console.log("here");
         this.index = suivantIndex;
         this.currentProduit = this.filtredData[suivantIndex];
         this.setPage(1);
@@ -1056,7 +1057,7 @@ export class EtatStockComponent implements OnInit {
     }
 
     if(!this.currentProduit.updated && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-      console.log("here");
+      //console.log("here");
       this.index = suivantIndex;
       this.currentProduit = this.filtredData[suivantIndex];
       this.setPage(1);
@@ -1103,13 +1104,13 @@ export class EtatStockComponent implements OnInit {
   errorUpdate:boolean;
   onEditProduit(template: TemplateRef<any>) {
 
-    //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
+    ////console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
 
-    //console.log("new projet to send " + JSON.stringify(this.currentProjet));
+    ////console.log("new projet to send " + JSON.stringify(this.currentProjet));
 
 
     if(this.newContentComment != null ){
-      console.log("here newContentComment");
+      //console.log("here newContentComment");
       this.addComment();
     }
 
@@ -1138,11 +1139,11 @@ export class EtatStockComponent implements OnInit {
   sortChange(e) {
     // save cookie with table sort data here
     this.dataSource.sortData(this.dataSource.filteredData,this.dataSource.sort);
-    // console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // console.log("sorting table");
+    // //console.log("this.before [0] " + this.filtredData[0].codeProjet);
+    // //console.log("sorting table");
     //this.filtredData = this.dataSource.filteredData;
 
-    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
 }

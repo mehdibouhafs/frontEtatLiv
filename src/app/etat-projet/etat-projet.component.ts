@@ -1,7 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
-  HostListener,
+  HostListener, OnDestroy,
   OnInit,
   TemplateRef,
   ViewChild,
@@ -32,7 +32,9 @@ import {AuthenticationService} from '../services/authentification.service';
 import {User} from '../../model/model.user';
 import {host} from "../services/host";
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
-
+import {CommentaireSocket} from "../../model/model.commentaireSocket";
+import * as SockJS from 'sockjs-client';
+import {Client, Frame, Message,Stomp} from "@stomp/stompjs";
 
 @Component({
   selector: 'app-etat-projet',
@@ -40,7 +42,7 @@ import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
   styleUrls: ['./etat-projet.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class EtatProjetComponent implements OnInit {
+export class EtatProjetComponent implements OnInit,OnDestroy {
 
    pageProjet :any;
    currentPage : number = 1;
@@ -176,151 +178,28 @@ export class EtatProjetComponent implements OnInit {
   roleBuVolume;
   roleBuCommercial;
   roleBuValueSoftware;
+  stompClient;
 
   constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
-
-   this.service = this.authService.getServName();
-
-   this.userAuthenticated = this.authService.getUserName();
-
-    this.userInSession = this.authService.getLastName();
-
-    this.authService.getRoles().forEach(authority => {
-    console.log("authority " + authority);
-      //this.authorized = false;
-      if(authority== 'BU_COMMERCIAL'){
-        this.roleBuCommercial = true;
-        this.service = 'Commercial';
-        this.authorized = true;
-
-      }
-
-      if(authority== 'BU_RESEAU_SECURITE'){
-        this.roleBuReseauSecurite = true;
-        this.bu1 = "VALUE_RS";
-        this.selectedBu = "VALUE_RS";
-        this.authorized = true;
-
-      }
-
-      if(authority== 'BU_CHEF_PROJET'){
-        this.roleBuChefProjet = true;
-
-        this.authorized = true;
-
-      }
-
-      if(authority== 'BU_SYSTEM'){
-        this.roleBuSystem = true;
-        this.bu1 = "VALUE_SI";
-        this.selectedBu = "VALUE_SI";
-        this.authorized = true;
-
-      }
-
-      if(authority== 'BU_VOLUME'){
-        this.roleBuVolume = true;
-        this.bu1 = "VOLUME";
-        this.selectedBu = "VOLUME";
-        this.authorized = true;
-
-      }
-
-    if(authority== 'BU_VALUE_SOFTWARE'){
-      this.roleBuValueSoftware = true;
-      this.bu1 = "VALUE_SW";
-      this.selectedBu = "VALUE_SW";
-      this.authorized = true;
-    }
-
-
-      if (authority == 'READ_ALL_PROJECTS') {
-        this.roleReadAllProjects = true;
-        this.authorized = true;
-
-      }
-      if (authority == 'READ_MY_PROJECTS') {
-        this.roleReadMyProjects = true;
-        this.authorized = true;
-        console.log("heee");
-        if(this.authService.getLastName()!=null){
-          this.userNameAuthenticated = this.authService.getLastName();
-          if(this.service == 'Commercial'){
-            this.selectedCommercial = this.userNameAuthenticated;
-          }
-          if(this.service == 'Chef Projet') {
-            this.selectedChefProjet = this.userNameAuthenticated;
-          }
-        }else{
-          this.userNameAuthenticated ="undefined"; // for not pass for undefined
-        }
-
-        }
-
-      if (authority == 'READ_PROJECT_RS') {
-        this.roleReadProjectRs = true;
-        this.authorized = true;
-
-      }
-
-      if (authority == 'READ_PROJECT_SI') {
-
-        this.roleReadProjectSi = true;
-        this.authorized = true;
-
-      }
-
-
-      if (authority == 'READ_ALL_RECOUVREMENTS') {
-        this.roleReadAllRecouvrement = true;
-
-
-      }
-      if (authority == 'READ_MY_RECOUVREMENT') {
-        this.roleReadMyRecouvrement = true;
-
-        if(this.authService.getLastName()!=null){
-          this.userNameAuthenticated = this.authService.getLastName();
-        }else{
-          this.userNameAuthenticated ="undefined";
-        }
-
-      }
-    });
-
-    this.sigleUserAuthenticated = this.authService.getSigle();
-
-    this.getAllProjet(false,this.bu1);
-
-    this.getAllEmployeesByService("Intervenant");
-
-    this.getAllEmployeesAvantVente();
-
-    this.getEtatProjet();
-
-    this.getAllChefProjets();
-
-   // this.getAllClients();
-
-    this.getAllCommericals();
-    console.log("this.selectedBu" + this.selectedBu);
-
 
 
   }
 
+
+
+ result;
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-
+currentPageComment;
   setPage(page: number) {
-
-      console.log("this.currentProjet.commentaires " + this.currentProjet.commentaires);
+  this.currentPageComment = page;
+      //console.log("this.currentProjet.commentaires " + this.currentProjet.commentaires);
 
     if(this.currentProjet.commentaires == null ||  this.currentProjet.commentaires.length==0) {
-      console.log("null");
+      //console.log("null");
       this.pager = null;
       this.pagedItems = null;
       return;
@@ -338,14 +217,10 @@ export class EtatProjetComponent implements OnInit {
 
     }
 
-
-    console.log("page " +  page );
-    console.log("this.pager.totalPages " + this.pager.totalPages);
-
     // get pager object from service
     this.pager = this.pagerService.getPager(this.currentProjet.commentaires.length, page);
 
-    // get current page of items
+    // get current page of item
 
   }
 
@@ -356,7 +231,7 @@ export class EtatProjetComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -368,7 +243,7 @@ export class EtatProjetComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -409,7 +284,7 @@ export class EtatProjetComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -422,7 +297,7 @@ export class EtatProjetComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -435,7 +310,7 @@ export class EtatProjetComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -448,7 +323,7 @@ export class EtatProjetComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
   }
@@ -465,7 +340,7 @@ export class EtatProjetComponent implements OnInit {
       err=>{
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(err));
+        //console.log("error "  +JSON.stringify(err));
       }
     )
  }
@@ -475,13 +350,13 @@ export class EtatProjetComponent implements OnInit {
    this.etatProjetService.refreshProjets().subscribe(
      data=>{
 
-       console.log("data "+ data);
+       //console.log("data "+ data);
        this.refreshProjets();
        this.ref.detectChanges();
        this.spinner.hide();
      },
      err=>{
-       console.log("error "+ JSON.stringify(err));
+       //console.log("error "+ JSON.stringify(err));
 
        this.refreshProjets();
        this.ref.detectChanges();
@@ -538,7 +413,7 @@ export class EtatProjetComponent implements OnInit {
 
           if (this.pageProjet[0] != null && this.pageProjet[0].detaills != null) {
             this.pageProjet[0].details.forEach(element => {
-              console.log(element.header.label);
+              //console.log(element.header.label);
               let a: string;
               a = element.header.label;
               this.keys.push(a);
@@ -679,7 +554,7 @@ export class EtatProjetComponent implements OnInit {
             === filter ;
         };
         this.dataSource.paginator = this.paginator;
-        console.log("page size " + this.paginator.pageSize );
+        //console.log("page size " + this.paginator.pageSize );
         this.dataSource.sort = this.sort;
        // this.dataSource.connect().subscribe(d => this.filtredData = d);
         if(this.currentFilter!=null)
@@ -692,7 +567,7 @@ export class EtatProjetComponent implements OnInit {
        // alert("erreur " + err);
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(err));
+        //console.log("error "  +JSON.stringify(err));
       }
     )
 
@@ -705,7 +580,7 @@ export class EtatProjetComponent implements OnInit {
 
 
 
-    console.log("this.currentProjet suivre" + this.currentProjet.suivre);
+    //console.log("this.currentProjet suivre" + this.currentProjet.suivre);
     this.mode = 1;
 
     this.filtredData = this.dataSource.filteredData;
@@ -719,10 +594,10 @@ export class EtatProjetComponent implements OnInit {
 
 
 
-    //console.log("this.filtredData  " + JSON.stringify(this.filtredData ));
+    ////console.log("this.filtredData  " + JSON.stringify(this.filtredData ));
 
-   // console.log("this.filtredData size  " + this.filtredData.length );
-    console.log("current Projet " + JSON.stringify(this.currentProjet));
+   // //console.log("this.filtredData size  " + this.filtredData.length );
+    //console.log("current Projet " + JSON.stringify(this.currentProjet));
 
     /*if(this.currentProjet.firstCommentaire != null && this.currentProjet.secondCommentaire != null){
       this.isShowTextComment = false;
@@ -749,9 +624,9 @@ export class EtatProjetComponent implements OnInit {
 
     this.etatProjetService.getEmployeesByName(filterValue).subscribe(
       (data: Array<Employer>)=>{
-        console.log("datalength " + data.length);
+        //console.log("datalength " + data.length);
         if(data.length == 1){
-          console.log("here");
+          //console.log("here");
           this.newEmployerId = data[0].sigle;
         }else{
           this.newEmployerId = null;
@@ -759,7 +634,7 @@ export class EtatProjetComponent implements OnInit {
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(error));
+        //console.log("error "  +JSON.stringify(error));
       }
     )
 
@@ -796,43 +671,154 @@ export class EtatProjetComponent implements OnInit {
 
   ngOnInit() {
 
+    this.connectAndReconnect();
+
+    this.service = this.authService.getServName();
+
+    this.userAuthenticated = this.authService.getUserName();
+
+    this.userInSession = this.authService.getLastName();
+
+    this.authService.getRoles().forEach(authority => {
+      //console.log("authority " + authority);
+      //this.authorized = false;
+      if(authority== 'BU_COMMERCIAL'){
+        this.roleBuCommercial = true;
+        this.service = 'Commercial';
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_RESEAU_SECURITE'){
+        this.roleBuReseauSecurite = true;
+        this.bu1 = "VALUE_RS";
+        this.selectedBu = "VALUE_RS";
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_CHEF_PROJET'){
+        this.roleBuChefProjet = true;
+
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_SYSTEM'){
+        this.roleBuSystem = true;
+        this.bu1 = "VALUE_SI";
+        this.selectedBu = "VALUE_SI";
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_VOLUME'){
+        this.roleBuVolume = true;
+        this.bu1 = "VOLUME";
+        this.selectedBu = "VOLUME";
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_VALUE_SOFTWARE'){
+        this.roleBuValueSoftware = true;
+        this.bu1 = "VALUE_SW";
+        this.selectedBu = "VALUE_SW";
+        this.authorized = true;
+      }
+
+
+      if (authority == 'READ_ALL_PROJECTS') {
+        this.roleReadAllProjects = true;
+        this.authorized = true;
+
+      }
+      if (authority == 'READ_MY_PROJECTS') {
+        this.roleReadMyProjects = true;
+        this.authorized = true;
+        //console.log("heee");
+        if(this.authService.getLastName()!=null){
+          this.userNameAuthenticated = this.authService.getLastName();
+          if(this.service == 'Commercial'){
+            this.selectedCommercial = this.userNameAuthenticated;
+          }
+          if(this.service == 'Chef Projet') {
+            this.selectedChefProjet = this.userNameAuthenticated;
+          }
+        }else{
+          this.userNameAuthenticated ="undefined"; // for not pass for undefined
+        }
+
+      }
+
+      if (authority == 'READ_PROJECT_RS') {
+        this.roleReadProjectRs = true;
+        this.authorized = true;
+
+      }
+
+      if (authority == 'READ_PROJECT_SI') {
+
+        this.roleReadProjectSi = true;
+        this.authorized = true;
+
+      }
+
+
+      if (authority == 'READ_ALL_RECOUVREMENTS') {
+        this.roleReadAllRecouvrement = true;
+
+
+      }
+      if (authority == 'READ_MY_RECOUVREMENT') {
+        this.roleReadMyRecouvrement = true;
+
+        if(this.authService.getLastName()!=null){
+          this.userNameAuthenticated = this.authService.getLastName();
+        }else{
+          this.userNameAuthenticated ="undefined";
+        }
+
+      }
+    });
+
+    this.sigleUserAuthenticated = this.authService.getSigle();
+
+    this.getAllProjet(false,this.bu1);
+
+    this.getAllEmployeesByService("Intervenant");
+
+    this.getAllEmployeesAvantVente();
+
+    this.getEtatProjet();
+
+    this.getAllChefProjets();
+
+    // this.getAllClients();
+
+    this.getAllCommericals();
+    //console.log("this.selectedBu" + this.selectedBu);
+
     if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite){
 
     }else{
       this.selectedBu = "undefined";
     }
 
-
     this.selectedStatut = "undefined";
     this.selectedCommercial = "undefined";
     this.selectedClient = null;
     this.selectedChefProjet = "undefined";
-
-
     this.selectedAffectation = "undefined";
 
+  }
 
-
-
-
-   /* this.commercialFilter.valueChanges.subscribe((commercialFiltreValue) => {
-      this.filteredValues['commercial'] = commercialFiltreValue;
-      this.dataSource.filter = JSON.stringify(this.filteredValues);
-    });
-
-    this.chefProjetFilter.valueChanges.subscribe((chefProjetFiltreValue) => {
-      this.filteredValues['chefProjet'] = chefProjetFiltreValue;
-      this.dataSource.filter = JSON.stringify(this.filteredValues);
-    });
-
-    this.dataSource.filterPredicate = this.customFilterPredicate();*/
-
-    //this function waits for a message from alert service, it gets
-    //triggered when we call this from any other component
-
-
-
-
+  ngOnDestroy(){
+    this.filtredData=null;
+    this.currentProjet=null;
+    if (this.stompClient !== null) {
+      this.stompClient.disconnect();
+    }
   }
 
   initFilter(){
@@ -859,7 +845,7 @@ export class EtatProjetComponent implements OnInit {
 
 
   doSearch(){
-   console.log("this. "+ this.etatProjet.id);
+   //console.log("this. "+ this.etatProjet.id);
     if(this.bu1 === "VALUE_RS" || this.bu1==="VALUE_SI"){
       this.bu2 = "VALUE_SI / VALUE_RS";
     }else{
@@ -872,7 +858,7 @@ export class EtatProjetComponent implements OnInit {
 
     this.etatProjetService.getProjets(this.projetCloture,this.bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClient,this.selectedAffectation).subscribe(
       data=>{
-        console.log("data Search " + JSON.stringify(data));
+        //console.log("data Search " + JSON.stringify(data));
         this.pageProjet = data;
         this.pages = new Array(data["totalPages"]);
         this.totalElement = data["totalElements"];
@@ -880,13 +866,13 @@ export class EtatProjetComponent implements OnInit {
       },err=>{
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error "  +JSON.stringify(err));
+        //console.log("error "  +JSON.stringify(err));
       });
   }
 
 
   gotoPage(page:number){
-    console.log("page goto "+ page);
+    //console.log("page goto "+ page);
     this.currentPage = page;
     this.doSearch();
   }
@@ -905,7 +891,7 @@ export class EtatProjetComponent implements OnInit {
       if (event.type === HttpEventType.UploadProgress) {
         this.progress.percentage = Math.round(100 * event.loaded / event.total);
       } else if (event instanceof HttpResponse) {
-        console.log('File is completely uploaded!');
+        //console.log('File is completely uploaded!');
         this.refreshProjets();
         this.getStatistics();
         this.viewUpload = false;
@@ -931,7 +917,7 @@ export class EtatProjetComponent implements OnInit {
 
     modalRef.result.then((updatedProject) => {
       if (updatedProject) {
-        console.log("updatedProject" +  updatedProject);
+        //console.log("updatedProject" +  updatedProject);
       }
     });
 
@@ -958,7 +944,7 @@ export class EtatProjetComponent implements OnInit {
 
   addComment(){
 
-    console.log("newContentComment " + this.newContentComment);
+    //console.log("newContentComment " + this.newContentComment);
 
     if(this.newContentComment.length != 0) {
       let newCommentaire = new Commentaire();
@@ -968,13 +954,14 @@ export class EtatProjetComponent implements OnInit {
       newCommentaire.content = this.newContentComment.split("\n").join("<br>");
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
-      console.log("this.authService.getSigle "+ this.authService.getSigle());
+      let projet  = new Projet();
+      projet.codeProjet = this.currentProjet.codeProjet;
       newCommentaire.user.sigle = this.authService.getSigle();
 
 
 
       if (this.newEmployerId != null ) {
-        console.log("this.newEmployerId" + this.newEmployerId)
+        //console.log("this.newEmployerId" + this.newEmployerId)
         newCommentaire.employer = this.newEmployerId;
 
       }
@@ -983,18 +970,29 @@ export class EtatProjetComponent implements OnInit {
         this.currentProjet.commentaires = new Array<Commentaire>();
       }
 
-      this.currentProjet.commentaires.push(newCommentaire);
+      let commentaireSocket = new CommentaireSocket();
+      commentaireSocket.content = newCommentaire.content;
+      commentaireSocket.user = newCommentaire.user;
+      commentaireSocket.employer = newCommentaire.employer;
+      commentaireSocket.date=newCommentaire.date;
+      commentaireSocket.joinId = this.currentProjet.codeProjet;
 
-      this.currentProjet.commentaires.sort((a, b) => {
+      //this.currentProjet.commentaires.push(newCommentaire);
+
+
+
+      this.stompClient.send("/app/addCommentaireProjet", {}, JSON.stringify(commentaireSocket));
+
+     /* this.currentProjet.commentaires.sort((a, b) => {
         return <any> new Date(b.date) - <any> new Date(a.date);
-      });
+      });*/
 
 
 
 
-      console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
+      //console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
 
-      this.currentProjet.updated = true;
+      this.currentProjet.updated = false;
       this.setPage(1);
       this.newContentComment = null;
       //this.newEmployerId = null;
@@ -1002,7 +1000,6 @@ export class EtatProjetComponent implements OnInit {
 
 
     }
-
 
 
   }
@@ -1034,7 +1031,7 @@ export class EtatProjetComponent implements OnInit {
 
 
 
-      console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
+      //console.log(" this.currentProjet.commentaires " + this.currentProjet.commentaires);
 
       this.currentProjet.updated = true;
       this.setPage(1);
@@ -1070,13 +1067,13 @@ export class EtatProjetComponent implements OnInit {
   errorUpdate : boolean;
   onEditProjet(template: TemplateRef<any>) {
 
-    //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
+    ////console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
 
-    //console.log("new projet to send " + JSON.stringify(this.currentProjet));
+    ////console.log("new projet to send " + JSON.stringify(this.currentProjet));
 
 
     if(this.newContentComment != null ){
-      console.log("here newContentComment");
+      //console.log("here newContentComment");
       this.addComment();
     }
 
@@ -1106,9 +1103,9 @@ export class EtatProjetComponent implements OnInit {
   }
 
    getIndexFromFiltrerdList(codeProjet){
-    console.log("this.filtredData.size " + this.filtredData.length);
+    //console.log("this.filtredData.size " + this.filtredData.length);
     for(var i=0;i<this.filtredData.length;i++){
-      console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
+      //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
       if(this.filtredData[i].codeProjet == codeProjet){
         return i;
         break;
@@ -1121,9 +1118,9 @@ export class EtatProjetComponent implements OnInit {
     if(!this.errorUpdate){
     var index = this.getIndexFromFiltrerdList(codeProjet);
 
-    console.log("page " + this.paginator.pageSize / index);
+    //console.log("page " + this.paginator.pageSize / index);
 
-    console.log("index found " + index);
+    //console.log("index found " + index);
     if(index-1 >=0) {
       var precedIndex = index - 1;
 
@@ -1156,13 +1153,13 @@ export class EtatProjetComponent implements OnInit {
 
   if(!this.errorUpdate){
       var index = this.getIndexFromFiltrerdList(codeProjet);
-      console.log("paginator size " + this.paginator.pageSize);
-      console.log("index " + index);
+      //console.log("paginator size " + this.paginator.pageSize);
+      //console.log("index " + index);
 
 
 
       var suivantIndex = index + 1;
-      console.log("index suivantIndex " + suivantIndex);
+      //console.log("index suivantIndex " + suivantIndex);
 
       if(this.currentProjet.updated ){
         //this.showDialog();
@@ -1170,18 +1167,18 @@ export class EtatProjetComponent implements OnInit {
         this.onEditProjet(null);
 
         if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-          console.log("here");
+          //console.log("here");
           this.index = suivantIndex;
-          console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
+          //console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
           this.paginator.pageIndex = Math.floor( this.index/this.paginator.pageSize);
-          console.log("this.paginator.pageIndex= " + this.paginator.pageIndex);
+          //console.log("this.paginator.pageIndex= " + this.paginator.pageIndex);
 
           this.ref.detectChanges();
         }
           this.currentProjet = this.filtredData[suivantIndex];
           this.setPage(1);
           this.mode=1;
-             // console.log("index " + this.index);
+             // //console.log("index " + this.index);
 
 
 
@@ -1189,9 +1186,9 @@ export class EtatProjetComponent implements OnInit {
       }
 
       if(!this.currentProjet.updated && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-        console.log("here");
+        //console.log("here");
         this.index = suivantIndex;
-        console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
+        //console.log("page " +   Math.floor( this.index/this.paginator.pageSize));
         this.paginator.pageIndex = Math.floor( this.index/this.paginator.pageSize);
         this.ref.detectChanges();
         this.currentProjet = this.filtredData[suivantIndex];
@@ -1206,11 +1203,20 @@ export class EtatProjetComponent implements OnInit {
   }
 
   deleteCommentaire(commentaire : any){
-    console.log("delete comment");
+    //console.log("delete comment real " + JSON.stringify(commentaire) );
 
-    this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
-    this.currentProjet.updated = true;
-    this.setPage(1);
+    //this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
+    let commentaireSocket = new CommentaireSocket();
+    commentaireSocket.id = commentaire.id;
+    commentaireSocket.content = commentaire.content;
+    commentaireSocket.date = commentaire.date;
+    commentaireSocket.employer = commentaire.employer;
+    commentaireSocket.user = commentaire.user;
+    commentaireSocket.joinId = this.currentProjet.codeProjet;
+    //console.log("delete comment fake " + JSON.stringify(commentaireSocket) );
+    this.stompClient.send("/app/deleteCommentaireProjet", {}, JSON.stringify(commentaireSocket));
+    this.currentProjet.updated = false;
+    //this.setPage(1);
 
   }
 
@@ -1220,7 +1226,7 @@ export class EtatProjetComponent implements OnInit {
 
 
  updated(event){
-    console.log("updated");
+    //console.log("updated");
     event.preventDefault();
     this.currentProjet.updated = true;
     this.ref.detectChanges();
@@ -1255,7 +1261,7 @@ export class EtatProjetComponent implements OnInit {
      this.nestedModalRef.hide();
     this.currentProjet.updated = false;
      if(this.suivant){
-       console.log("here");
+       //console.log("here");
        this.goToSuivant(codeProjet,secondModal);
      }else{
        this.goToPrecedent(codeProjet,secondModal);
@@ -1274,7 +1280,7 @@ export class EtatProjetComponent implements OnInit {
   }
 
   showMotifModal( escalader :boolean, fourthModal: TemplateRef<any>) {
-    console.log("here3");
+    //console.log("here3");
     if(escalader){
       this.actionModal = "escalader";
     }else{
@@ -1336,12 +1342,12 @@ export class EtatProjetComponent implements OnInit {
     $event.stopPropagation();
     $event.preventDefault();
 
-    console.log("filtre "+ this.dataSource.filter);
+    //console.log("filtre "+ this.dataSource.filter);
     var result= this.etatProjetService.exportEtatProjet(this.filtredData);
 
     var d = new Date();
 
-    console.log("day " + d.getDay());
+    //console.log("day " + d.getDay());
     var fileName = "EtatProjet-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
 
     result.subscribe((response: any) => {
@@ -1373,7 +1379,7 @@ export class EtatProjetComponent implements OnInit {
 
   composeEmail(projet : Projet){
 
-    console.log("compose Email");
+    //console.log("compose Email");
 
     var codeProjet = projet.codeProjet;
 
@@ -1406,18 +1412,18 @@ export class EtatProjetComponent implements OnInit {
       if(lastCommentaire1){
         email = email+ "%0A";
 
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
       }
        let lastCommentaire2 = new Commentaire();
       lastCommentaire2= projet.commentaires[1];
       if(lastCommentaire2)
-      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
+      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= projet.commentaires[2];
       if(lastCommentaire3)
-      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
+      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
     }
-    console.log("email " + email);
+    //console.log("email " + email);
 
     /*Insert commentaire ssytem with motif*/
 
@@ -1449,7 +1455,7 @@ export class EtatProjetComponent implements OnInit {
   }
 
   selectFiltre() {
-    console.log("this.selectedBu " + this.selectedBu);
+    //console.log("this.selectedBu " + this.selectedBu);
 
     this.selectedAffectation = "undefined";
     if (this.selectedChefProjet != "undefined" || this.selectedStatut != "undefined" || this.selectedClient != "undefined"
@@ -1459,11 +1465,11 @@ export class EtatProjetComponent implements OnInit {
 
 
     if (this.selectedBu == "none") {
-      console.log("none");
+      //console.log("none");
       this.bu1 = undefined;
       this.bu2 = undefined;
     } else {
-      console.log("not none");
+      //console.log("not none");
       this.bu2 = undefined;
       this.bu1 = this.selectedBu;
     }
@@ -1482,13 +1488,13 @@ export class EtatProjetComponent implements OnInit {
 
     switch(type)
     {
-      case 'codeCommercial':console.log("codeCommercial "+ value); this.router.navigate(['/etatRecouvrementCodeCommercial',value]); break;
+      case 'codeCommercial'://console.log("codeCommercial "+ value); this.router.navigate(['/etatRecouvrementCodeCommercial',value]); break;
 
-      case 'chefProjet':console.log("chefProjet "+ value);this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
+      case 'chefProjet'://console.log("chefProjet "+ value);this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
 
-      case 'codeClient':console.log("codeClient "+ value);this.router.navigate(['/etatRecouvrementCodeClient',value]); break;
+      case 'codeClient'://console.log("codeClient "+ value);this.router.navigate(['/etatRecouvrementCodeClient',value]); break;
 
-      case 'codeProjet':console.log("codeProjet "+ value);this.router.navigate(['/etatRecouvrementCodeProjet',value]); break;
+      case 'codeProjet'://console.log("codeProjet "+ value);this.router.navigate(['/etatRecouvrementCodeProjet',value]); break;
 
 
     }
@@ -1503,7 +1509,7 @@ export class EtatProjetComponent implements OnInit {
 
     switch(type)
     {
-      case 'codeProjet':console.log("codeProjet "+ value);
+      case 'codeProjet'://console.log("codeProjet "+ value);
 
      let url =  '/#/etatStockCodeProjet/'+value;
 
@@ -1519,9 +1525,11 @@ export class EtatProjetComponent implements OnInit {
 
   checkIFMorethanFifthMinuteAgo(commentaie : Commentaire){
 
-    if(commentaie.user.sigle == 'SYSTEM'){
+    if(commentaie.user.sigle == 'SYSTEM' || commentaie.user.username != this.userAuthenticated){
       return true;
     }
+
+
 
     let dateCom = moment(commentaie.date).add(15, 'minutes');
 
@@ -1537,7 +1545,7 @@ export class EtatProjetComponent implements OnInit {
     let template:any;
 
     if (event.keyCode === this.RIGHT_ARROW && !this.blockedKey1) {
-      console.log("right");
+      //console.log("right");
       this.goToSuivant(this.currentProjet.codeProjet,template);
     }
 
@@ -1560,7 +1568,7 @@ export class EtatProjetComponent implements OnInit {
   }
 
   searchByAffectation(affecation :string) {
-    console.log("aff "+ affecation);
+    //console.log("aff "+ affecation);
     if(affecation == 'true'){
       this.selectedAffectation = 'true';
     }
@@ -1592,11 +1600,11 @@ export class EtatProjetComponent implements OnInit {
       //this.modalRef.hide();
     }, err => {
       this.currentProjet.updated = true;
-      console.log(JSON.stringify(err));
+      //console.log(JSON.stringify(err));
       this.returnedError = err.error.message;
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      //console.log("error "  +JSON.stringify(err));
 
     });
   }
@@ -1605,10 +1613,10 @@ export class EtatProjetComponent implements OnInit {
 
     this.etatProjetService.declotureProjet(projet).subscribe((data: Projet) => {
       this.currentProjet.updated = false;
-      console.log("data.cloture " + data.cloture);
+      //console.log("data.cloture " + data.cloture);
 
       this.currentProjet.cloture = data.cloture;
-      console.log("this.currentProjet.cloture " + this.currentProjet.cloture);
+      //console.log("this.currentProjet.cloture " + this.currentProjet.cloture);
       this.currentProjet.decloturedByUser = data.decloturedByUser;
       //this.mode = 2;
       this.currentProjet.updated = false;
@@ -1616,11 +1624,11 @@ export class EtatProjetComponent implements OnInit {
       //this.modalRef.hide();
     }, err => {
       this.currentProjet.updated = true;
-      console.log(JSON.stringify(err));
+      //console.log(JSON.stringify(err));
       this.returnedError = err.error.message;
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      //console.log("error "  +JSON.stringify(err));
 
     });
 
@@ -1641,11 +1649,118 @@ export class EtatProjetComponent implements OnInit {
   sortChange(e) {
     // save cookie with table sort data here
     this.dataSource.sortData(this.dataSource.filteredData,this.dataSource.sort);
-   // console.log("this.before [0] " + this.filtredData[0].codeProjet);
-   // console.log("sorting table");
+   // //console.log("this.before [0] " + this.filtredData[0].codeProjet);
+   // //console.log("sorting table");
     //this.filtredData = this.dataSource.filteredData;
 
-   // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+   // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+
+  }
+
+  addCommentaireFromSocket(commentaire : CommentaireSocket){
+  //console.log("addCommentration " + commentaire);
+  var projet : Projet;
+    for(var i=0;i<this.filtredData.length;i++){
+      //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
+      if(this.filtredData[i].codeProjet == commentaire.joinId){
+        //console.log("eqals");
+        projet = this.filtredData[i];
+        this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
+        if (this.filtredData[i].commentaires == null) {
+          this.filtredData[i].commentaires = new Array<Commentaire>();
+        }
+
+         this.filtredData[i].commentaires.push(commentaire);
+
+
+        this.filtredData[i].commentaires.sort((a, b) => {
+          return <any> new Date(b.date) - <any> new Date(a.date);
+        });
+
+
+        if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
+          //console.log("same projet " + JSON.stringify(projet));
+          this.currentProjet = projet;
+          this.setPage(this.currentPageComment);
+          this.ref.detectChanges();
+        }
+       return;
+
+      }
+
+
+
+
+    }
+
+  }
+
+  deleteCommentaireFromSocket(commentaire : CommentaireSocket){
+    //console.log("deleteCommentaire " + JSON.stringify(commentaire));
+    var projet : Projet;
+    for(var i=0;i<this.filtredData.length;i++){
+      //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
+      if(this.filtredData[i].codeProjet == commentaire.joinId && this.filtredData[i].commentaires!=null && this.filtredData[i].commentaires.length>0){
+
+
+        var commentaireSimple = new Commentaire();
+        commentaireSimple.id = commentaire.id;
+        commentaireSimple.content = commentaire.content;
+        commentaireSimple.date = commentaire.date;
+        commentaireSimple.employer = commentaire.employer;
+        commentaireSimple.user = commentaire.user;
+
+        for(var j =0;i<this.filtredData[i].commentaires.length;j++){
+          if(this.filtredData[i].commentaires[j].id===commentaire.id){
+            this.filtredData[i].commentaires.splice(j,1);
+            break;
+          }
+        }
+
+        //this.filtredData[i].commentaires = this.filtredData[i].commentaires.filter(item => item !== commentaireSimple);
+
+        //console.log("length comm2 " +  this.filtredData[i].commentaires.length);
+        projet = this.filtredData[i];
+        if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
+          //console.log("here" + this.currentProjet.commentaires.length);
+          this.currentProjet.commentaires = this.filtredData[i].commentaires;
+          //console.log("here" + this.currentProjet.commentaires.length);
+          this.setPage(this.currentPageComment);
+          this.ref.detectChanges();
+        }
+        return;
+
+      }
+
+    }
+
+  }
+
+
+  connectAndReconnect(){
+    this.stompClient = this.etatProjetService.connect();
+
+    this.stompClient.connect({'Authorization': this.authService.getToken()},'',  (frame: Frame) => {
+      //console.log('CONNECT CONNECT');
+      this.stompClient.subscribe("/topic/addCommentProjet", (comment : Message)=> {
+        if(comment.body!=null){
+          //console.log("commentReceived " + comment.body);
+          this.addCommentaireFromSocket(JSON.parse(comment.body));
+        }
+
+      });
+
+      this.stompClient.subscribe("/topic/deleteCommentProjet", (comment : Message)=> {
+        if(comment.body!=null){
+          this.deleteCommentaireFromSocket(JSON.parse(comment.body));
+        }
+      });
+
+    },()=>{
+      setTimeout(()=>{
+        this.connectAndReconnect();
+      },5000);
+      });
 
   }
 

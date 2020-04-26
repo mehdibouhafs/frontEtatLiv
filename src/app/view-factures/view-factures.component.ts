@@ -72,11 +72,11 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   sortChange(e) {
     // save cookie with table sort data here
     this.dataSourceFacturesEcheance.sortData(this.dataSourceFacturesEcheance.filteredData,this.dataSourceFacturesEcheance.sort);
-    // console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // console.log("sorting table");
+    // ////console.log("this.before [0] " + this.filtredData[0].codeProjet);
+    // //console.log("sorting table");
     //this.filtredData = this.dataSource.filteredData;
 
-    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
 

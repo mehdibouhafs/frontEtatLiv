@@ -67,12 +67,13 @@
 
   <ng-container matColumnDef="du">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header>Echéance  </th>
-    <td mat-cell *matCellDef="let element"  > [{{element.echeance.du | date:'dd/MM/yyyy'}} Au  {{element.echeance.au | date:'dd/MM/yyyy'}}]    </td>
+    <td mat-cell *matCellDef="let element"  ><div *ngIf="element.echeance">[{{element.echeance.du | date:'dd/MM/yyyy'}} Au  {{element.echeance.au | date:'dd/MM/yyyy'}}] </div>    </td>
   </ng-container>
 
 
+
   <tr mat-header-row *matHeaderRowDef="displayedColumnsFacturesEcheance; sticky: true"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumnsFacturesEcheance;" ></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumnsFacturesEcheance;" [ngStyle]= "(row!=null && row.echeance==null) && {'background-color':'#ff0b0b30'}" ></tr>
 
 
 </table>

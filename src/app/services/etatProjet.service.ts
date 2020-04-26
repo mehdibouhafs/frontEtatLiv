@@ -6,7 +6,8 @@ import {Observable} from 'rxjs';
 import {Projet} from '../../model/model.projet';
 import {ResponseContentType} from '@angular/http';
 import {AuthenticationService} from './authentification.service';
-
+import * as SockJS from 'sockjs-client';
+import {Client, Frame, Message,Stomp} from "@stomp/stompjs";
 
 @Injectable()
 export class EtatProjetService {
@@ -118,6 +119,15 @@ export class EtatProjetService {
     return this.http.get(this.host+'/getProjetsByChefDeProjetNotNull',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
   }
+
+  connect() {
+    const socket = new SockJS(this.host+'/gs-guide-websocket') as WebSocket;
+    var stompClient = Stomp.over(socket);
+
+    return stompClient;
+  }
+
+
 
 
 
