@@ -101,6 +101,8 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
         downloadLink.setAttribute('download', fileName);
       document.body.appendChild(downloadLink);
       downloadLink.click();
+    },err=>{
+       alert("Ereur de téléchargement de la pièce ! Veuillez contacter votre administrateur ");
     });
   }
 
