@@ -786,6 +786,11 @@ export class EtatRecouvrementComponent implements OnInit {
 
     const codeCommercial = this.activatedRoute.snapshot.params['codeCommercial'];
     console.log("codeCommercial " + codeCommercial);
+
+    const age = this.activatedRoute.snapshot.params['age'];
+
+    const clientBalance = this.activatedRoute.snapshot.params['client'];
+
     const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
     console.log("codeProjet " + codeProjet);
 
@@ -795,6 +800,25 @@ export class EtatRecouvrementComponent implements OnInit {
     console.log("codeClient " + codeClient);
 
     const numDocument = this.activatedRoute.snapshot.params['numDocument'];
+
+
+
+    if(age != null && clientBalance !=null){
+      this.selectedAge = age;
+      this.selectedClient = clientBalance;
+      setTimeout(()=>{    //<<<---    using ()=> syntax
+        this.selectedClient = clientBalance;
+      }, 2000);
+      this.selectFiltre();
+    }else
+    if(clientBalance!=null){
+      this.selectedClient = clientBalance;
+      setTimeout(()=>{    //<<<---    using ()=> syntax
+        this.selectedClient = clientBalance;
+      }, 2000);
+      this.selectFiltre();
+    }
+    else
     if(numDocument!=null){
       console.log("numDocument");
       this.getDocumentsByNumDocument(false,numDocument);
