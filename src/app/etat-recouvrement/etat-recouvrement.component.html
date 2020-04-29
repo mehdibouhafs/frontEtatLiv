@@ -179,12 +179,23 @@
     </select>
   </div>
 
+  <div class="col-md-2">
+    <label for="client">Age :</label>
+    <br/>
+
+    <select style="margin-left: 5px;width: 175px;height: 26px;" id="client" class="browser-default custom-select" name="age"  [(ngModel)]="selectedAge" (change)="selectFiltre()" >
+      <option value="undefined" selected>Filtrer par age </option>
+      <option *ngFor="let age of ages"
+              [ngValue]="age.name">{{age.name}}</option>
+    </select>
+  </div>
+
   <div class="col-md-2" [hidden]="service=='Commercial'">
     <label for="com">Commercial :</label>
     <br/>
     <select style="margin-left: 5px;width: 175px;height: 26px;" id="com" class="browser-default custom-select" name="com"  [(ngModel)]="selectedCommercial" (change)="selectFiltre()" >
       <option value="undefined" selected>Filtrer par commercial </option>
-      <option *ngFor="let com of commercials"
+      <option *ngFor="let com of commercials" 
               [ngValue]="com">{{com}}</option>
     </select>
   </div>

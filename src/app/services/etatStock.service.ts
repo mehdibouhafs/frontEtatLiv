@@ -44,6 +44,7 @@ export class EtatStockService {
   }
 //new teste
   exportEtatStock(stock : Array<StockProjet>) {
+    console.log("STOCK TO EXPORT / "+JSON.stringify(stock))
     return this.http.post(this.host + '/exportStockExcel', stock, {
         responseType: 'blob' as 'json',
         headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})

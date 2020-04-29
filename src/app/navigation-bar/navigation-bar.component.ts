@@ -43,6 +43,8 @@ export class NavigationBarComponent implements OnInit {
 
   @Input() recouvNav:boolean;
 
+  @Input() recouvBNav:boolean;
+
   @Input() reunionNav:boolean;
 
   authorized:boolean;

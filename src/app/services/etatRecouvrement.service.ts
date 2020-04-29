@@ -15,10 +15,10 @@ export class EtatRecouvrementService {
 
   constructor(private  http:HttpClient,private authenticationService:AuthenticationService){}
 
-  getDocuments(cloture : boolean,chargeRecouvrement:string,statut:string,commercial:string,chefProjet:string,client:string,anneePiece:string) {
+  getDocuments(cloture : boolean,chargeRecouvrement:string,statut:string,commercial:string,chefProjet:string,client:string,anneePiece:string,age:string) {
     //return this.http.get(this.host+"/getProjets?username="+username, {headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
     //return this.http.get(this.host+"/getProjects?idEtatProjet=1"+"&page="+page+"&size="+size);
-    return this.http.get(this.host+"/getDocuments?idEtatRecouvrement=1&cloturer="+cloture+"&chargeRecouvrement="+chargeRecouvrement+"&statut="+statut+"&commercial="+commercial+"&chefProjet="+chefProjet+"&client="+client+"&anneePiece="+anneePiece,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.get(this.host+"/getDocuments?idEtatRecouvrement=1&cloturer="+cloture+"&chargeRecouvrement="+chargeRecouvrement+"&statut="+statut+"&commercial="+commercial+"&chefProjet="+chefProjet+"&client="+client+"&anneePiece="+anneePiece+"&age="+age,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
   uploadEtat(file:File, file_name:string){

@@ -357,16 +357,16 @@ montantNat:any;
 
           p.id_stock = produit.id_stock;
 
-            p.num_lot = produit.numLot;
+            p.num_lot = produit.num_lot;
             p.client = produit.client;
             p.commercial = produit.commercial;
             p.montant = produit.montant;
             p.annee = produit.annee;
-            p.chef_projet = produit.chefProjet;
+            p.chef_projet = produit.chef_projet;
               p.commentaires = produit.commentaires;
               p.magasin = produit.magasin;
-              p.date_rec = produit.dateRec;
-              p.nom_lot = produit.nomLot;
+              p.date_rec = produit.date_rec;
+              p.nom_lot = produit.nom_lot;
 
 
 
@@ -378,7 +378,7 @@ montantNat:any;
                  .map(item => ((!item.client)? "AUCUN CLIENT": item.client))
                  .filter((value, index, self) => self.indexOf(value) === index)
                 this.lot = this.pageProduit
-                 .map(item => item.numLot)
+                 .map(item => item.num_lot)
                  .filter((value, index, self) => self.indexOf(value) === index)
 
                  this.commercial = this.pageProduit
@@ -387,7 +387,7 @@ montantNat:any;
 
 
                  this.chefProjets = this.pageProduit
-                 .map(item => ((!item.chefProjet)? "AUCUN CDP": item.chefProjet))
+                 .map(item => ((!item.chef_projet)? "AUCUN CDP": item.chef_projet))
                  .filter((value, index, self) => self.indexOf(value) === index)
 
                  this.chefProjets = this.chefProjets.filter(item => item !== "AUCUN CDP");
@@ -399,7 +399,7 @@ montantNat:any;
 
 
             this.addToArray(p.client,'client');this.addToArray(p.commercial,'commercial');
-            this.addToArray(p.chef_projet,'chefProjet');this.addToArray(p.num_lot,'numLot');
+            this.addToArray(p.chef_projet,'chefProjet');this.addToArray(p.num_lot,'num_lot');
 
 
 
@@ -474,7 +474,7 @@ montantNat:any;
           this.clients.push(value);
         }
         break;
-      case 'numLot':
+      case 'num_lot':
         if(this.numsLots.indexOf(value) === -1 && value!="") {
           this.numsLots.push(value);
         }
@@ -829,16 +829,16 @@ montantNat:any;
             let p = new StockProjet();
 
             p.id_stock = produit.id_stock;
-            p.num_lot = produit.numLot;
+            p.num_lot = produit.num_lot;
             p.client = produit.client;
             p.commercial = produit.commercial;
             p.montant = produit.montant;
             p.annee = produit.annee;
-            p.chef_projet = produit.chefProjet;
+            p.chef_projet = produit.chef_projet;
               p.commentaires = produit.commentaires;
               p.magasin = produit.magasin;
-              p.date_rec = produit.dateRec;
-              p.nom_lot = produit.nomLot;
+              p.date_rec = produit.date_rec;
+              p.nom_lot = produit.nom_lot;
 
             if(produit.commentaires != null && produit.commentaires.length>0){
               p.commentaires = produit.commentaires;
@@ -1017,7 +1017,7 @@ montantNat:any;
     var d = new Date();
 
     console.log("day " + d.getDay());
-    var fileName = "EtatStock-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
+    var fileName = "Stock_Projet-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
 
     result.subscribe((response: any) => {
       let dataType = response.type;

@@ -37,6 +37,9 @@ import { NavigationBarComponent } from './navigation-bar/navigation-bar.componen
 import { ViewFacturesComponent } from './view-factures/view-factures.component';
 import { ViewPiecesComponent } from './view-pieces/view-pieces.component';
 import { EtatStockProjetComponent } from './etat-stock-projet/etat-stock-projet.component';
+import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
+
+import { BalanceAgeeService } from './services/balanceAgee.service';
 registerLocaleData(localeFr, 'fr');
 
 
@@ -50,6 +53,7 @@ registerLocaleData(localeFr, 'fr');
     EtatRecouvrementComponent,
     EtatStockComponent,
     EtatStockProjetComponent,
+    BalanceAgeeComponent,
     DashboardComponent,
     ContratComponent,
     ViewEcheanceComponent,
@@ -77,7 +81,7 @@ registerLocaleData(localeFr, 'fr');
     NgxSpinnerModule,
     NgSelectModule
   ],
-  providers: [DatePipe,ContratService,EventService,CurrencyPipe,AuthenticationService,EtatProjetService,EtatRecouvrementService,EtatStockService,UserService,ReunionService,PagerService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
+  providers: [DatePipe,BalanceAgeeService,ContratService,EventService,CurrencyPipe,AuthenticationService,EtatProjetService,EtatRecouvrementService,EtatStockService,UserService,ReunionService,PagerService,{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],
 
 })

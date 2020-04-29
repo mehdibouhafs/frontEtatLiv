@@ -8,6 +8,7 @@ import {EtatStockComponent} from './etat-stock/etat-stock.component';
 import {DashboardComponent} from "./dashboard/dashboard.component";
 import {ContratComponent} from "./contrat/contrat.component";
 import {EtatStockProjetComponent} from './etat-stock-projet/etat-stock-projet.component';
+import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
 
 
 
@@ -17,6 +18,8 @@ const routes: Routes = [
   {path:"notifications",component:DashboardComponent},
   {path:"etatProjet",component:EtatProjetComponent},
   {path:"etatRecouvrement",component:EtatRecouvrementComponent},
+  {path:"etatRecouvrementClient/:client",component:EtatRecouvrementComponent},
+  {path:"etatRecouvrementClientAge/:age/:client",component:EtatRecouvrementComponent},
   {path:"etatRecouvrementNumDocument/:numDocument",component:EtatRecouvrementComponent},
   {path:"etatRecouvrementCodeCommercial/:codeCommercial",component:EtatRecouvrementComponent},
   {path:"etatRecouvrementCodeClient/:codeClient",component:EtatRecouvrementComponent},
@@ -24,6 +27,8 @@ const routes: Routes = [
   {path:"etatRecouvrementCodeProjet/:codeProjet",component:EtatRecouvrementComponent},
   {path:"etatStock",component:EtatStockComponent},
   {path:"etatStockProjet",component:EtatStockProjetComponent},
+  {path:"balanceAgee",component:BalanceAgeeComponent},
+
   {path:"etatStockCodeProjet/:codeProjet",component:EtatStockComponent},
   {path:"etatStockNature/:codeProjet/:nature",component:EtatStockComponent},
   {path:"login",component:AuthentificationComponent},

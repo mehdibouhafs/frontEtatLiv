@@ -72,8 +72,24 @@ export class EtatRecouvrementComponent implements OnInit {
 
   clients : Array<String> = new Array<string>();
 
-
+   ages = [
+    {
+      name: '3M'
+    },
+    {
+      name: '6M'
+    },
+    {
+      name: 'A12M'
+    },
+    {
+      name: 'Sup. 12M'
+    }
+  ];
   selectedClient :any;
+  selectedAge: any;
+
+
 
   commercials: Array<String> = new Array<string>();
 
@@ -248,12 +264,29 @@ export class EtatRecouvrementComponent implements OnInit {
     const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
     console.log("codeProjet " + codeProjet);
 
+    const age = this.activatedRoute.snapshot.params['age'];
+
+    const clientBalance = this.activatedRoute.snapshot.params['client'];
     const chefProjet = this.activatedRoute.snapshot.params['chefProjet'];
     console.log("chefProjet " + chefProjet);
     const codeClient = this.activatedRoute.snapshot.params['codeClient'];
     console.log("codeClient " + codeClient);
 
     const numDocument = this.activatedRoute.snapshot.params['numDocument'];
+
+    if(age != null && clientBalance !=null){
+      this.selectedAge = age;
+      this.selectedClient = clientBalance;
+      setTimeout(()=>{    //<<<---    using ()=> syntax
+        this.selectedClient = clientBalance;
+      }, 2000);
+      this.selectFiltre();
+    }else
+    if(clientBalance!=null){
+      this.selectedClient = clientBalance;
+      this.selectFiltre();
+    }
+    else
     if(numDocument!=null){
       console.log("numDocument");
       this.getDocumentsByNumDocument(false,numDocument);
@@ -662,7 +695,7 @@ export class EtatRecouvrementComponent implements OnInit {
     console.log("selectChargeRecouvrement " + this.selectedChargeRecouvrement);
 
     this.etatRecouvrementService.getDocuments(cloture,this.selectedChargeRecouvrement,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,
-      this.selectedClient,this.selectedAnneePiece).subscribe(
+      this.selectedClient,this.selectedAnneePiece,this.selectedAge).subscribe(
       data=>{
         this.pageDocument = data;
 
@@ -680,6 +713,8 @@ export class EtatRecouvrementComponent implements OnInit {
         }
 
         this.insertIntoDocuments(this.pageDocument);
+
+
 
         this.dataSource =  new MatTableDataSource(this.Documents);
 
@@ -699,7 +734,6 @@ export class EtatRecouvrementComponent implements OnInit {
             (data.codeProjet !=null ? data.codeProjet : "").toLowerCase()
             === filter
 
-
         };
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
@@ -708,8 +742,6 @@ export class EtatRecouvrementComponent implements OnInit {
         }else{
           this.getStatistics();
         }
-
-        // this.getStatistics();
 
 
       },err=>{
@@ -897,7 +929,7 @@ export class EtatRecouvrementComponent implements OnInit {
   doSearch(){
     console.log("this. "+ this.etatRecouvrement.id);
     this.etatRecouvrementService.getDocuments(this.documentCloture,this.selectedChargeRecouvrement,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,
-      this.selectedClient,this.selectedAnneePiece).subscribe(
+      this.selectedClient,this.selectedAnneePiece,this.selectedAge).subscribe(
       data=>{
         console.log("data Search " + JSON.stringify(data));
         this.pageDocument = data;
