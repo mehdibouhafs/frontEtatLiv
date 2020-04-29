@@ -83,11 +83,11 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
   sortChange(e) {
     // save cookie with table sort data here
     this.dataSourceCommandeFournisseur.sortData(this.dataSourceCommandeFournisseur.filteredData,this.dataSourceCommandeFournisseur.sort);
-    // console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // console.log("sorting table");
+    // //console.log("this.before [0] " + this.filtredData[0].codeProjet);
+    // //console.log("sorting table");
     //this.filtredData = this.dataSource.filteredData;
 
-    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
 

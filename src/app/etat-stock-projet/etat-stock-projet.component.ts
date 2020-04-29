@@ -1058,16 +1058,19 @@ montantNat:any;
       let lastCommentaire1 = new CommentaireStock();
       lastCommentaire1= produit.commentaires[0];
       if(lastCommentaire1){
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+"  : "+(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) +" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+this.removeAnd(lastCommentaire1.content)+"%0A";
+        email = email+ "%0A";
+        email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
+        email = email + "%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+"  : "+(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) +" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
       }
       let lastCommentaire2 = new CommentaireStock();
       lastCommentaire2= produit.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+": " +(lastCommentaire2.user_username.sigle == null ? "": "  @"+lastCommentaire2.user_username.sigle) + " "+(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+this.removeAnd(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+": " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " "+(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
       let lastCommentaire3 = new CommentaireStock();
       lastCommentaire3= produit.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" : " +(lastCommentaire3.user_username.sigle == null ? "": "  @"+lastCommentaire3.user_username.sigle) + " " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+this.removeAnd(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" : " +(lastCommentaire1.user_username.sigle == null ? "": "  @"+lastCommentaire1.user_username.sigle) + " " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
     }
     console.log("email " + email);
 

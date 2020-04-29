@@ -149,13 +149,23 @@ export class ContratComponent implements OnInit {
   }
 
   constructor(private activatedRoute:ActivatedRoute ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private contratService: ContratService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
+
+
+  }
+
+
+  sortAll(){
+
+  }
+
+  ngOnInit() {
     this.service = this.authService.getServName();
     this.authorized = false;
     this.userInSession = this.authService.getLastName();
 
 
     this.authService.getRoles().forEach(authority => {
-  console.log("auth " +authority );
+
       if (authority == 'READ_ALL_CONTRATS') {
         this.roleReadAllContrats = true;
         this.authorized = true;
@@ -163,6 +173,7 @@ export class ContratComponent implements OnInit {
       }
       if (authority == 'READ_MY_CONTRATS') {
         this.roleReadMyContrats = true;
+        this.authorized = true;
         if (this.authService.getLastName() != null) {
           this.userNameAuthenticated = this.authService.getLastName();
           this.selectedPilote = this.userNameAuthenticated;
@@ -173,7 +184,7 @@ export class ContratComponent implements OnInit {
       }
     });
 
-    console.log("this.authorize " + this.authorized);
+    //console.log("this.authorize " + this.authorized);
 
     this.sigleUserAuthenticated = this.authService.getSigle();
 
@@ -192,20 +203,6 @@ export class ContratComponent implements OnInit {
       }
 
     }
-
-
-
-
-
-
-  }
-
-
-  sortAll(){
-
-  }
-
-  ngOnInit() {
   }
 
  lastUpdate : any;
@@ -313,7 +310,7 @@ export class ContratComponent implements OnInit {
 
 
         this.ref.detectChanges()
-        console.log("loading contrat");
+        //console.log("loading contrat");
         this.dataSource = new MatTableDataSource(this.contrats);
         this.dataSource.filterPredicate = function(data, filter: string): boolean {
 
@@ -345,7 +342,7 @@ export class ContratComponent implements OnInit {
         this.spinner.hide();
         this.authService.logout();
         this.router.navigateByUrl('/login');
-        console.log("error " + JSON.stringify(err));
+        //console.log("error " + JSON.stringify(err));
       }
     )
 
@@ -390,7 +387,7 @@ export class ContratComponent implements OnInit {
     let template:any;
 
     if (event.keyCode === this.RIGHT_ARROW && !this.blockedKey1) {
-      console.log("right");
+      //console.log("right");
       this.goToSuivant(this.currentContrat.numContrat,template);
     }
 
@@ -418,13 +415,13 @@ export class ContratComponent implements OnInit {
       newCommentaire.content = this.newContentComment.split("\n").join("<br>");
       newCommentaire.user = new User();
       newCommentaire.user.username = this.authService.getUserName();
-      console.log("this.authService.getSigle "+ this.authService.getSigle());
+      //console.log("this.authService.getSigle "+ this.authService.getSigle());
       newCommentaire.user.sigle = this.authService.getSigle();
 
 
 
       if (this.newEmployerId != null ) {
-        console.log("this.newEmployerId" + this.newEmployerId)
+        //console.log("this.newEmployerId" + this.newEmployerId)
         newCommentaire.employer = this.newEmployerId;
 
       }
@@ -442,7 +439,7 @@ export class ContratComponent implements OnInit {
 
 
 
-      console.log(" this.currentProjet.commentaires " + this.currentContrat.commentaires);
+      //console.log(" this.currentProjet.commentaires " + this.currentContrat.commentaires);
 
       this.currentContrat.updated = true;
       this.setPage(1);
@@ -463,7 +460,7 @@ export class ContratComponent implements OnInit {
 
     var index = this.getIndexFromFiltrerdList(id);
 
-    console.log("index found " + index);
+    //console.log("index found " + index);
     if(index-1 >=0) {
       var precedIndex = index - 1;
 
@@ -505,7 +502,7 @@ export class ContratComponent implements OnInit {
   }
 
   deleteCommentaire(commentaire : any){
-    console.log("delete comment");
+    //console.log("delete comment");
 
     this.currentContrat.commentaires = this.currentContrat.commentaires.filter(item => item !== commentaire);
     this.currentContrat.updated = true;
@@ -526,7 +523,7 @@ export class ContratComponent implements OnInit {
   }
 
   updated(event){
-    console.log("updated");
+    //console.log("updated");
     this.currentContrat.updated = true;
     this.ref.detectChanges();
   }
@@ -536,13 +533,13 @@ export class ContratComponent implements OnInit {
 
   selectContrat(contrat : Contrat,template: TemplateRef<any>){
     this.currentContrat = contrat;
-    console.log("ooccurence " + this.currentContrat.occurenceFacturationLabel);
-    console.log("ooccurence Facturation " + this.currentContrat.occurenceFacturation);
+    //console.log("ooccurence " + this.currentContrat.occurenceFacturationLabel);
+    //console.log("ooccurence Facturation " + this.currentContrat.occurenceFacturation);
     this.setPage(1);
 
     this.setPage(1);
 
-    //console.log("this.currentProjet suivre" + this.currentContrat.suivre);
+    ////console.log("this.currentProjet suivre" + this.currentContrat.suivre);
     this.mode = 1;
 
     this.filtredData = this.dataSource.filteredData;
@@ -558,10 +555,10 @@ export class ContratComponent implements OnInit {
 
   setPage(page: number) {
 
-    console.log("this.currentProjet.commentaires " + this.currentContrat.commentaires);
+    //console.log("this.currentProjet.commentaires " + this.currentContrat.commentaires);
 
     if(this.currentContrat.commentaires == null ||  this.currentContrat.commentaires.length==0) {
-      console.log("null");
+      //console.log("null");
       this.pager = null;
       this.pagedItems = null;
       return;
@@ -580,8 +577,8 @@ export class ContratComponent implements OnInit {
     }
 
 
-    console.log("page " +  page );
-    console.log("this.pager.totalPages " + this.pager.totalPages);
+    //console.log("page " +  page );
+    //console.log("this.pager.totalPages " + this.pager.totalPages);
 
     // get pager object from service
     this.pager = this.pagerService.getPager(this.currentContrat.commentaires.length, page);
@@ -591,9 +588,9 @@ export class ContratComponent implements OnInit {
   }
 
   getIndexFromFiltrerdList(id){
-    console.log("this.filtredData.size " + this.filtredData.length);
+    //console.log("this.filtredData.size " + this.filtredData.length);
     for(var i=0;i<this.filtredData.length;i++){
-      console.log("this.filtredData[i] " + this.filtredData[i].numContrat);
+      //console.log("this.filtredData[i] " + this.filtredData[i].numContrat);
       if(this.filtredData[i].numContrat == id){
         return i;
         break;
@@ -608,10 +605,10 @@ export class ContratComponent implements OnInit {
 
         this.getAllContrats(false);
         this.spinner.hide();
-        console.log("data "+ data);
+        //console.log("data "+ data);
       },
       err=>{
-        console.log("error "+ JSON.stringify(err));
+        //console.log("error "+ JSON.stringify(err));
         this.getAllContrats(false);
         this.spinner.hide();
       }
@@ -622,12 +619,12 @@ export class ContratComponent implements OnInit {
     $event.stopPropagation();
     $event.preventDefault();
 
-    console.log("filtre "+ this.dataSource.filter);
+    //console.log("filtre "+ this.dataSource.filter);
     var result= this.contratService.exportContrat(this.filtredData);
 
     var d = new Date();
 
-    console.log("day " + d.getDay());
+    //console.log("day " + d.getDay());
     var fileName = "Contrats-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
 
     result.subscribe((response: any) => {
@@ -645,7 +642,7 @@ export class ContratComponent implements OnInit {
 
   composeEmail(contrat : Contrat){
 
-    console.log("compose Email");
+    //console.log("compose Email");
     var email="mailto:?subject="+this.removeAnd(contrat.nomPartenaire)+""+(contrat.numMarche  == null ? "":"/"+this.removeAnd(contrat.numMarche.toString()))+""+(contrat.numContrat  == null ? "":"/"+this.removeAnd(contrat.numContrat.toString()) )+ "&body= Bonjour,%0A"
       +"Ce message concerne le contrat cité en objet et dont le détail est ci-après :%0A"
       + "Marché: "+(contrat.numMarche  == null ? "": contrat.numMarche ) +"%0A"+
@@ -664,18 +661,18 @@ export class ContratComponent implements OnInit {
         email = email+ "%0A";
         email = email + "Je vous prie de consulter les commentaires en bas et d’agir en conséquence."+"%0A";
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content)+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": lastCommentaire1.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
       }
       let lastCommentaire2 = new Commentaire();
       lastCommentaire2= contrat.commentaires[1];
       if(lastCommentaire2)
-        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content)+"%0A";
+        email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": lastCommentaire2.user.sigle)+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= contrat.commentaires[2];
       if(lastCommentaire3)
-        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content)+"%0A";
+        email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": lastCommentaire3.user.sigle)+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
     }
-    console.log("email " + email);
+    ////console.log("email " + email);
 
     /*Insert commentaire ssytem with motif*/
 
@@ -694,7 +691,7 @@ export class ContratComponent implements OnInit {
     this.nestedModalRef.hide();
     this.currentContrat.updated = false;
     if(this.suivant){
-      console.log("here");
+      //console.log("here");
       this.goToSuivant(id,secondModal);
     }else{
       this.goToPrecedent(id,secondModal);
@@ -708,14 +705,14 @@ export class ContratComponent implements OnInit {
   goToSuivant(id,template){
 
     if(!this.errorUpdate){
-  console.log("goToSuivant");
+  //console.log("goToSuivant");
     this.ref.detectChanges();
 
     var index = this.getIndexFromFiltrerdList(id);
 
 
     var suivantIndex = index + 1;
-    console.log("index suivantIndex " + suivantIndex);
+    //console.log("index suivantIndex " + suivantIndex);
 
     if(this.currentContrat.updated){
       //this.showDialog();
@@ -723,7 +720,7 @@ export class ContratComponent implements OnInit {
       this.onEditContrat(null);
 
       if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-        console.log("here");
+        //console.log("here");
         this.index = suivantIndex;
         this.currentContrat = this.filtredData[suivantIndex];
         this.setPage(1);
@@ -734,7 +731,7 @@ export class ContratComponent implements OnInit {
     }
 
     if(!this.currentContrat.updated && suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
-      console.log("here");
+      //console.log("here");
       this.index = suivantIndex;
       this.currentContrat = this.filtredData[suivantIndex];
       this.setPage(1);
@@ -786,13 +783,13 @@ export class ContratComponent implements OnInit {
   errorUpdate:boolean;
   onEditContrat(template: TemplateRef<any>) {
 
-    //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
+    ////console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
 
-    //console.log("new projet to send " + JSON.stringify(this.currentProjet));
+    ////console.log("new projet to send " + JSON.stringify(this.currentProjet));
 
 
     if(this.newContentComment != null ){
-      console.log("here newContentComment");
+      //console.log("here newContentComment");
       this.addComment();
     }
 
@@ -820,13 +817,13 @@ export class ContratComponent implements OnInit {
 
   /*onEditContrat(template: TemplateRef<any>) {
 
-    //console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
+    ////console.log("this.currentProjet "  + JSON.stringify(this.currentProjet));
 
-    //console.log("new projet to send " + JSON.stringify(this.currentProjet));
+    ////console.log("new projet to send " + JSON.stringify(this.currentProjet));
 
 
     if(this.newContentComment != null ){
-      console.log("here newContentComment");
+      //console.log("here newContentComment");
       this.addComment();
     }
 
@@ -842,11 +839,11 @@ export class ContratComponent implements OnInit {
 
     }, err => {
       this.currentContrat.updated = true;
-      console.log(JSON.stringify(err));
+      //console.log(JSON.stringify(err));
       this.returnedError = err.error.message;
       this.authService.logout();
       this.router.navigateByUrl('/login');
-      console.log("error "  +JSON.stringify(err));
+      //console.log("error "  +JSON.stringify(err));
 
     });
 
@@ -935,10 +932,8 @@ export class ContratComponent implements OnInit {
 
         this.sortAllArrays();
 
-        this.getStatistics();
-
         this.ref.detectChanges()
-        console.log("loading contrat");
+        //console.log("loading my contrat");
         this.dataSource = new MatTableDataSource(this.contrats);
         this.dataSource.filterPredicate = function(data, filter: string): boolean {
 
@@ -968,7 +963,7 @@ export class ContratComponent implements OnInit {
         this.authService.logout();
         this.router.navigateByUrl('/login');
         this.spinner.hide();
-        console.log("error "  +JSON.stringify(err));
+        //console.log("error "  +JSON.stringify(err));
       });
   }
 
@@ -984,7 +979,7 @@ export class ContratComponent implements OnInit {
 
 
     this.filtredData.forEach(element=>{
-      console.log("element " + JSON.stringify(element));
+      //console.log("element " + JSON.stringify(element));
       totalMontant = totalMontant + element.montantContrat;
       totalMontantFacture = totalMontantFacture + element.montantFactureAn;
       totalMontantAfacture = totalMontantAfacture + element.montantRestFactureAn;
@@ -1010,13 +1005,13 @@ export class ContratComponent implements OnInit {
    this.contratService.refreshContrats().subscribe(
      data=>{
 
-       console.log("data "+ data);
+       //console.log("data "+ data);
        this.refreshContrats();
        this.ref.detectChanges();
        this.spinner.hide();
      },
      err=>{
-       console.log("error "+ JSON.stringify(err));
+       //console.log("error "+ JSON.stringify(err));
        this.refreshContrats();
        this.spinner.hide();
 
@@ -1029,11 +1024,11 @@ export class ContratComponent implements OnInit {
   sortChange(e) {
     // save cookie with table sort data here
     this.dataSource.sortData(this.dataSource.filteredData,this.dataSource.sort);
-    // console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // console.log("sorting table");
+    // //console.log("this.before [0] " + this.filtredData[0].codeProjet);
+    // //console.log("sorting table");
     //this.filtredData = this.dataSource.filteredData;
 
-    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
 
@@ -1045,12 +1040,12 @@ export class ContratComponent implements OnInit {
     $event.stopPropagation();
     $event.preventDefault();
 
-    console.log("filtre "+ this.dataSource.filter);
+    //console.log("filtre "+ this.dataSource.filter);
     var result= this.contratService.exportContrat(this.filtredData);
 
     var d = new Date();
 
-    console.log("day " + d.getDay());
+    //console.log("day " + d.getDay());
     var fileName = "EtatContrat-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
 
     result.subscribe((response: any) => {

@@ -14,6 +14,7 @@ export class NavigationBarComponent implements OnInit {
   roleBuChefProjet:boolean;
   roleBuVolume:boolean;
   roleBuCommercial:boolean;
+  roleBuValueSoftware :boolean;
 
   roleReadAllProjects: boolean;
 
@@ -75,6 +76,12 @@ export class NavigationBarComponent implements OnInit {
       if(authority== 'BU_CHEF_PROJET'){
         this.roleBuChefProjet = true;
 
+        this.authorized = true;
+
+      }
+
+      if(authority== 'BU_VALUE_SOFTWARE'){
+        this.roleBuValueSoftware = true;
         this.authorized = true;
 
       }

@@ -51,12 +51,12 @@ export class AuthentificationComponent implements OnInit {
             }
 
             if (authority == 'READ_ALL_PROJECTS') {
-              console.log("onlogin1");
+              //console.log("onlogin1");
               this.routeToProjects = true;
 
             }
             if (authority == 'READ_MY_PROJECTS') {
-              console.log("onlogin");
+              //console.log("onlogin");
               this.routeToProjects = true;
 
             }
