@@ -353,6 +353,7 @@ export class EtatRecouvrementComponent implements OnInit {
         p.details = document.details;
         p.creation = document.creation;
         p.lastUpdate = document.lastUpdate;
+        const balanceUpdate = document.lastUpdate;
         p.statut = document.statut;
         p.motif = document.motif;
         p.montantGarantie = document.montantGarantie;

@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef, Component, HostListener, OnInit, TemplateRef, ViewChild, ViewContainerRef,
-  ViewEncapsulation
+  ViewEncapsulation,
+  Input
 } from '@angular/core';
 import {NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
@@ -29,8 +30,9 @@ import { BalanceAgeeService } from '../services/balanceAgee.service';
   styleUrls: ['./balance-agee.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class BalanceAgeeComponent implements OnInit {
 
+
+export class BalanceAgeeComponent implements OnInit {
   pageProduit: any;
   currentPage: number = 1;
   pages: any;
@@ -52,6 +54,10 @@ export class BalanceAgeeComponent implements OnInit {
 
   selectedClientTMP: any;
 
+  selectedCR:any;
+  
+  selectedCRTMP:any;
+
 
   chefProjets: Array<String>;
 
@@ -70,7 +76,7 @@ export class BalanceAgeeComponent implements OnInit {
 
   actionModal: string;
 
-  displayedColumns: string[] = ['client', 'tois_mois', 'six_mois','douze_mois', 'sup_douze_mois','total'];
+  displayedColumns: string[] = ['client', 'chargee_recouv','sup_douze_mois','douze_mois', 'six_mois', 'tois_mois','total'];
   public dataSource: MatTableDataSource<BalanceAgee>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -140,6 +146,7 @@ montantNat:any;
   client: any;
   lot: any;
   selectedCommercial: string;
+  chargesR: any;
 
 
   constructor(public datepipe: DatePipe,private activatedRoute:ActivatedRoute,private balanceAgeeService:BalanceAgeeService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
@@ -196,6 +203,7 @@ montantNat:any;
           if (this.service == 'Commercial') {
             this.selectedCommercial = this.userNameAuthenticated;
           }
+
           if (this.service == 'Chef Projet') {
             this.selectedChefProjet = this.userNameAuthenticated;
           }
@@ -266,6 +274,7 @@ montantNat:any;
 
   getBalance() {
 
+    if (this.roleReadAllRecouvrement == true) {
 
     this.balanceAgeeService.getBalance().subscribe(
       data => {
@@ -283,6 +292,7 @@ montantNat:any;
           p.id_balance = produit.id_balance;
 
             p.client = produit.client;
+            p.chargee_recouv = produit.chargee_recouv;
             p.tois_mois = produit.tois_mois;
             p.six_mois = produit.six_mois;
             p.douze_mois = produit.douze_mois;
@@ -298,6 +308,11 @@ montantNat:any;
 
                  this.client = this.client.filter(item => item !== "AUCUN CLIENT");
 
+                 this.chargesR = this.pageProduit
+                 .map(item => ((!item.chargee_recouv)? "AUCUN CR": item.chargee_recouv))
+                 .filter((value, index, self) => self.indexOf(value) === index)
+
+                 this.chargesR = this.chargesR.filter(item => item !== "AUCUN CR");
 
 
             this.addToArray(p.client,'client');
@@ -338,7 +353,90 @@ montantNat:any;
         this.router.navigateByUrl('/login');
         console.log("error " + JSON.stringify(err));
       }
-    )
+    )}
+
+    if (this.roleReadMyRecouvrement == true) {
+
+      this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.userNameAuthenticated).subscribe(
+        data => {
+          this.pageProduit = data;
+
+  
+          console.log("THIS BALANCE "+JSON.stringify(this.pageProduit))
+  
+          if (this.pageProduit != null) {
+  
+            this.produits = new Array<BalanceAgee>();
+            this.pageProduit.forEach(produit => {
+              let p = new BalanceAgee();
+            this.pageProduit.client
+  
+            p.id_balance = produit.id_balance;
+  
+              p.client = produit.client;
+              p.chargee_recouv = produit.chargee_recouv;
+              p.tois_mois = produit.tois_mois;
+              p.six_mois = produit.six_mois;
+              p.douze_mois = produit.douze_mois;
+              p.sup_douze_mois = produit.sup_douze_mois;
+              p.total = produit.total;
+              
+  
+  
+  
+                    this.client = this.pageProduit
+                   .map(item => ((!item.client)? "AUCUN CLIENT": item.client))
+                   .filter((value, index, self) => self.indexOf(value) === index)
+  
+                   this.client = this.client.filter(item => item !== "AUCUN CLIENT");
+  
+                   this.chargesR = this.pageProduit
+                   .map(item => ((!item.chargee_recouv)? "AUCUN CR": item.chargee_recouv))
+                   .filter((value, index, self) => self.indexOf(value) === index)
+  
+                   this.chargesR = this.chargesR.filter(item => item !== "AUCUN CR");
+  
+  
+              this.addToArray(p.client,'client');
+  
+  
+  
+  
+              this.produits.push(p);
+  
+  
+            });
+          }
+  
+  
+          this.sortAllArrays();
+          this.clientsList = this.clients;
+  
+          this.ref.detectChanges()
+          this.dataSource = new MatTableDataSource(this.produits);
+  
+          this.dataSource.filterPredicate = function(data, filter: string): boolean {
+  
+  
+            return (data.client != null ? data.client : "").toLowerCase()
+              === filter;
+          };
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+          if (this.currentFilter != null)
+            this.applyFilter(this.currentFilter);
+          this.getStatistics();
+  
+  
+  
+        }, err => {
+          // alert("erreur " + err);
+          this.authService.logout();
+          this.router.navigateByUrl('/login');
+          console.log("error " + JSON.stringify(err));
+        }
+      )}
+  
 
   }
 
@@ -364,8 +462,11 @@ montantNat:any;
 
 
   applyFilter(filterValue: string) {
+
+    console.log("FILTER TEXT")
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+
     this.dataSource.filter = filterValue;
     this.currentFilter = filterValue;
 
@@ -540,8 +641,14 @@ totalBalance = totalBalance + element.total;
     }else{
       this.selectedClientTMP = this.selectedClient;
     }
+
+    if(this.selectedCR == null){
+      this.selectedCRTMP = "undefined";
+    }else{
+      this.selectedCRTMP = this.selectedCR;
+    }
   
-    this.balanceAgeeService.getBalanceByClient(this.selectedClientTMP).subscribe(
+    this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.selectedCRTMP).subscribe(
       data => {
         this.pageProduit = data;
 
@@ -557,6 +664,7 @@ totalBalance = totalBalance + element.total;
           p.id_balance = produit.id_balance;
 
             p.client = produit.client;
+            p.chargee_recouv = produit.chargee_recouv;
             p.tois_mois = produit.tois_mois;
             p.six_mois = produit.six_mois;
             p.douze_mois = produit.douze_mois;

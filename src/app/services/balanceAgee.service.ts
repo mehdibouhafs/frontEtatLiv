@@ -24,8 +24,13 @@ export class BalanceAgeeService {
     return this.http.get(this.host+"/getBalance",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
-  getBalanceByClient(client: any){
-    return this.http.get(this.host+"/getBalanceByClient?client="+client,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  getBalanceByCR(user: any){
+    return this.http.get(this.host+"/getBalanceByCR?cr="+user,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  getBalanceByFiltre(client: any,cr:any){
+    return this.http.get(this.host+"/getBalanceByFiltre?client="+client+"&cr="+cr,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
   }
 

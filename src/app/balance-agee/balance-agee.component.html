@@ -6,6 +6,10 @@
     width: 30% !important;
 }
 
+.balance_table .mat-column-chargee_recouv {
+    width: 10%;
+}
+
 .balance_table .mat-column-tois_mois {
     width: 9%;
 }
@@ -48,19 +52,20 @@
       <label style="color: #ff0824;
       font-size: 11px;padding-left: 5px;">{{statitics.totalTrois| currency:'DH':'symbol':undefined:'fr'}}</label>
 <br/>
-  <label style="font-size: 11px;">Total 6 Mois : </label>
-  <label style="color: #ff0824;
-  font-size: 11px;padding-left: 5px;">{{statitics.totalSix | currency:'DH':'symbol':undefined:'fr'}}</label>
+<label style="font-size: 11px;">Total A 12 Mois : </label>
+<label style="color: #ff0824;
+font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symbol':undefined:'fr'}}</label>
+
 
   
     </div>
   
     <div class="col-md-3">
-  
-      
-      <label style="font-size: 11px;">Total A 12 Mois : </label>
+      <label style="font-size: 11px;">Total 6 Mois : </label>
       <label style="color: #ff0824;
-      font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symbol':undefined:'fr'}}</label>
+      font-size: 11px;padding-left: 5px;">{{statitics.totalSix | currency:'DH':'symbol':undefined:'fr'}}</label>
+      
+
   <br/>
     
       <label style="font-size: 11px;">Total Sup. 12 Mois : </label>
@@ -79,16 +84,13 @@
       font-size: 11px;padding-left: 5px;">{{statitics.totalBalance | currency:'DH':'symbol':undefined:'fr'}}</label>
   
   
-      <div style="display: none;"><button style="color: white;
-      background-color: #337ab7;font-size: 12px;
-      padding: 4px;" class="btn pull-right" (click)="refreshStock()" *ngIf="!viewUpload"><i class="fa fa-refresh" aria-hidden="true"></i> Mise à jour</button></div>
-  
+      <div >Last update {{balanceUpdate}}</div>  
       <div>
         <button style="color: white;
       background-color: #337ab7;font-size: 12px;
       padding: 4px;" class="btn"  (click)="exportBalance($event)" [disabled]="this.filtredData==null || this.filtredData.length ==0" id="btnXlsRpt"><i class="fa fa-download" aria-hidden="true"></i> Exporter l'état</button>
       </div>
-      <span class="pull-right" style="margin-top: 2px;font-size: 11px;" *ngIf="lastUpdate"> {{lastUpdate  | date:'dd/MM/yyyy HH:mm'}}</span>
+      <span class="pull-right" style="margin-top: 2px;font-size: 11px;" *ngIf="balanceUpdate"> {{balanceUpdate  | date:'dd/MM/yyyy HH:mm'}}</span>
     </div>
   </div>
   
@@ -107,6 +109,25 @@
       [items]="client"
       placeholder="Filtrer par client"
       [(ngModel)]="selectedClient"
+      (change)="selectFiltre()"
+      class="custom"
+  >
+  
+  </ng-select>
+  
+  
+    </div>
+
+    <div class="col-md-2">
+  
+      <label for="com">Chargé de recouvrement :</label>
+      <br/>
+      <ng-select id="cr"
+      [clearable]="true"
+      name="cr"
+      [items]="chargesR"
+      placeholder="Filtrer par CR"
+      [(ngModel)]="selectedCR"
       (change)="selectFiltre()"
       class="custom"
   >
@@ -145,13 +166,12 @@
   
   
   
- <!-- <mat-form-field >
-  
-    <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filtrer">
-    <input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">
+ <mat-form-field >
+
+  <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filtrer">
    
   </mat-form-field>
-  -->
+  
   
   <table mat-table (matSortChange)="sortChange($event)" [dataSource]="dataSource" class="mat-elevation-z8 balance_table" matSort>
   
@@ -164,7 +184,31 @@
     <ng-container matColumnDef="client"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Client
       <td mat-cell *matCellDef="let element"> {{element.client}}  </td></ng-container>
+
+      <ng-container matColumnDef="chargee_recouv">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Chargé de recouvrement
+        <td mat-cell *matCellDef="let element"> {{element.chargee_recouv}}  </td></ng-container>
   
+        
+          <!-- Symbol Column -->
+    <ng-container matColumnDef="sup_douze_mois"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Sup. 12 Mois
+        <td mat-cell *matCellDef="let element"><a *ngIf="element.sup_douze_mois  != 0" target="_blank" [routerLink]="['/etatRecouvrementClientAge/Sup. 12M',element.client]"
+          style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.sup_douze_mois == 0">{{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
+           
+          <!-- Symbol Column -->
+            <ng-container matColumnDef="douze_mois">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> A 12 Mois
+              <td mat-cell *matCellDef="let element"><a *ngIf="element.douze_mois != 0" target="_blank" [routerLink]="['/etatRecouvrementClientAge/A12M',element.client]"
+                style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}}  </a> <span *ngIf="element.douze_mois == 0">{{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
+    
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="six_mois"  >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> 6 Mois
+        <td mat-cell *matCellDef="let element"> <a *ngIf="element.six_mois != 0" target="_blank" [routerLink]="['/etatRecouvrementClientAge/6M',element.client]"
+          style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{element.six_mois | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.six_mois == 0">{{element.six_mois | currency:'DH':'symbol':undefined:'fr'}} </span> </td></ng-container>
+
+
         <!-- Weight Column -->
     <ng-container matColumnDef="tois_mois"  >
       <th mat-header-cell *matHeaderCellDef  mat-sort-header> 3 Mois</th>
@@ -173,23 +217,7 @@
   
       </ng-container>
   
-      <!-- Symbol Column -->
-      <ng-container matColumnDef="six_mois"  >
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> 6 Mois
-        <td mat-cell *matCellDef="let element"> <a *ngIf="element.six_mois != 0" target="_blank" [routerLink]="['/etatRecouvrementClientAge/6M',element.client]"
-          style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{element.six_mois | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.six_mois == 0">{{element.six_mois | currency:'DH':'symbol':undefined:'fr'}} </span> </td></ng-container>
   
-            <!-- Symbol Column -->
-      <ng-container matColumnDef="douze_mois">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> A 12 Mois
-          <td mat-cell *matCellDef="let element"><a *ngIf="element.douze_mois != 0" target="_blank" [routerLink]="['/etatRecouvrementClientAge/A12M',element.client]"
-            style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}}  </a> <span *ngIf="element.douze_mois == 0">{{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
-  
-          <!-- Symbol Column -->
-    <ng-container matColumnDef="sup_douze_mois"  >
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> >Sup. 12 Mois
-        <td mat-cell *matCellDef="let element"><a *ngIf="element.sup_douze_mois  != 0" target="_blank" [routerLink]="['/etatRecouvrementClientAge/Sup. 12M',element.client]"
-          style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.sup_douze_mois == 0">{{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
   
   
     <ng-container matColumnDef="total"  >
@@ -211,414 +239,8 @@
   <mat-paginator [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
   
   
-  <ng-template #template>
-    <div *ngIf="mode==1">
-      <form  #f="ngForm" (ngSubmit)="onEditProduit(template)">
-        <div class="modal-header" >
-          <button type="button" class="close pull-right" aria-label="Close" (click)="checkCanceled(thirdModal)">
-            <span style="font-size: 20px;" aria-hidden="true">&times;</span>
-          </button>
-          <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail  :
-            <strong style="font-size: 13px;
-      color: #337ab7;">{{currentProduit.annee}}/{{currentProduit.client}} / {{currentProduit.num_lot}} </strong>
-          </p>
-  
-        </div>
-  
-        <div class="modal-body" style="padding: 0px">
-  
-          <div *ngIf="errorUpdate" id="errorUpdate" class="alert alert-danger" style="text-align: center;font-size: 14px;margin: 0px;height: 10px;line-height: 2px;">
-            <strong style="font-size: 14px">Erreur!</strong> Problème d'envoi de donnée au serveur ! Merci de contacter l'administrateur
-          </div>
-  
-          <div class="card mt-3 tab-card">
-            <div class="card-header tab-card-header">
-              <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
-                <li class="nav-item active">
-                  <a style="    background-color: #337ab7;
-      color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-newspaper-o" aria-hidden="true"></i>  Stock : </a>
-                </li>
-  
-              </ul>
-            </div>
-  
-            <div class="tab-content" id="myTabContent">
-              <div class="tab-pane active" id="one" role="tabpanel" aria-labelledby="one-tab">
-                <div class="row" style="padding: 2px">
-                  <div class="col-xs-12 col-md-6">
-                  <div class="col-xs-12 col-md-12" style="padding-left: 20px;
-      padding-right: 0px;
-      margin-right: -10px;">
-                    <div class="panel-group">
-                      <div class="panel panel-primary">
-  
-  
-                        <div class="panel panel-info">
-  
-                          <div class="panel-body" >
-  
-                              <div class="row">
-  
-                                  <div class="form-group col-sm-6">
-                                    <label> <i class="fa fa-university fa-lg"></i>  Client :</label>
-                                    <span style="overflow: unset !important;"
-                                          class="labelModal"> {{currentProduit.client}}</span>
-                                  </div>
-  
-                                  <div class="form-group col-sm-6">
-                                    <label> <i class="fa fa-handshake-o fa-lg"></i>  Commercial :</label>
-                                    <span style="overflow: unset !important;"
-                                          class="labelModal"> {{currentProduit.commercial}}</span>
-                                  </div>
-  
-                                </div>
-  
-                            <div class="row">
-  
-  
-                                <div class="form-group col-sm-6">
-                                    <label> <i class="fa fa-handshake-o fa-lg"></i> Chef de projet :</label>
-                                    <span style="overflow: unset !important;"
-                                          class="labelModal"> {{currentProduit.chef_projet}}</span>
-                                  </div>
-  
-                              <div class="form-group col-sm-6">
-                                <label> <i class="fa fa-cubes fa-lg"></i>  Nom Projet :</label>
-                                <span style="overflow: unset !important;display: contents !important;white-space: pre-line;"
-                                      class="labelModal"> {{currentProduit.nom_lot}}</span>
-                              </div>
-  
-                            </div>
-                            <div class="row">
-                                <div class="form-group col-sm-6">
-                                <label> <i class="fa fa-cubes fa-lg"></i>  Code Projet :</label>
-                                <span style="overflow: unset !important;"
-                                      class="labelModal"> {{currentProduit.num_lot}}</span>
-                              </div>
-  
-                              <div>
-                                  <div class="form-group col-sm-6">
-                      <label> <i class="fa fa-cubes fa-lg"></i>  1ère réception :</label>
-                      <span style="overflow: unset !important;"
-                            class="labelModal"> {{currentProduit.date_rec | date:'dd-MM-yyyy'}}</span>
-                    </div>
-                  </div>
-  
-                            </div>
-  
-  
-  
-                            <div class="row">
-  
-  
-                                <div class="form-group col-sm-6">
-                                    <label> <i class="fa fa-home fa-lg"></i> Magasin :</label>
-                                    <span style="overflow: unset !important;"
-                                          class="labelModal"> {{currentProduit.magasin}}</span>
-                                  </div>
-  
-                                <div class="form-group col-sm-6">
-                                    <label> <i class="fa fa-money fa-lg"></i> Montant  :</label>
-                                    <span style="overflow: unset !important;"
-                                          class="labelModal">  <a target="_blank" [routerLink]="['/etatStockCodeProjet/',currentProduit.num_lot]"
-                                          style="text-decoration: underline;cursor: pointer;font-size:10px"  >
-                                          {{currentProduit.montant | currency:'DH':'symbol':undefined:'fr'}}</a></span>
-  
-  
-                                  </div>
-  
-                            </div>
-                            <div class="row">
-                              <div class="form-group col-sm-4">
-                                <label> <i class="fa fa-calendar fa-lg"></i>  Année CMD :</label>
-                                <span style="overflow: unset !important;"
-                                      class="labelModal"> {{currentProduit.annee}}</span>
-                              </div>
-                            </div>
-  
-  
-  
-  
-  
-  
-                          </div>
-                        </div>
-  
-                      </div>
-                    </div>
-  
-  
-  
-  
-  
-  
-  
-  
-                  </div>
-  
-                  <div class="card-header tab-card-header">
-                    <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
-                      <li class="nav-item active">
-                        <a style="    background-color: #337ab7;
-            color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-money" aria-hidden="true"></i>  Montant par nature : </a>
-                      </li>
-        
-                    </ul>
-                  </div>
-                  <div class="col-xs-12 col-md-12" style="padding-left: 20px;
-                  padding-right: 0px;
-                  margin-right: -10px;">
-                                <div class="panel-group">
-                                  <div class="panel panel-primary">
-              
-              
-                                    <div class="panel panel-info">
-              
-                                      <div class="panel-body" >
-              
-                                          <div *ngFor="let nat of Totalnatures; let i = index" class="row">
-              
-                                              <div class="form-group col-sm-6">
-                                                  <label> <i class="fa fa-money fa-lg"></i>{{nat.split(",", 2)[0].replace(" "," : ")}} : </label>
-                                                  <span style="overflow: unset !important;"
-                                                        class="labelModal">  <a target="_blank" [routerLink]="['/etatStockNature/',currentProduit.num_lot,nat.split(',', 2)[0]]"
-                                                        style="text-decoration: underline;cursor: pointer;font-size:10px"  >
-                                                        {{ nat.split(",", 2)[1]}} DH</a></span>
 
 
-                                              </div>
-              
-  
-              
-                                            </div>
-              
-   
-  
-              
-              
-              
-  
-                          
-              
-              
-              
-                                      </div>
-                                    </div>
-              
-                                  </div>
-                                </div>
-              
-              
-              
-              
-              
-              
-              
-              
-                              </div>
-                  </div>
-  
-                  <div class="col-xs-12 col-md-6">
-                    <div class="panel-group" >
-                      <div class="panel panel-primary">
-                        <div class="panel-heading">
-                          <h4 class="panel-title">
-                            <a data-toggle="collapse" href="#collapse14"><i class="fa fa-commenting-o fa-lg"></i> Commentaires </a>
-                          </h4>
-                        </div>
-  
-                        <div class="panel-group">
-                          <div class="panel panel-default">
-                            <div class="panel-body" style="min-height: 374px;max-height: 374px">
-  
-  
-                              <div class="row">
-                                <div class="form-group col-sm-6">
-  
-                                  <label for="newEmployerId"><i class="fa fa-user-circle fa-lg"></i> Collaborateur :</label>
-  
-                                  <input id="newEmployerId" class="form-control input-sm"
-                                         placeholder="saisir le collaborateur"
-                                         [(ngModel)]="newEmployerId" name="newEmployerId" (focusin)="blockedKey()" (focusout)="deBlockedKey()" >
-  
-  
-                                </div>
-  
-                              </div>
-  
-  
-                              <textarea class="form-control input-sm" name="newContentComment" [(ngModel)]="newContentComment"  placeholder="Ecrire un commentaire.." rows="2"  (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
-                              <p></p>
-                              <button type="button" class="btn btn-info btn-xs pull-right" style="margin-top: 10px;" (click)="addComment(currentProduit.num_lot,currentProduit.id_stock)" [disabled]="!newContentComment"><i class="fa fa-plus" aria-hidden="true"></i> Ajouter</button>
-                              <div class="clearfix"></div>
-                              <hr>
-                              <ul class="media-list" *ngIf="pagedItems!=null" >
-  
-                                <li class="media" *ngFor="let commentaire of pagedItems">
-                                  <a href="#" class="pull-left">
-  
-                                    <span class="badge badge-success">{{commentaire.user_username.sigle}} :</span>
-  
-                                  </a>
-                                  <div class="media-body">
-                                  <span class="text-muted pull-right"   >
-                                      <small class="text-muted">{{commentaire.date | date:'dd/MM/yyyy HH:mm'}} </small>
-                                      <a *ngIf="!checkIFMorethanFifthMinuteAgo(commentaire) " style="cursor: pointer" (click)="deleteCommentaire(commentaire.id,commentaire)"><i class="fa fa-times fa-lg"></i> </a>
-                                  </span>
-  
-                                    <span class="badge badge-info" *ngIf="commentaire.employer">@ {{commentaire.employer}}</span>
-                                    <p style="font-size: 11px;max-width: 500px;">
-                                      {{commentaire.content}}
-                                    </p>
-                                  </div>
-                                </li>
-  
-  
-                              </ul>
-  
-                              <div class="row"  *ngIf="pager">
-                                <div class="form-group col-sm-3">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                  <!-- pager -->
-                                  <ul *ngIf="pager.pages && pager.pages.length" class="pagination">
-  
-                                    <li [ngClass]="{disabled:pager.currentPage === 1}">
-                                      <a style="font-size: 11px;" (click)="setPage(pager.currentPage - 1)" >Précédant</a>
-                                    </li>
-                                    <li *ngFor="let page of pager.pages" [ngClass]="{active:pager.currentPage === page}">
-                                      <a style="font-size: 11px;" (click)="setPage(page)">{{page}}</a>
-                                    </li>
-                                    <li [ngClass]="{disabled:pager.currentPage === pager.totalPages}">
-                                      <a style="font-size: 11px;" (click)="setPage(pager.currentPage + 1)"  >Suivant</a>
-                                    </li>
-  
-                                  </ul>
-                                </div>
-                                <div class="form-group col-sm-3">
-                                </div>
-  
-                              </div>
-  
-  
-  
-  
-  
-  
-                            </div>
-                          </div>
-  
-                        </div>
-  
-                      </div>
-                    </div>
-                  </div>
-  
-  
-                  
-  
-                </div>
-              </div>
-  
-  
-            </div>
-          </div>
-  
-  
-          <!-- First -->
-  
-  
-  
-  
-  
-  
-  
-  
-        </div>
-  
-  
-  
-  
-        <div class="modal-footer" style="padding: 0px">
-  
-          <div class="row">
-  
-            <div class="form-group col-xs-2 col-md-2">
-              <p></p>
-            </div>
-            <div class="form-group col-xs-3 col-md-2">
-              <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index-1>=0 ? '#337ab7' : 'black'}"  (click)="goToPrecedent(currentProduit.id_stock,secondModal)" ><i class="fa fa-backward fa-lg"></i> Précédant</a>
-            </div>
-            <div class="form-group col-xs-4 col-md-2">
-              <label style="padding: 3px;"><span style="color: #3875d7">{{index+1}}</span> /<span style="color: red">{{this.filtredData.length}}</span> </label>
-            </div>
-            <div class="form-group col-xs-4 col-md-2">
-              <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index+2<=this.filtredData.length ? '#337ab7' : 'black'}" (click)="goToSuivant(currentProduit.id_stock,secondModal)"> Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
-            </div>
-            <div class="form-group col-xs-3 col-md-4">
-  
-              <a style="cursor: pointer;padding: 4px;
-      font-size: 10px;" class="btn btn-primary btn-sm " (click)="composeEmail(currentProduit)" target="_blank" ><i class="fa fa-share" aria-hidden="true"></i> Email</a>
-  
-  
-            </div>
-          </div>
-  
-  
-  
-  
-        </div>
-      </form>
-  
-    </div>
-  
-  
-  
-  </ng-template>
-  
-  <ng-template #secondModal>
-    <div class="modal-header">
-      <button type="button" class="close pull-right" aria-label="Close" (click)="annulation()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body rejection-body">
-      <div class="body-title-container">
-        <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce produit ?</h5>
-      </div>
-  
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success btn-sm" (click)="annulation()">Annuler</button>
-      <button type="button" class="btn btn-danger btn-sm" (click)="annulationModificationProduit(currentProduit.id_stock,secondModal)">Ignorer</button>
-  
-    </div>
-  </ng-template>
-  
-  <ng-template #thirdModal>
-    <div class="modal-header">
-      <button type="button" class="close pull-right" aria-label="Close" (click)="annulation2()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body rejection-body">
-      <div class="body-title-container">
-        <h5 class="title-with-border d-inline" style="color: red">Voulez vous ignorer les modification sur ce produit ?</h5>
-      </div>
-  
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-success btn-sm" (click)="annulation2()">Annuler</button>
-      <button type="button" class="btn btn-danger btn-sm" (click)="ignore2()">Ignorer</button>
-  
-    </div>
-  
-  
-  
-  
-  
-  
-  </ng-template>
   </div>
   
   <div [hidden]="authorized==true">
