@@ -1,5 +1,7 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges,
+  ChangeDetectionStrategy, Component, DoCheck, EventEmitter, HostListener, Input, IterableDiffers, OnChanges, OnInit,
+  Output,
+  SimpleChanges, TemplateRef,
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
@@ -9,6 +11,8 @@ import {Router} from "@angular/router";
 import {ContratService} from "../services/contrat.service";
 import {AuthenticationService} from "../services/authentification.service";
 import {CommentaireEcheance} from "../../model/model.commentaireEcheance";
+import {FactureEcheance} from "../../model/model.factureEcheance";
+import {BsModalRef, BsModalService} from "ngx-bootstrap";
 
 @Component({
   selector: 'app-view-echeance',
@@ -20,7 +24,7 @@ import {CommentaireEcheance} from "../../model/model.commentaireEcheance";
 export class ViewEcheanceComponent implements OnInit,OnChanges {
 
 
-  displayedColumnsEcheance: string[] = ['du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire'];
+  displayedColumnsEcheance: string[] = ['du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
   public dataSourceEcheance: MatTableDataSource<Echeance>;
   @ViewChild('echeanceTableSort', {static: true}) sortEcheance: MatSort;
   @ViewChild('echeanceTablePaginator', {static: true}) paginatorEcheance: MatPaginator;
@@ -31,12 +35,29 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
   @Output() errorUpdate= new EventEmitter<boolean>();
 
   commentaireEcheances : Array<CommentaireEcheance>;
-  constructor(private router:Router,private contratService : ContratService,private authService: AuthenticationService) {
-    this.getAllCommentaitreEcheance();
+
+  selectedEcheance : Echeance;
+
+  deleteEcheanceModalRef : BsModalRef;
+
+  @Output() deleteEcheanceEmitter = new EventEmitter<Echeance>();
+
+  roleEditEcheance:boolean;
+
+  constructor(private authService: AuthenticationService,private modalService: BsModalService,private router:Router,private contratService : ContratService) {
+
   }
 
   ngOnInit() {
 
+    this.authService.getRoles().forEach(authority => {
+
+      if (authority == 'EDIT_ECHEANCE_CONTRAT') {
+        this.roleEditEcheance= true;
+      }
+    });
+
+    this.getAllCommentaitreEcheance();
 
     this.dataSourceEcheance = new MatTableDataSource(this.echeances);
 
@@ -47,7 +68,11 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
     console.log("echeancesOnInit" + this.echeances);
   }
 
+
+
   ngOnChanges(changes: SimpleChanges) {
+
+    console.log("onChanges echeances" );
     this.dataSourceEcheance = new MatTableDataSource(this.echeances);
 
     //  this.dataSourceEcheance.paginator = this.paginatorEcheance;
@@ -102,5 +127,27 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
     )
   }
 
+  showDeleteFactureEcheanceModal(echeance : Echeance,deleteModal: TemplateRef<any>){
+    console.log("echeance " + JSON.stringify(echeance));
+    this.selectedEcheance= echeance;
+    this.deleteEcheanceModalRef =  this.modalService.show(deleteModal, Object.assign({}, {class: 'modal-sm'}));
+  }
+
+  annulationDeleteEcheance(){
+    this.deleteEcheanceModalRef.hide();
+  }
+
+  deleteEcheance(){
+    this.contratService.deleteEcheance(this.selectedEcheance.id).subscribe(() => {
+
+      this.deleteEcheanceEmitter.emit(this.selectedEcheance);
+      this.deleteEcheanceModalRef.hide();
+
+    }, err => {
+      console.log("ereur", err);
+
+
+    });
+  }
 
 }

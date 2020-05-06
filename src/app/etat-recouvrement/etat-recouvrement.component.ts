@@ -720,6 +720,10 @@ export class EtatRecouvrementComponent implements OnInit {
 
       }
 
+      if(authority== 'BU_VALUE_SOFTWARE'){
+        this.authorized = false;
+      }
+
 
       if(authority== 'BU_RESEAU_SECURITE'){
         this.roleBuReseauSecurite = true;

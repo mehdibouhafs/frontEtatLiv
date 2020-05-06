@@ -63,9 +63,13 @@
                 [ngValue]="com.id">{{com.comment}}</option>
       </select>
 
-
   </td>
   </ng-container>
+
+  <ng-container matColumnDef="option"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+    <td mat-cell *matCellDef="let element">  <a  *ngIf="roleEditEcheance==true" (click)="showDeleteFactureEcheanceModal(element,deleteEcheanceModal)"><i class="fa fa-remove" aria-hidden="true"></i></a>  </td></ng-container>
+
 
 
 
@@ -76,3 +80,37 @@
 </table>
 <mat-paginator #echeanceTablePaginator="matPaginator"  [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
 
+<ng-template #deleteEcheanceModal>
+  <div class="modal-header">
+    <h5>Suppression echeance</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulationDeleteEcheance()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+
+    <div class="row">
+
+
+      <div class="form-group col-sm-2"></div>
+      <div class="form-group col-sm-8">
+
+        <label for="messageDelete"><i class="fa fa-calendar-times-o fa-lg"></i> Cause de suppression :</label>
+
+        <textarea class="form-control input-sm" id="messageDelete" name="messageDelete" [(ngModel)]="selectedEcheance.messageDelete"  placeholder="Ecrire la raison de suppression.." rows="2" ></textarea>
+
+      </div>
+
+
+    </div>
+
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Etes-vous sure de vouloir supprimer l'echance {{selectedEcheance.id}} [Du {{selectedEcheance.du | date:'dd/MM/yyyy'}} , Au {{selectedEcheance.au | date:'dd/MM/yyyy'}}] ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="deleteEcheance()">Supprimer</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulationDeleteEcheance()">Annuler</button>
+  </div>
+</ng-template>

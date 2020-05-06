@@ -19,6 +19,7 @@ import {Echeance} from "../../model/model.echeance";
 import {CommandeFournisseur} from "../../model/model.commandeFournisseur";
 import {StatiticsContrat} from "../../model/model.statisticsContrat";
 import {CommentaireEcheance} from "../../model/model.commentaireEcheance";
+import {FactureEcheance} from "../../model/model.factureEcheance";
 
 @Component({
   selector: 'app-contrat',
@@ -1062,6 +1063,70 @@ export class ContratComponent implements OnInit {
   }
 
 
+  onAddNewEcheance(echeance : Echeance){
+
+    let c = new Contrat();
+    c.numContrat = this.currentContrat.numContrat;
+    echeance.contrat= c;
+
+    if(this.currentContrat.echeances==null){
+      this.currentContrat.echeances = new Array<Echeance>();
+    }
+
+    let commentaire = new CommentaireEcheance();
+    commentaire.id=0;
+    echeance.commentaire=commentaire;
+
+    this.currentContrat.echeances.push(echeance);
+
+    this.currentContrat.echeances = [].concat(this.currentContrat.echeances);
+
+    this.currentContrat.echeances.sort(function(a,b){
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(b.du).valueOf() - new Date(a.du).valueOf();
+
+    });
+
+    this.ref.detectChanges();
+
+  }
+
+  findIndexToUpdate(newItem) {
+    return newItem.id === this;
+  }
+
+
+  onEditFactureEcheance(factureEcheance : FactureEcheance){
+
+    this.currentContrat.factureEcheances = this.currentContrat.factureEcheances.filter(item => item.id !== factureEcheance.id);
+
+    this.currentContrat.factureEcheances.push(factureEcheance);
+
+    this.currentContrat.factureEcheances = [].concat(this.currentContrat.factureEcheances);
+
+    this.currentContrat.factureEcheances.sort(function(a,b){
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      if(b.echeance!=null && a.echeance!=null){
+        return new Date(b.echeance.du).valueOf() - new Date(a.echeance.du).valueOf();
+      }else{
+        return new Date(b.facture.dateEnregistrement).valueOf() - new Date(a.facture.dateEnregistrement).valueOf();
+      }
+
+
+
+    });
+
+    this.ref.detectChanges();
+
+  }
+
+  onDeleteEcheance(echeance :Echeance){
+    this.currentContrat.echeances = this.currentContrat.echeances.filter(item => item !== echeance);
+    this.currentContrat.echeances = [].concat(this.currentContrat.echeances);
+    this.ref.detectChanges();
+  }
 
 
 

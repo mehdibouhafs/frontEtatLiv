@@ -9,6 +9,7 @@ import {AuthenticationService} from './authentification.service';
 import {Contrat} from "../../model/model.contrat";
 import {Echeance} from "../../model/model.echeance";
 import {Commentaire} from "../../model/model.commentaire";
+import {FactureEcheance} from "../../model/model.factureEcheance";
 
 
 @Injectable()
@@ -43,6 +44,20 @@ export class ContratService {
 
   }
 
+  editEcheance(numContrat :any,echeance : Echeance){
+    return this.http.put(this.host+'/editEcheance/'+numContrat,echeance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  editFactureEcheance(numContrat :any,factureEcheance : FactureEcheance){
+    return this.http.put(this.host+'/editFactureEcheance/'+numContrat,factureEcheance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  deleteEcheance(idEcheance : any){
+    return this.http.delete(this.host+'/deleteEcheance/'+idEcheance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
 
 
   refreshContrats(){

@@ -9,7 +9,9 @@
     </mat-form-field>
   </div>
   <div class="col-md-4"></div>
-  <div class="col-md-4"></div>
+  <div class="col-md-4">
+    <button class="btn btn-success btn-sm pull-right" *ngIf="roleEditEcheance==true" (click)="showAddEcheanceModal(addEcheanceModal)"><i class="fa fa-plus-circle" aria-hidden="true"></i> Nouvelle echeance</button>
+  </div>
 </div>
 <table mat-table  #factureEcheanceTable
        #factureEcheanceTableSort="matSort" [dataSource]="dataSourceFacturesEcheance" class="mat-elevation-z8" matSort>
@@ -28,20 +30,24 @@
     <td mat-cell *matCellDef="let element"> {{element.facture.dateEnregistrement | date:'dd/MM/yyyy'}}   </td>
   </ng-container>
 
+
+
   <ng-container matColumnDef="montantHT">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant HT  </th>
     <td mat-cell *matCellDef="let element"  > {{element.facture.montantHT | currency:'DH':'symbol':undefined:'fr'}}  </td>
   </ng-container>
-  <!-- Position Column -->
-  <ng-container matColumnDef="montantRestant">
-    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Reste à payé   </th>
-    <td mat-cell *matCellDef="let element"  > {{element.facture.montantRestant | currency:'DH':'symbol':undefined:'fr'}}  </td>
-  </ng-container>
+
 
 
   <ng-container matColumnDef="montantTTC">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant TTC   </th>
     <td mat-cell *matCellDef="let element"  > {{element.facture.montantTTC | currency:'DH':'symbol':undefined:'fr'}}  </td>
+  </ng-container>
+
+  <!-- Position Column -->
+  <ng-container matColumnDef="montantRestant">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant payé   </th>
+    <td mat-cell *matCellDef="let element"  > {{element.facture.montantRestant | currency:'DH':'symbol':undefined:'fr'}}  </td>
   </ng-container>
 
   <ng-container matColumnDef="montant">
@@ -70,6 +76,12 @@
     <td mat-cell *matCellDef="let element"  ><div *ngIf="element.echeance">[{{element.echeance.du | date:'dd/MM/yyyy'}} Au  {{element.echeance.au | date:'dd/MM/yyyy'}}] </div>    </td>
   </ng-container>
 
+  <ng-container matColumnDef="option">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header>  </th>
+    <td mat-cell *matCellDef="let element" >  <a  *ngIf="roleEditEcheance==true"(click)="showEditFactureEcheanceModal(element,editFacturationEcheanceModal)"><i class="fa fa-edit" aria-hidden="true"></i></a>
+
+    </td>
+  </ng-container>
 
 
   <tr mat-header-row *matHeaderRowDef="displayedColumnsFacturesEcheance; sticky: true"></tr>
@@ -80,3 +92,143 @@
 <mat-paginator #factureEcheanceTablePaginator="matPaginator"  [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
 
 
+
+<ng-template #editFacturationEcheanceModal>
+  <div class="modal-header">
+    <p>Modification d'une écheance </p>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeEditFactureEcheanceModal()">
+      <span aria-hidden="true">X</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+
+    <div class="row">
+
+      <div class="form-group col-sm-2"></div>
+      <div class="form-group col-sm-8">
+        <label for="numFacture"><i class="fa fa-file-text-o fa-lg"></i> N°facture :</label>
+
+        <input id="numFacture" class="form-control input-sm"
+               [(ngModel)]="updatedFactureEcheance.facture.numFacture" name="numFacture" disabled>
+      </div>
+    </div>
+
+
+    <div class="row">
+
+      <div class="form-group col-sm-2"></div>
+      <div class="form-group col-sm-8">
+        <label for="au1"><i class="fa fa-calendar-times-o fa-lg"></i> Echeance Au :</label>
+        <select id="au1" class="form-control" name="au1"  [(ngModel)]="updatedFactureEcheance.echeance"  >
+          <option value="undefined" selected>Sélectionner l'écheance </option>
+          <option *ngFor="let echeance of echeances"
+                  [ngValue]="echeance">[ Du {{echeance.du | date:'dd/MM/yyyy'}} , Au {{echeance.au | date:'dd/MM/yyyy'}} ]</option>
+        </select>
+      </div>
+    </div>
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="editFactureEcheance()">Modifier </button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="closeEditFactureEcheanceModal()">Annuler</button>
+
+  </div>
+</ng-template>
+
+
+<ng-template #addEcheanceModal>
+  <div class="modal-header">
+    <p>Ajout d'une nouvelle écheance </p>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeAddEcheanceModal()">
+      <span aria-hidden="true">X</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+
+      <div class="row">
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+
+          <label for="du"><i class="fa fa-calendar-times-o fa-lg"></i> Echeance du :</label>
+
+          <input id="du" name="du"  type="date" class="form-control input-sm" [ngModel]="newEcheance.du | date:'yyyy-MM-dd'" (ngModelChange)="newEcheance.du = $event"
+                 [value]="newEcheance.du | date:'yyyy-MM-dd'" #BirthDate="ngModel"  >
+
+        </div>
+
+      </div>
+
+      <div class="row">
+
+
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+
+          <label for="au"><i class="fa fa-calendar-times-o fa-lg"></i> Echeance Au :</label>
+
+          <input id="au" name="au"  type="date" class="form-control input-sm" [ngModel]="newEcheance.au | date:'yyyy-MM-dd'" (ngModelChange)="newEcheance.au  = $event"
+                 [value]="newEcheance.au  | date:'yyyy-MM-dd'" #BirthDate="ngModel" min="{{newEcheance.du | date:'yyyy-MM-dd'}}" (change)="onChangeDate()"  >
+
+        </div>
+
+
+      </div>
+
+
+      <div class="row">
+
+
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+          <label for="periodeFacturation"><i class="fa fa-flag-o fa-lg"></i> Période de facturation :</label>
+          <select id="periodeFacturation" class="form-control" name="periodeFacturation" [(ngModel)]="newEcheance.periodeFacturation">
+            <option value="MENSUELLE" [disabled]="nbMonth>=1">MENSUELLE</option>
+            <option value="TRIMESTRIELLE" [disabled]="nbMonth<4">TRIMESTRIELLE</option>
+            <option value="SEMESTRIELLE" [disabled]="nbMonth<6">SEMESTRIELLE</option>
+            <option value="ANNUELLE" [disabled]="nbMonth<12">ANNUELLE</option>
+            <option value="UNKNOWN" >Undefini</option>
+
+          </select>
+
+        </div>
+      </div>
+
+      <div class="row">
+
+
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+          <label for="occurenceFacturation"><i class="fa fa-flag-o fa-lg"></i> Occurence de facturation :</label>
+          <select  id="occurenceFacturation" class="form-control" name="occurenceFacturation" [(ngModel)]="newEcheance.occurenceFacturation" >
+            <option value="DEBUTPERIODE">Début de période</option>
+            <option value="FINPERIODE" >Fin de période</option>
+            <option value="UNKNOWNPERIODE" >Undefini</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+          <label for="montantPrevisionnel"><i class="fa fa-money"></i> Montant prévisionnel :</label>
+          <input class="form-control" style="width:150px" id="montantPrevisionnel" type="number" min="0"  [(ngModel)]="newEcheance.montantPrevision" />
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="addNewEcheance()">Creer Echeance</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="closeAddEcheanceModal()">Annuler</button>
+
+
+  </div>
+</ng-template>

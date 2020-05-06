@@ -91,7 +91,7 @@
       <div >
         <label style="margin-left: 8px;" for="filtrerBU">Bu :</label>
         <br/>
-        <select style="margin-left: 5px;width: 175px;height: 34px" id="filtrerBU" class="browser-default custom-select" name="selectBU" [(ngModel)]="selectedBu" (change)="selectFiltre()" [disabled]="roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume" >
+        <select style="margin-left: 5px;width: 175px;height: 34px" id="filtrerBU" class="browser-default custom-select" name="selectBU" [(ngModel)]="selectedBu" (change)="selectFiltre()" [disabled]="roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware" >
           <option value="undefined" selected>Filtrer par B.U </option>
           <option value="VALUE_SW">VALUE_SW</option>
           <option value="VALUE_RS">VALUE_RS</option>
@@ -588,7 +588,7 @@
                                 <label for="dateFinProjet1"><i class="fa fa-calendar-times-o fa-lg"></i> Date Fin du Projet :</label>
 
                                 <input id="dateFinProjet1" name="dateFinProjet"  type="date" class="form-control input-sm" [ngModel]="currentProjet.dateFinProjet | date:'yyyy-MM-dd'" (ngModelChange)="currentProjet.dateFinProjet = $event"
-                                       [value]="currentProjet.dateFinProjet | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+                                       [value]="currentProjet.dateFinProjet | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
 
                               </div>
 
@@ -598,7 +598,7 @@
 
                                 <input id="condPaiement1" class="form-control input-sm"
                                        placeholder="saisir la condition de paiement"
-                                       [(ngModel)]="currentProjet.condPaiement" name="condPaiement"  (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+                                       [(ngModel)]="currentProjet.condPaiement" name="condPaiement"  (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
 
 
                               </div>
@@ -608,7 +608,7 @@
 
                                 <input id="garantie1" class="form-control input-sm"
                                        placeholder="saisir une garantie"
-                                       [(ngModel)]="currentProjet.garantie" name="garantie"  (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+                                       [(ngModel)]="currentProjet.garantie" name="garantie"  (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
 
 
                               </div>
@@ -625,7 +625,7 @@
                               <div class="form-group col-sm-4">
 
                                 <label for="priorite"><i class="fa fa-flag fa-lg"></i> Priorité :</label>
-                                <select id="priorite" class="browser-default custom-select" name="selectPriorite" [(ngModel)]="currentProjet.priorite" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " >
+                                <select id="priorite" class="browser-default custom-select" name="selectPriorite" [(ngModel)]="currentProjet.priorite" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " >
                                   <option value="undefined" selected>Sélectioner la priorité </option>
                                   <option value="#PH">Priorité Haute</option>
                                   <option value="#PM">Priorité Moyenne</option>
@@ -638,7 +638,7 @@
 
                                 <label for="risque1"><i class="fa fa-exclamation-triangle  fa-lg"></i> Risque :</label>
 
-                                <textarea id="risque1" name ="risque" class="form-control input-sm" [(ngModel)]="currentProjet.risque" placeholder="saisissez un risque"   rows="2" (change)="updatedRisque($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
+                                <textarea id="risque1" name ="risque" class="form-control input-sm" [(ngModel)]="currentProjet.risque" placeholder="saisissez un risque"   rows="2" (change)="updatedRisque($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
 
                               </div>
 
@@ -648,7 +648,7 @@
 
                               <div class="form-group col-sm-4">
                                 <label for="avantVente2"><i class="fa fa-user fa-lg"></i> Avant vente :</label>
-                                <select style="margin-left: 5px;width: 175px;" id="avantVente2" class="browser-default custom-select" name="avantVente2" [(ngModel)]="currentProjet.avantVente" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " >
+                                <select style="margin-left: 5px;width: 175px;" id="avantVente2" class="browser-default custom-select" name="avantVente2" [(ngModel)]="currentProjet.avantVente" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " >
                                   <option selected>Sélectionner l'avant vente </option>
                                   <option *ngFor="let employe of employeesAvantVente"
                                           [ngValue]="employe.name">{{employe.name}}</option>
@@ -659,7 +659,7 @@
                               <div class="form-group col-sm-8">
                                 <label for="perimetreProjet1"><i class="fa fa-arrows  fa-lg"></i> Périmetre Projet :</label>
 
-                                <textarea id="perimetreProjet1" name ="perimetreProjet" class="form-control input-sm" [(ngModel)]="currentProjet.perimetreProjet" placeholder="saisissez le perimetre du projet"   rows="2" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                                <textarea id="perimetreProjet1" name ="perimetreProjet" class="form-control input-sm" [(ngModel)]="currentProjet.perimetreProjet" placeholder="saisissez le perimetre du projet"   rows="2" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
                               </div>
 
 
@@ -671,7 +671,7 @@
                             <div class="row">
                               <div class="form-group col-sm-4">
                                 <label for="intervenantPrincipal1"><i class="fa fa-user fa-lg"></i> Intervenant Principal :</label>
-                                <select style="margin-left: 5px" id="intervenantPrincipal1" class="browser-default custom-select" name="intervenantPrincipal1" [(ngModel)]="currentProjet.intervenantPrincipal" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()" >
+                                <select style="margin-left: 5px" id="intervenantPrincipal1" class="browser-default custom-select" name="intervenantPrincipal1" [(ngModel)]="currentProjet.intervenantPrincipal" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()" >
                                   <option selected>Sélectionner l'intervenant principal </option>
                                   <option *ngFor="let employe of employees"
                                           [ngValue]="employe.name">{{employe.name}}</option>
@@ -683,7 +683,7 @@
 
                                 <label for="commentaireDirection1"><i class="fa fa-gavel fa-lg"></i> Situation actuelle du projet :</label>
 
-                                <textarea id="commentaireDirection1" name ="commentaireDirection1" class="form-control input-sm" [(ngModel)]="currentProjet.syntheseProjet" placeholder="saisissez une synthèse du projet"  rows="2" (change)="updatedSituationActuelle($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                                <textarea id="commentaireDirection1" name ="commentaireDirection1" class="form-control input-sm" [(ngModel)]="currentProjet.syntheseProjet" placeholder="saisissez une synthèse du projet"  rows="2" (change)="updatedSituationActuelle($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
 
 
 
@@ -694,7 +694,7 @@
 
                               <div class="form-group col-sm-4">
                                 <label for="intervenantSecondaire1"><i class="fa fa-user fa-lg"></i> Intervenant Secondaire :</label>
-                                <select style="margin-left: 5px;width: 175px" id="intervenantSecondaire1" class="browser-default custom-select" name="intervenantSecondaire1" [(ngModel)]="currentProjet.intervenantSecondaire" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+                                <select style="margin-left: 5px;width: 175px" id="intervenantSecondaire1" class="browser-default custom-select" name="intervenantSecondaire1" [(ngModel)]="currentProjet.intervenantSecondaire" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
                                   <option selected>Sélectionner l'intervenant secondaire </option>
                                   <option *ngFor="let employe of employees"
                                           [ngValue]="employe.name">{{employe.name}}</option>
@@ -703,7 +703,7 @@
 
                               <div class="form-group col-sm-4">
                                 <label for="statutProjet"><i class="fa fa-flag-o fa-lg"></i> Statut Projet :</label>
-                                <select style="margin-left: 5px;width: 175px" id="statutProjet" class="browser-default custom-select" name="intervenantSecondaire1" [(ngModel)]="currentProjet.statutProjet" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+                                <select style="margin-left: 5px;width: 175px" id="statutProjet" class="browser-default custom-select" name="intervenantSecondaire1" [(ngModel)]="currentProjet.statutProjet" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume ||roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()">
                                   <option value="A Planifier">A Planifier</option>
                                   <option value="En cours">En cours</option>
                                   <option value="Réceptionné">Réceptionné</option>
@@ -714,7 +714,7 @@
                               </div>
                               <div class="form-group col-sm-4">
                                 <label for="statutProjet"><i class="fa fa-flag-o fa-lg"></i> Taux d’avancement :</label>
-                                <input class="form-control" style="width: 150px" id="tauxAvancement" type="number" min="0" max="100" [(ngModel)]="currentProjet.tauxAvancement" name="tauxAvancement" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume " (focusin)="blockedKey()" (focusout)="deBlockedKey()" />
+                                <input class="form-control" style="width: 150px" id="tauxAvancement" type="number" min="0" max="100" [(ngModel)]="currentProjet.tauxAvancement" name="tauxAvancement" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware " (focusin)="blockedKey()" (focusout)="deBlockedKey()" />
                               </div>
 
                             </div>
@@ -914,7 +914,7 @@
                               <label for="datePvReceptionProvisoire"><i class="fa fa-calendar-times-o fa-lg"></i> Date Pv Réception Provisoire :</label>
 
                               <input id="datePvReceptionProvisoire" name="datePvReceptionProvisoire"  type="date" class="form-control input-sm" [ngModel]="currentProjet.datePvReceptionProvisoire | date:'yyyy-MM-dd'" (ngModelChange)="currentProjet.datePvReceptionProvisoire = $event"
-                                     [value]="currentProjet.datePvReceptionProvisoire | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume ">
+                                     [value]="currentProjet.datePvReceptionProvisoire | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume|| roleBuValueSoftware || roleBuValueSoftware">
 
                             </div>
                             <div class="col-md-4"></div>
@@ -925,7 +925,7 @@
                               <label for="datePvReceptionDefinitive"><i class="fa fa-calendar-times-o fa-lg"></i> Date Pv Réception Définitive :</label>
 
                               <input id="datePvReceptionDefinitive" name="datePvReceptionDefinitive"  type="date" class="form-control input-sm" [ngModel]="currentProjet.datePvReceptionDefinitive | date:'yyyy-MM-dd'" (ngModelChange)="currentProjet.datePvReceptionDefinitive = $event"
-                                     [value]="currentProjet.datePvReceptionDefinitive | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume ">
+                                     [value]="currentProjet.datePvReceptionDefinitive | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="updated($event)" [disabled]="service=='Commercial' || roleBuReseauSecurite || roleBuChefProjet || roleBuSystem || roleBuVolume || roleBuValueSoftware ">
 
                             </div>
                             <div class="col-md-4"></div>

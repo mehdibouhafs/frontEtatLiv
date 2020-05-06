@@ -190,6 +190,10 @@ export class EtatStockComponent implements OnInit {
 
     this.authService.getRoles().forEach(authority => {
 
+      if(authority== 'BU_VALUE_SOFTWARE'){
+        this.authorized = false;
+      }
+
       if(authority== 'BU_COMMERCIAL'){
         this.roleBuCommercial = true;
         //this.service = 'Commercial';

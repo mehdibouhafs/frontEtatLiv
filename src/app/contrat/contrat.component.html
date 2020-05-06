@@ -525,7 +525,7 @@
 
                           <div class="row">
 
-                            <app-view-echeance [echeances]="currentContrat.echeances"> </app-view-echeance>
+                            <app-view-echeance (deleteEcheanceEmitter)="onDeleteEcheance($event)" [echeances]="currentContrat.echeances"> </app-view-echeance>
 
                           </div>
                         </div>
@@ -578,7 +578,7 @@
 
                           <div class="row">
 
-                            <app-view-factures (errorUpdate)="onErrorUpdate($event)" [factureEcheances]="currentContrat.factureEcheances" ></app-view-factures>
+                            <app-view-factures (errorUpdate)="onErrorUpdate($event)" (addNewEcheanceEmitter)="onAddNewEcheance($event)" (editFactureEcheanceEmitter)="onEditFactureEcheance($event)" [numContrat]="currentContrat.numContrat"  [echeances]="currentContrat.echeances" [factureEcheances]="currentContrat.factureEcheances" ></app-view-factures>
 
                           </div>
 

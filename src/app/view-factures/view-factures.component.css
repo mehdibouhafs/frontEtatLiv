@@ -1,3 +1,8 @@
+.modal-sm {
+  width: 30%;
+  margin: 0px auto;
+}
+
 .mat-column-debutPeriode{
   word-wrap: break-word !important;
   white-space: unset !important;

@@ -5,6 +5,7 @@ import {User} from './model.user';
 import {EtatRecouvrement} from './model.etatRecouvrement';
 import {Employer} from './model.employer';
 import {CommentaireEcheance} from "./model.commentaireEcheance";
+import {Contrat} from "./model.contrat";
 
 
 export class Echeance {
@@ -31,6 +32,8 @@ export class Echeance {
 
   public commentaire : CommentaireEcheance;
 
+  public contrat : Contrat;
 
+  public messageDelete:string;
 
 }
