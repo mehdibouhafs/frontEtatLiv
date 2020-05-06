@@ -147,6 +147,10 @@ montantNat:any;
   lot: any;
   selectedCommercial: string;
   chargesR: any;
+  active: boolean=false;
+  idB: any = null;
+  rowcolor: string;
+  updatedDate: Date;
 
 
   constructor(public datepipe: DatePipe,private activatedRoute:ActivatedRoute,private balanceAgeeService:BalanceAgeeService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
@@ -267,19 +271,19 @@ montantNat:any;
   }
 
   ngOnInit() {
+    
   }
 
 
 
 
   getBalance() {
-
+this.dataSource = null;
     if (this.roleReadAllRecouvrement == true) {
 
     this.balanceAgeeService.getBalance().subscribe(
       data => {
         this.pageProduit = data;
-
         console.log("THIS BALANCE "+JSON.stringify(this.pageProduit))
 
         if (this.pageProduit != null) {
@@ -298,6 +302,8 @@ montantNat:any;
             p.douze_mois = produit.douze_mois;
             p.sup_douze_mois = produit.sup_douze_mois;
             p.total = produit.total;
+            p.last_update = produit.last_update;
+            this.updatedDate =p.last_update;
             
 
 
@@ -336,8 +342,9 @@ montantNat:any;
         this.dataSource.filterPredicate = function(data, filter: string): boolean {
 
 
-          return (data.client != null ? data.client : "").toLowerCase()
-            === filter;
+          return (data.chargee_recouv != null ? data.chargee_recouv : "").toLowerCase().includes(filter) ||
+          (data.client != null ? data.client : "").toLowerCase().includes(filter)
+            
         };
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
@@ -380,6 +387,9 @@ montantNat:any;
               p.douze_mois = produit.douze_mois;
               p.sup_douze_mois = produit.sup_douze_mois;
               p.total = produit.total;
+              p.last_update = produit.last_update;
+              this.updatedDate =p.last_update;
+
               
   
   
@@ -418,8 +428,8 @@ montantNat:any;
           this.dataSource.filterPredicate = function(data, filter: string): boolean {
   
   
-            return (data.client != null ? data.client : "").toLowerCase()
-              === filter;
+            return (data.chargee_recouv != null ? data.chargee_recouv : "").toLowerCase().includes(filter) ||
+            (data.client != null ? data.client : "").toLowerCase().includes(filter)
           };
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
@@ -878,4 +888,19 @@ this.montantNat = null;
   ConvertString(value){
     return parseFloat(value)
     }
+
+
+testN(){
+
+  this.rowcolor = "";
+  this.idB= null;
+
+}
+
+test(id:any){
+  this.idB = id;
+  console.log("ACTIVE"+id)
+}
+
+
 }

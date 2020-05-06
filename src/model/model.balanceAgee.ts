@@ -8,6 +8,7 @@ export class BalanceAgee {
   public douze_mois: number;
   public sup_douze_mois: number;
   public total: number;
+  public last_update: Date;
 
 
 

@@ -28,7 +28,6 @@ const routes: Routes = [
   {path:"etatStock",component:EtatStockComponent},
   {path:"etatStockProjet",component:EtatStockProjetComponent},
   {path:"balanceAgee",component:BalanceAgeeComponent},
-
   {path:"etatStockCodeProjet/:codeProjet",component:EtatStockComponent},
   {path:"etatStockNature/:codeProjet/:nature",component:EtatStockComponent},
   {path:"login",component:AuthentificationComponent},

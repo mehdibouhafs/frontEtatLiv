@@ -168,6 +168,7 @@ export class EtatRecouvrementComponent implements OnInit {
   roleBuSystem:any;
   roleBuChefProjet:any;
   roleBuVolume:any;
+  test: Date;
 
 
   constructor(private authService:AuthenticationService,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatRecouvrementService: EtatRecouvrementService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef,
@@ -322,6 +323,7 @@ export class EtatRecouvrementComponent implements OnInit {
 
 
   insertIntoDocuments(pageDocument : any){
+    this.test = new Date();
     this.Documents = new Array<Document>();
     if(pageDocument!=null){
       pageDocument.forEach(document => {
@@ -353,7 +355,6 @@ export class EtatRecouvrementComponent implements OnInit {
         p.details = document.details;
         p.creation = document.creation;
         p.lastUpdate = document.lastUpdate;
-        const balanceUpdate = document.lastUpdate;
         p.statut = document.statut;
         p.motif = document.motif;
         p.montantGarantie = document.montantGarantie;
