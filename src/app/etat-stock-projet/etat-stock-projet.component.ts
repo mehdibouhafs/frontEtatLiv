@@ -425,8 +425,7 @@ montantNat:any;
             (data.chef_projet != null ? data.chef_projet : "").toLowerCase().includes(filter) ||
             (data.annee != null ? data.annee : "").toLowerCase().includes(filter) ||
             (data.commercial != null ? data.commercial : "").toLowerCase().includes(filter) ||
-            (data.num_lot != null ? data.num_lot : "").toString().toLowerCase()
-            === filter;
+            (data.num_lot != null ? data.num_lot : "").toString().toLowerCase().includes(filter) 
         };
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
@@ -863,8 +862,7 @@ montantNat:any;
             (data.commercial != null ? data.commercial : "").toLowerCase().includes(filter) ||
             (data.magasin != null ? data.magasin : "").toLowerCase().includes(filter) ||
             (data.nom_lot != null ? data.nom_lot : "").toLowerCase().includes(filter) ||
-            (data.num_lot != null ? data.num_lot : "").toString().toLowerCase()
-            === filter;
+            (data.num_lot != null ? data.num_lot : "").toString().toLowerCase().includes(filter)
         };
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
