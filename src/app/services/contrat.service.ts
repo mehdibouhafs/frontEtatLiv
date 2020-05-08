@@ -27,6 +27,12 @@ export class ContratService {
     return this.http.get(this.host+"/getAllContrat",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
+  getAllEcheancesForContrat(numContrat : number) {
+    //return this.http.get(this.host+"/getProjets?username="+username, {headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    //return this.http.get(this.host+"/getProjects?idEtatProjet=1"+"&page="+page+"&size="+size);
+    return this.http.get(this.host+"/getAllEcheancesForContrat?numContrat="+numContrat,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
   getAllCommentaireEcheance() {
     //return this.http.get(this.host+"/getProjets?username="+username, {headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
     //return this.http.get(this.host+"/getProjects?idEtatProjet=1"+"&page="+page+"&size="+size);

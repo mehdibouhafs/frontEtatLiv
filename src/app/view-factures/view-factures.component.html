@@ -121,7 +121,7 @@
         <label for="au1"><i class="fa fa-calendar-times-o fa-lg"></i> Echeance Au :</label>
         <select id="au1" class="form-control" name="au1"  [(ngModel)]="updatedFactureEcheance.echeance"  >
           <option value="undefined" selected>Sélectionner l'écheance </option>
-          <option *ngFor="let echeance of echeances"
+          <option *ngFor="let echeance of allEcheances"
                   [ngValue]="echeance">[ Du {{echeance.du | date:'dd/MM/yyyy'}} , Au {{echeance.au | date:'dd/MM/yyyy'}} ]</option>
         </select>
       </div>

@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectorRef, Component, HostListener, OnInit, TemplateRef, ViewChild,
   ViewContainerRef, ViewEncapsulation
 } from '@angular/core';
@@ -20,6 +21,7 @@ import {CommandeFournisseur} from "../../model/model.commandeFournisseur";
 import {StatiticsContrat} from "../../model/model.statisticsContrat";
 import {CommentaireEcheance} from "../../model/model.commentaireEcheance";
 import {FactureEcheance} from "../../model/model.factureEcheance";
+import {ViewFacturesComponent} from "../view-factures/view-factures.component";
 
 @Component({
   selector: 'app-contrat',
@@ -137,7 +139,7 @@ export class ContratComponent implements OnInit {
   roleReadAllContrats : boolean;
   roleReadMyContrats:boolean;
 
-
+  currentAllEcheances : Array<Echeance>;
 
   initFilter(){
     this.selectedClient = null;
@@ -552,6 +554,9 @@ export class ContratComponent implements OnInit {
     this.modalOption.backdrop = 'static';
     this.modalOption.keyboard = false;
     this.modalRef = this.modalService.show(template,this.modalOption );
+
+    this.loadAllEcheance(this.currentContrat.numContrat);
+
   }
 
   setPage(page: number) {
@@ -1088,6 +1093,17 @@ export class ContratComponent implements OnInit {
 
     });
 
+    this.currentAllEcheances.push(echeance);
+
+    this.currentAllEcheances = [].concat(this.currentAllEcheances);
+
+    this.currentAllEcheances.sort(function(a,b){
+      // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      return new Date(b.du).valueOf() - new Date(a.du).valueOf();
+
+    });
+
     this.ref.detectChanges();
 
   }
@@ -1113,10 +1129,23 @@ export class ContratComponent implements OnInit {
       }else{
         return new Date(b.facture.dateEnregistrement).valueOf() - new Date(a.facture.dateEnregistrement).valueOf();
       }
-
-
-
     });
+
+    this.currentContrat.echeances = this.currentContrat.echeances.filter(item => item.id !== factureEcheance.echeance.id);
+
+    this.currentContrat.echeances.push(factureEcheance.echeance);
+
+    this.currentContrat.echeances = [].concat(this.currentContrat.echeances);
+
+     // Turn your strings into dates, and then subtract them
+      // to get a value that is either negative, positive, or zero.
+      this.currentContrat.echeances.sort(function(a,b){
+        // Turn your strings into dates, and then subtract them
+        // to get a value that is either negative, positive, or zero.
+        return new Date(b.du).valueOf() - new Date(a.du).valueOf();
+
+      });
+
 
     this.ref.detectChanges();
 
@@ -1125,7 +1154,20 @@ export class ContratComponent implements OnInit {
   onDeleteEcheance(echeance :Echeance){
     this.currentContrat.echeances = this.currentContrat.echeances.filter(item => item !== echeance);
     this.currentContrat.echeances = [].concat(this.currentContrat.echeances);
+    this.currentAllEcheances = this.currentAllEcheances.filter(item => item.id !== echeance.id);
     this.ref.detectChanges();
+  }
+
+  loadAllEcheance(numContrat : any){
+
+    this.contratService.getAllEcheancesForContrat(numContrat).subscribe(
+      (data: Array<Echeance>) => {
+        this.currentAllEcheances = data;
+      }, err => {
+        console.log("error " + JSON.stringify(err));
+      }
+    )
+
   }
 
 

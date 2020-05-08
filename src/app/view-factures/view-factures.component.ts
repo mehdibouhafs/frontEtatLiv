@@ -30,9 +30,10 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   currentFilter:any;
   @Input() factureEcheances : Array<FactureEcheance>;
 
-  @Input() echeances : Array<Echeance>;
+  @Input()  allEcheances : Array<Echeance>;
 
-  @Input() numContrat : string;
+  @Input() numContrat : any;
+
 
   currentFacturationEcheance : FactureEcheance;
 
@@ -45,7 +46,6 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   updatedFactureEcheance : FactureEcheance;
 
   newEcheance : Echeance;
-
 
   @Output() addNewEcheanceEmitter = new EventEmitter<Echeance>();
 
@@ -63,7 +63,6 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
         this.roleEditEcheance= true;
       }
     });
-
 
     this.dataSourceFacturesEcheance = new MatTableDataSource(this.factureEcheances);
 
@@ -96,11 +95,7 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     this.dataSourceFacturesEcheance = new MatTableDataSource(this.factureEcheances);
 
-
-
-
     this.dataSourceFacturesEcheance.filterPredicate = function(data, filter: string): boolean {
-
 
       return (data.facture.numFacture != null ? data.facture.numFacture : "").toString().toLowerCase()
 
@@ -116,11 +111,6 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   sortChange(e) {
     // save cookie with table sort data here
     this.dataSourceFacturesEcheance.sortData(this.dataSourceFacturesEcheance.filteredData,this.dataSourceFacturesEcheance.sort);
-    // ////console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // //console.log("sorting table");
-    //this.filtredData = this.dataSource.filteredData;
-
-    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
 
@@ -181,12 +171,12 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   }
 
 
-
   nbMonth :number=0;
 
   onChangeDate(){
     this.nbMonth = moment(new Date(this.newEcheance.au)).diff(new Date(this.newEcheance.du), 'months', true);
   }
+
 
 
 
