@@ -140,7 +140,24 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
   
     </div>
 
- 
+    <div class="col-md-2">
+  
+        <label for="com">Age :</label>
+        <br/>
+        <ng-select id="age"
+        [clearable]="true"
+        name="age"
+        [items]="ages"
+        placeholder="Filtrer par age"
+        [(ngModel)]="selectedAge"
+        (change)="selectFiltre()"
+        class="custom"
+    >
+    
+    </ng-select>
+    
+    
+      </div>
   
     <div class="col-md-2">
       <button style="color: white;

@@ -29,8 +29,8 @@ export class BalanceAgeeService {
 
   }
 
-  getBalanceByFiltre(client: any,cr:any){
-    return this.http.get(this.host+"/getBalanceByFiltre?client="+client+"&cr="+cr,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  getBalanceByFiltre(client: any,cr:any,age:any){
+    return this.http.get(this.host+"/getBalanceByFiltre?client="+client+"&cr="+cr+"&age="+age,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
   }
 
