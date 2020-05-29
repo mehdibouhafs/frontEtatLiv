@@ -836,10 +836,10 @@ console.log("TEMPLATE"+console.log(template));
 
 
     if(age != null && clientBalance !=null){
-      this.selectedAge = age;
       this.selectedClient = clientBalance;
       setTimeout(()=>{    //<<<---    using ()=> syntax
         this.selectedClient = clientBalance;
+        this.selectedAge = age;
         this.toSelectDoc = this.Documents[0];
         this.selectDocument(this.toSelectDoc,this.template);
       }, 2000);
