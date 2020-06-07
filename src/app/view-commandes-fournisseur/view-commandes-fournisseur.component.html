@@ -1,3 +1,4 @@
+<div *ngIf="commandesFournisseurs!=null">
 <div class="row">
 
   <div class="col-md-4">
@@ -14,7 +15,7 @@
 
 
 <table mat-table  #commandesTable
-       #commandesTableSort="matSort"  [dataSource]="dataSourceCommandeFournisseur" class="mat-elevation-z8" matSort>
+       (matSortChange)="sortChange($event)" [dataSource]="dataSourceCommandeFournisseur" class="mat-elevation-z8" matSort>
 
 
   <!-- Name Column -->
@@ -83,4 +84,15 @@
 
 
 </table>
-<mat-paginator #commandesTablePaginator="matPaginator" [pageSizeOptions]="[10, 15,20]"></mat-paginator>
+
+<mat-paginator #commandesTablePaginator="matPaginator"
+               [length]="lengthCommandeFournisseurs "
+               [pageSize]="pageSizeCommandeFournisseurs"
+               [pageSizeOptions]="pageSizeOptionsCommandeFournisseurs"
+               (page)="onPaginateChangeCommandeFournisseurs($event) ">
+</mat-paginator>
+
+</div>
+<div *ngIf="commandesFournisseurs==null"><h5>Chargement des commandes fournisseurs pour le contrat {{numContrat}} merci de patienter...</h5></div>
+
+

@@ -29,7 +29,7 @@ export class Contrat {
 
   public nomSousTraitant:string;
 
-  public  contratSigne :boolean;
+  public  contratSigne :boolean=false;
 
   public codeProjet : string;
 

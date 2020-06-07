@@ -1,9 +1,12 @@
 import {
-  ChangeDetectionStrategy, Component, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Input, OnChanges, OnInit, SimpleChanges,
+  ViewChild,
   ViewEncapsulation
 } from '@angular/core';
 import {CommandeFournisseur} from "../../model/model.commandeFournisseur";
 import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
+import {ContratService} from "../services/contrat.service";
+import {NgxSpinnerService} from "ngx-spinner";
 
 @Component({
   selector: 'app-view-commandes-fournisseur',
@@ -20,29 +23,32 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
   @ViewChild('commandesTablePaginator', {static: true}) paginatorCommandeFournisseur: MatPaginator;
   filtredDataCommandeFournisseur: Array<CommandeFournisseur>;
 
-  @Input() commandesFournisseurs : Array<CommandeFournisseur>;
+  @Input() numContrat : any;
+  commandesFournisseurs : Array<CommandeFournisseur>;
 
   currentFilter;
 
-  constructor() { }
+  lengthCommandeFournisseurs:number;
+  pageSizeCommandeFournisseurs:number;
+  pageSizeOptionsCommandeFournisseurs:number[] = [5,10, 15,25,30];
+  currentPageCommandeFournisseurs : number;
+  totalPagesCommandeFournisseurs:number;
+  offsetCommandeFournisseurs:number;
+  numberOfElementsCommandeFournisseurs:number;
+
+  sortBy:any=null;
+
+  sortType:any=null;
+
+  constructor(private ref: ChangeDetectorRef,private spinner: NgxSpinnerService,private contratService:ContratService) { }
 
   ngOnInit() {
 
-    this.dataSourceCommandeFournisseur = new MatTableDataSource(this.commandesFournisseurs);
+    this.currentPageCommandeFournisseurs=1;
+    this.pageSizeCommandeFournisseurs=5;
+    /*this.getCommandeFournisseur(this.numContrat,null,this.currentPageCommandeFournisseurs,this.pageSizeCommandeFournisseurs
+      ,this.sortBy,this.sortType);*/
 
-    this.dataSourceCommandeFournisseur.filterPredicate = function(data, filter: string): boolean {
-
-
-      return (data.fournisseur != null ? data.fournisseur : "").toLowerCase().includes(filter) ||
-        (data.remarque != null ? data.remarque : "").toLowerCase().includes(filter) ||
-        (data.descriptionArticle != null ? data.descriptionArticle : "").toLowerCase().includes(filter) ||
-        (data.numeroDocument !=null ? data.numeroDocument : "").toString().toLowerCase()
-
-        === filter;
-    };
-
-    this.dataSourceCommandeFournisseur.paginator = this.paginatorCommandeFournisseur;
-    this.dataSourceCommandeFournisseur.sort = this.sortCommandeFournisseur;
   }
 
   applyFilter(filterValue: string) {
@@ -51,43 +57,64 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
     this.dataSourceCommandeFournisseur.filter = filterValue;
     this.currentFilter = filterValue;
 
-    if (this.dataSourceCommandeFournisseur.paginator) {
-      this.dataSourceCommandeFournisseur.paginator.firstPage();
-    }
-
+    this.getCommandeFournisseur(this.numContrat, this.currentFilter,1,5,this.sortBy,this.sortType);
 
 
 
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    console.log("change commande fournisseru");
+    this.dataSourceCommandeFournisseur=null;
+    this.commandesFournisseurs=null;
+    this.getCommandeFournisseur(this.numContrat, null,1,5,this.sortBy,this.sortType);
 
-    this.dataSourceCommandeFournisseur = new MatTableDataSource(this.commandesFournisseurs);
-
-    this.dataSourceCommandeFournisseur.filterPredicate = function(data, filter: string): boolean {
-
-
-      return (data.fournisseur != null ? data.fournisseur : "").toLowerCase().includes(filter) ||
-        (data.remarque != null ? data.remarque : "").toLowerCase().includes(filter) ||
-        (data.descriptionArticle != null ? data.descriptionArticle : "").toLowerCase().includes(filter) ||
-        (data.numeroDocument !=null ? data.numeroDocument : "").toString().toLowerCase()
-
-        === filter;
-    };
-
-    this.dataSourceCommandeFournisseur.paginator = this.paginatorCommandeFournisseur;
-    this.dataSourceCommandeFournisseur.sort = this.sortCommandeFournisseur;
   }
 
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    this.dataSourceCommandeFournisseur.sortData(this.dataSourceCommandeFournisseur.filteredData,this.dataSourceCommandeFournisseur.sort);
-    // //console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // //console.log("sorting table");
-    //this.filtredData = this.dataSource.filteredData;
+    if(e.direction==""){
+      this.sortBy=null;
+      this.sortType=null;
+    }else{
+      this.sortBy=e.active;
+      this.sortType=e.direction;
+    }
 
-    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+    this.getCommandeFournisseur(this.numContrat, this.currentFilter,this.currentPageCommandeFournisseurs,this.pageSizeCommandeFournisseurs,this.sortBy,this.sortType);
+
+  }
+
+  onPaginateChangeCommandeFournisseurs(event) {
+    console.log("onPaginateChangeCommandeFournisseurs ");
+    this.currentPageCommandeFournisseurs= event.pageIndex+1;
+    this.pageSizeCommandeFournisseurs = event.pageSize;
+    this.getCommandeFournisseur(this.numContrat,this.currentFilter,this.currentPageCommandeFournisseurs,this.pageSizeCommandeFournisseurs,this.sortBy,this.sortType);
+
+
+  }
+
+
+  getCommandeFournisseur(numContrat:number,mc:string,page :number,size:number,sortBy:any,sortType:any){
+
+
+    this.contratService.getCommandeFournisseurs(numContrat,mc,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.commandesFournisseurs = data.content;
+
+        this.lengthCommandeFournisseurs = data.totalElements;
+        this.totalPagesCommandeFournisseurs= data.totalPages;
+        this.currentPageCommandeFournisseurs = data.pageable.pageNumber+1;
+
+        this.dataSourceCommandeFournisseur = new MatTableDataSource(this.commandesFournisseurs);
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
 
   }
 

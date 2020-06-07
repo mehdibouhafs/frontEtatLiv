@@ -6,9 +6,9 @@ import {ReunionComponent} from './reunion/reunion.component';
 import {EtatRecouvrementComponent} from './etat-recouvrement/etat-recouvrement.component';
 import {EtatStockComponent} from './etat-stock/etat-stock.component';
 import {DashboardComponent} from "./dashboard/dashboard.component";
-import {ContratComponent} from "./contrat/contrat.component";
 import {EtatStockProjetComponent} from './etat-stock-projet/etat-stock-projet.component';
 import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
+import {ContratsComponent} from "./contrats/contrats.component";
 
 
 
@@ -32,7 +32,7 @@ const routes: Routes = [
   {path:"etatStockNature/:codeProjet/:nature",component:EtatStockComponent},
   {path:"login",component:AuthentificationComponent},
   {path:"consultReunions",component:ReunionComponent},
-  {path:"contrats",component:ContratComponent},
+  {path:"contrats",component:ContratsComponent},
 
 ];
 

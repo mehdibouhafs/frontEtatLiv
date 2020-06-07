@@ -55,7 +55,7 @@ export class BalanceAgeeComponent implements OnInit {
   selectedClientTMP: any;
 
   selectedCR:any;
-  
+
   selectedCRTMP:any;
 
 
@@ -158,8 +158,6 @@ montantNat:any;
 
     this.userInSession = this.authService.getLastName();
 
-
-
     this.authService.getRoles().forEach(authority => {
 
       if(authority== 'BU_COMMERCIAL'){
@@ -230,7 +228,6 @@ montantNat:any;
 
       }
 
-
       if (authority == 'READ_ALL_RECOUVREMENTS') {
         this.roleReadAllRecouvrement = true;
         this.authorized = true;
@@ -271,7 +268,7 @@ montantNat:any;
   }
 
   ngOnInit() {
-    
+
   }
 
 
@@ -304,7 +301,7 @@ this.dataSource = null;
             p.total = produit.total;
             p.last_update = produit.last_update;
             this.updatedDate =p.last_update;
-            
+
 
 
 
@@ -344,7 +341,7 @@ this.dataSource = null;
 
           return (data.chargee_recouv != null ? data.chargee_recouv : "").toLowerCase().includes(filter) ||
           (data.client != null ? data.client : "").toLowerCase().includes(filter)
-            
+
         };
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
@@ -368,18 +365,18 @@ this.dataSource = null;
         data => {
           this.pageProduit = data;
 
-  
+
           console.log("THIS BALANCE "+JSON.stringify(this.pageProduit))
-  
+
           if (this.pageProduit != null) {
-  
+
             this.produits = new Array<BalanceAgee>();
             this.pageProduit.forEach(produit => {
               let p = new BalanceAgee();
             this.pageProduit.client
-  
+
             p.id_balance = produit.id_balance;
-  
+
               p.client = produit.client;
               p.chargee_recouv = produit.chargee_recouv;
               p.tois_mois = produit.tois_mois;
@@ -390,44 +387,44 @@ this.dataSource = null;
               p.last_update = produit.last_update;
               this.updatedDate =p.last_update;
 
-              
-  
-  
-  
+
+
+
+
                     this.client = this.pageProduit
                    .map(item => ((!item.client)? "AUCUN CLIENT": item.client))
                    .filter((value, index, self) => self.indexOf(value) === index)
-  
+
                    this.client = this.client.filter(item => item !== "AUCUN CLIENT");
-  
+
                    this.chargesR = this.pageProduit
                    .map(item => ((!item.chargee_recouv)? "AUCUN CR": item.chargee_recouv))
                    .filter((value, index, self) => self.indexOf(value) === index)
-  
+
                    this.chargesR = this.chargesR.filter(item => item !== "AUCUN CR");
-  
-  
+
+
               this.addToArray(p.client,'client');
-  
-  
-  
-  
+
+
+
+
               this.produits.push(p);
-  
-  
+
+
             });
           }
-  
-  
+
+
           this.sortAllArrays();
           this.clientsList = this.clients;
-  
+
           this.ref.detectChanges()
           this.dataSource = new MatTableDataSource(this.produits);
-  
+
           this.dataSource.filterPredicate = function(data, filter: string): boolean {
-  
-  
+
+
             return (data.chargee_recouv != null ? data.chargee_recouv : "").toLowerCase().includes(filter) ||
             (data.client != null ? data.client : "").toLowerCase().includes(filter)
           };
@@ -436,9 +433,9 @@ this.dataSource = null;
           if (this.currentFilter != null)
             this.applyFilter(this.currentFilter);
           this.getStatistics();
-  
-  
-  
+
+
+
         }, err => {
           // alert("erreur " + err);
           this.authService.logout();
@@ -446,7 +443,7 @@ this.dataSource = null;
           console.log("error " + JSON.stringify(err));
         }
       )}
-  
+
 
   }
 
@@ -500,12 +497,12 @@ this.dataSource = null;
     let totalBalance =0;
 
     this.filtredData.forEach(element=>{
- 
-        totalTrois = totalTrois + element.tois_mois;      
+
+        totalTrois = totalTrois + element.tois_mois;
         totalSix = totalSix + element.six_mois;
         totalDouze = totalDouze + element.douze_mois;
         totalSupDouze = totalSupDouze + element.sup_douze_mois;
-      
+
 totalBalance = totalBalance + element.total;
 
 
@@ -657,7 +654,7 @@ totalBalance = totalBalance + element.total;
     }else{
       this.selectedCRTMP = this.selectedCR;
     }
-  
+
     this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.selectedCRTMP).subscribe(
       data => {
         this.pageProduit = data;
@@ -680,7 +677,7 @@ totalBalance = totalBalance + element.total;
             p.douze_mois = produit.douze_mois;
             p.sup_douze_mois = produit.sup_douze_mois;
             p.total = produit.total;
-            
+
 
 
             this.addToArray(p.client,'client');
@@ -755,7 +752,7 @@ totalBalance = totalBalance + element.total;
 
     // get current page of items
 
-  
+
 
   getIndexFromFiltrerdList(id){
     console.log("this.filtredData.size " + this.filtredData.length);

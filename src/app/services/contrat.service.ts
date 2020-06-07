@@ -17,8 +17,6 @@ export class ContratService {
 
   private host = host;
 
-
-
   constructor(private  http:HttpClient,private authenticationService:AuthenticationService){}
 
   getAllContrats() {
@@ -26,6 +24,178 @@ export class ContratService {
     //return this.http.get(this.host+"/getProjects?idEtatProjet=1"+"&page="+page+"&size="+size);
     return this.http.get(this.host+"/getAllContrat",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
+
+  getAllContrat(page: number,size:number) {
+    //return this.http.get(this.host+"/getProjets?username="+username, {headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    //return this.http.get(this.host+"/getProjects?idEtatProjet=1"+"&page="+page+"&size="+size);
+    return this.http.get(this.host+"/getAllContrats?page="+page+"&size="+size,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getContrat(numContrat : number){
+
+    return this.http.get(this.host+"/getContrat?numContrat="+numContrat,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getEcheance(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+
+    return this.http.get(this.host+"/getEcheance?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getFactureEcheance(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+    return this.http.get(this.host+"/getFactureEcheance?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getCommandeFournisseurs(numContrat : number,mc:string,page: number,size:number,sortBy :string,sortType :string){
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(mc!=null && mc!="null" ){
+      res.push("mc="+mc);
+    }
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+    return this.http.get(this.host+"/getCommandeFournisseur?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getPieces(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+    return this.http.get(this.host+"/getPieces?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getCommentairesContrat(numContrat : number,page: number,size:number){
+
+    return this.http.get(this.host+"/getCommentairesContrat?numContrat="+numContrat+"&page="+page+"&size="+size,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getAllClients(){
+
+    return this.http.get(this.host+"/getAllClients",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getAllNumMarches(){
+
+    return this.http.get(this.host+"/getAllNumMarches",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getPilotes(){
+
+    return this.http.get(this.host+"/getPilotes",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+
+
+
+
+  contratsFilter2(page:number,size:number,mc:string,numMarche:string,nomPartenaire:string,pilote:string,sousTraiter:any,sortBy :string,sortType :string){
+
+    var res = new Array();
+
+    res.push("page="+page);
+    res.push("size="+size);
+    if(mc!=null && mc!="null" ){
+      res.push("mc="+mc);
+    }
+
+    if(numMarche!=null && numMarche!="null"){
+      res.push("numMarche="+numMarche);
+    }
+
+    if(nomPartenaire!=null && nomPartenaire!="null"){
+      res.push("nomPartenaire="+nomPartenaire);
+    }
+
+    if(pilote!=null && pilote!="null"){
+      res.push("pilote="+pilote);
+    }
+
+    if(sousTraiter!=null && sousTraiter!="null"){
+      res.push("sousTraiter="+sousTraiter);
+    }
+
+    if(sortBy!=null && sortBy!="null" && sortType!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+    console.log("res " + res);
+
+    return this.http.get(this.host+'/contratsFilter2?'+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getStatisticsContrat(mc:string,numMarche:string,nomPartenaire:string,pilote:string,sousTraiter:any){
+
+    var res = new Array();
+
+
+    if(mc!=null && mc!="null" ){
+      res.push("mc="+mc);
+    }
+
+    if(numMarche!=null && numMarche!="null"){
+      res.push("numMarche="+numMarche);
+    }
+
+    if(nomPartenaire!=null && nomPartenaire!="null"){
+      res.push("nomPartenaire="+nomPartenaire);
+    }
+
+    if(pilote!=null && pilote!="null"){
+      res.push("pilote="+pilote);
+    }
+
+    if(sousTraiter!=null && sousTraiter!="null"){
+      res.push("sousTraiter="+sousTraiter);
+    }
+
+    var str = res.join("&");
+
+    console.log("res " + res);
+
+    return this.http.get(this.host+'/getStatisticsContrat?'+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+
 
   getAllEcheancesForContrat(numContrat : number) {
     //return this.http.get(this.host+"/getProjets?username="+username, {headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
@@ -40,8 +210,37 @@ export class ContratService {
   }
 
 
-  exportContrat(contrats : Array<Contrat>) {
-    return this.http.post(this.host + '/exportContratExcel',contrats, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
+  exportContrats(mc:string,numMarche:string,nomPartenaire:string,pilote:string,sousTraiter:any) {
+    var res = new Array();
+
+    if(mc!=null && mc!="null" ){
+      res.push("mc="+mc);
+    }
+
+    if(numMarche!=null && numMarche!="null"){
+      res.push("numMarche="+numMarche);
+    }
+
+    if(nomPartenaire!=null && nomPartenaire!="null"){
+      res.push("nomPartenaire="+nomPartenaire);
+    }
+
+    if(pilote!=null && pilote!="null"){
+      res.push("pilote="+pilote);
+    }
+
+    if(sousTraiter!=null && sousTraiter!="null"){
+      res.push("sousTraiter="+sousTraiter);
+    }
+
+    var str="";
+    if(res.length>0){
+      str = "?"+res.join("&");
+    }
+
+
+    console.log("res " + res);
+    return this.http.get(this.host + '/exportContratExcel'+str, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
     );
   }
 
@@ -60,6 +259,11 @@ export class ContratService {
 
   }
 
+  addEcheance(numContrat :any,echeance : Echeance){
+    return this.http.post(this.host+'/addEcheance/'+numContrat,echeance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
   deleteEcheance(idEcheance : any){
     return this.http.delete(this.host+'/deleteEcheance/'+idEcheance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
@@ -70,12 +274,12 @@ export class ContratService {
     return this.http.get(this.host+'/refreshContrats',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
-  addCommentaires(numContrat:number,commentaires:Array<Commentaire>){
-    return this.http.put(this.host+'/addCommentaires/'+numContrat,commentaires,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  addCommentaire(numContrat:number,commentaire:Commentaire){
+    return this.http.put(this.host+'/addCommentaire/'+numContrat,commentaire,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
   deleteCommentaire(idCommentaire){
-    return this.http.delete(this.host+'/idCommentaire/'+idCommentaire,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.delete(this.host+'/deleteCommentaire/'+idCommentaire,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
 

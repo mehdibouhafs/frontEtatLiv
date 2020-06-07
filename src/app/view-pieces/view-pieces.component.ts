@@ -1,10 +1,12 @@
 import {
-  ChangeDetectionStrategy, Component, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Input, OnChanges, OnInit, SimpleChanges,
+  ViewChild,
   ViewEncapsulation
 } from '@angular/core';
 import {Piece} from "../../model/model.piece";
 import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
 import {ContratService} from "../services/contrat.service";
+import {NgxSpinnerService} from "ngx-spinner";
 
 @Component({
   selector: 'app-view-pieces',
@@ -19,24 +21,30 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
   public dataSourcePieceContrat: MatTableDataSource<Piece>;
   @ViewChild('pieceContratTableSort', {static: true}) sortPieceContrat: MatSort;
   @ViewChild('pieceContratTablePaginator', {static: true}) paginatorPieceContrat: MatPaginator;
-  @Input() piecesContrat : Array<Piece>;
+  @Input() numContrat : any;
+   piecesContrat : Array<Piece>;
   currentFilter:any;
 
-  constructor(private contratService:ContratService) { }
+  lengthPieces:number;
+  pageSizePieces:number;
+  pageSizeOptionsPieces:number[] = [5,10, 15,25,30];
+  currentPagePieces : number;
+  totalPagesPieces:number;
+  offsetPieces:number;
+  numberOfElementsPieces:number;
+
+  sortBy:any=null;
+
+  sortType:any=null;
+
+
+  constructor(private ref: ChangeDetectorRef,private spinner: NgxSpinnerService, private contratService:ContratService) { }
 
   ngOnInit() {
-    //console.log("PieceOnInit" + this.piecesContrat);
-    this.dataSourcePieceContrat = new MatTableDataSource(this.piecesContrat);
-    this.dataSourcePieceContrat.filterPredicate = function(data, filter: string): boolean {
+    this.currentPagePieces=1;
+    this.pageSizePieces=5;
+    //this.getPieces(this.numContrat,this.currentPagePieces,this.pageSizePieces,this.sortBy,this.sortType);
 
-      return (data.name != null ? data.name : "").toString().toLowerCase()
-
-        === filter;
-    };
-    //  this.dataSourceEcheance.paginator = this.paginatorEcheance;
-
-    this.dataSourcePieceContrat.paginator = this.paginatorPieceContrat;
-    this.dataSourcePieceContrat.sort=this.sortPieceContrat;
   }
 
   applyFilter(filterValue: string) {
@@ -45,37 +53,29 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
     this.dataSourcePieceContrat.filter = filterValue;
     this.currentFilter = filterValue;
 
-    if (this.dataSourcePieceContrat.paginator) {
-      this.dataSourcePieceContrat.paginator.firstPage();
-    }
 
 
   }
 
   ngOnChanges(changes: SimpleChanges) {
     //console.log("PieceOnInit" + this.piecesContrat);
-    this.dataSourcePieceContrat = new MatTableDataSource(this.piecesContrat);
-    this.dataSourcePieceContrat.filterPredicate = function(data, filter: string): boolean {
-
-      return (data.name != null ? data.name : "").toString().toLowerCase()
-
-        === filter;
-    };
-    //  this.dataSourceEcheance.paginator = this.paginatorEcheance;
-
-    this.dataSourcePieceContrat.paginator = this.paginatorPieceContrat;
-    this.dataSourcePieceContrat.sort=this.sortPieceContrat;
+    this.dataSourcePieceContrat=null;
+    this.piecesContrat=null;
+    this.getPieces(this.numContrat,1,5,this.sortBy,this.sortType);
   }
 
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    this.dataSourcePieceContrat.sortData(this.dataSourcePieceContrat.filteredData,this.dataSourcePieceContrat.sort);
-    // //console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // //console.log("sorting table");
-    //this.filtredData = this.dataSource.filteredData;
+    if(e.direction==""){
+      this.sortBy=null;
+      this.sortType=null;
+    }else{
+      this.sortBy=e.active;
+      this.sortType=e.direction;
+    }
+    this.getPieces(this.numContrat,this.currentPagePieces,this.pageSizePieces,this.sortBy,this.sortType);
 
-    // //console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
 
   }
 
@@ -104,6 +104,35 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
     },err=>{
        alert("Ereur de téléchargement de la pièce ! Veuillez contacter votre administrateur ");
     });
+  }
+
+  onPaginateChangePieces(event) {
+    console.log("onPaginateChangePieces ");
+    this.currentPagePieces = event.pageIndex+1;
+    this.pageSizePieces = event.pageSize;
+    this.getPieces(this.numContrat,this.currentPagePieces,this.pageSizePieces,this.sortBy,this.sortType);
+
+
+  }
+
+  getPieces(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+
+    this.contratService.getPieces(numContrat,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.piecesContrat = data.content;
+
+        this.lengthPieces = data.totalElements;
+        this.currentPagePieces = data.pageable.pageNumber+1;
+
+        this.dataSourcePieceContrat = new MatTableDataSource(this.piecesContrat);
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
   }
 
 

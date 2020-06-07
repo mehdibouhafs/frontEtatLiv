@@ -12,9 +12,11 @@ export class Echeance {
 
  public id : number;
 
-  public   du : Date;
+  public  du : Date;
 
-  public   au: Date;
+  public  au: Date;
+
+  public montant : number;
 
   public  montantPrevision :number;
 
@@ -35,5 +37,7 @@ export class Echeance {
   public contrat : Contrat;
 
   public messageDelete:string;
+
+  public addedByUser : boolean;
 
 }

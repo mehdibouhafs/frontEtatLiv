@@ -1412,16 +1412,16 @@ currentPageComment;
       if(lastCommentaire1){
         email = email+ "%0A";
 
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content).split("<br>").join("%0A")+"%0A";
       }
        let lastCommentaire2 = new Commentaire();
       lastCommentaire2= projet.commentaires[1];
       if(lastCommentaire2)
-      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
+      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content).split("<br>").join("%0A")+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= projet.commentaires[2];
       if(lastCommentaire3)
-      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
+      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content).split("<br>").join("%0A")+"%0A";
     }
     //console.log("email " + email);
 
@@ -1488,13 +1488,13 @@ currentPageComment;
 
     switch(type)
     {
-      case 'codeCommercial'://console.log("codeCommercial "+ value); this.router.navigate(['/etatRecouvrementCodeCommercial',value]); break;
+      case 'codeCommercial': this.router.navigate(['/etatRecouvrementCodeCommercial',value]); break;
 
-      case 'chefProjet'://console.log("chefProjet "+ value);this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
+      case 'chefProjet':this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
 
-      case 'codeClient'://console.log("codeClient "+ value);this.router.navigate(['/etatRecouvrementCodeClient',value]); break;
+      case 'codeClient':this.router.navigate(['/etatRecouvrementCodeClient',value]); break;
 
-      case 'codeProjet'://console.log("codeProjet "+ value);this.router.navigate(['/etatRecouvrementCodeProjet',value]); break;
+      case 'codeProjet':this.router.navigate(['/etatRecouvrementCodeProjet',value]); break;
 
 
     }
@@ -1658,35 +1658,39 @@ currentPageComment;
   }
 
   addCommentaireFromSocket(commentaire : CommentaireSocket){
-  //console.log("addCommentration " + commentaire);
-  var projet : Projet;
-    for(var i=0;i<this.filtredData.length;i++){
-      //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
-      if(this.filtredData[i].codeProjet == commentaire.joinId){
-        //console.log("eqals");
-        projet = this.filtredData[i];
-        this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
-        if (this.filtredData[i].commentaires == null) {
-          this.filtredData[i].commentaires = new Array<Commentaire>();
+
+    if(commentaire!=null){
+      var projet : Projet;
+      for(var i=0;i<this.filtredData.length;i++){
+        //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
+        if(commentaire.joinId!=null && this.filtredData[i].codeProjet == commentaire.joinId){
+          //console.log("eqals");
+          projet = this.filtredData[i];
+
+          //this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
+          if (this.filtredData[i].commentaires == null) {
+            this.filtredData[i].commentaires = new Array<Commentaire>();
+          }
+
+          this.filtredData[i].commentaires.push(commentaire);
+
+
+          this.filtredData[i].commentaires.sort((a, b) => {
+            return <any> new Date(b.date) - <any> new Date(a.date);
+          });
+
+
+          if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
+            //console.log("same projet " + JSON.stringify(projet));
+            this.currentProjet = projet;
+            this.setPage(this.currentPageComment);
+            this.ref.detectChanges();
+          }
+          return;
+
         }
+    }
 
-         this.filtredData[i].commentaires.push(commentaire);
-
-
-        this.filtredData[i].commentaires.sort((a, b) => {
-          return <any> new Date(b.date) - <any> new Date(a.date);
-        });
-
-
-        if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
-          //console.log("same projet " + JSON.stringify(projet));
-          this.currentProjet = projet;
-          this.setPage(this.currentPageComment);
-          this.ref.detectChanges();
-        }
-       return;
-
-      }
 
 
 
@@ -1696,41 +1700,45 @@ currentPageComment;
   }
 
   deleteCommentaireFromSocket(commentaire : CommentaireSocket){
-    //console.log("deleteCommentaire " + JSON.stringify(commentaire));
+    console.log("deleteCommentaire " + JSON.stringify(commentaire));
     var projet : Projet;
-    for(var i=0;i<this.filtredData.length;i++){
-      //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
-      if(this.filtredData[i].codeProjet == commentaire.joinId && this.filtredData[i].commentaires!=null && this.filtredData[i].commentaires.length>0){
+    if(commentaire!=null){
+      for(var i=0;i<this.filtredData.length;i++){
 
+        if(this.filtredData[i].codeProjet == commentaire.joinId && this.filtredData[i].commentaires!=null && this.filtredData[i].commentaires.length>0){
+          if(commentaire.id!=null){
+            var commentaireSimple = new Commentaire();
+            commentaireSimple.id = commentaire.id;
+            commentaireSimple.content = commentaire.content;
+            commentaireSimple.date = commentaire.date;
+            commentaireSimple.employer = commentaire.employer;
+            commentaireSimple.user = commentaire.user;
 
-        var commentaireSimple = new Commentaire();
-        commentaireSimple.id = commentaire.id;
-        commentaireSimple.content = commentaire.content;
-        commentaireSimple.date = commentaire.date;
-        commentaireSimple.employer = commentaire.employer;
-        commentaireSimple.user = commentaire.user;
+            for(var j =0;i<this.filtredData[i].commentaires.length;j++){
+              if(this.filtredData[i].commentaires[j].id===commentaire.id){
+                this.filtredData[i].commentaires.splice(j,1);
+                break;
+              }
+            }
 
-        for(var j =0;i<this.filtredData[i].commentaires.length;j++){
-          if(this.filtredData[i].commentaires[j].id===commentaire.id){
-            this.filtredData[i].commentaires.splice(j,1);
-            break;
+            if(this.filtredData[i].commentaires!=null && this.filtredData[i].commentaires.length>0){
+              this.filtredData[i].commentaires = this.filtredData[i].commentaires.filter(item => item !== commentaireSimple);
+            }
+
+            projet = this.filtredData[i];
+            if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
+              this.currentProjet.commentaires = this.filtredData[i].commentaires;
+              //console.log("here" + this.currentProjet.commentaires.length);
+              this.setPage(this.currentPageComment);
+              this.ref.detectChanges();
+            }
+            return;
           }
+
+
         }
+    }
 
-        //this.filtredData[i].commentaires = this.filtredData[i].commentaires.filter(item => item !== commentaireSimple);
-
-        //console.log("length comm2 " +  this.filtredData[i].commentaires.length);
-        projet = this.filtredData[i];
-        if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
-          //console.log("here" + this.currentProjet.commentaires.length);
-          this.currentProjet.commentaires = this.filtredData[i].commentaires;
-          //console.log("here" + this.currentProjet.commentaires.length);
-          this.setPage(this.currentPageComment);
-          this.ref.detectChanges();
-        }
-        return;
-
-      }
 
     }
 
@@ -1743,7 +1751,7 @@ currentPageComment;
     this.stompClient.connect({'Authorization': this.authService.getToken()},'',  (frame: Frame) => {
       //console.log('CONNECT CONNECT');
       this.stompClient.subscribe("/topic/addCommentProjet", (comment : Message)=> {
-        if(comment.body!=null){
+        if(comment!=null && comment.body!=null){
           //console.log("commentReceived " + comment.body);
           this.addCommentaireFromSocket(JSON.parse(comment.body));
         }
@@ -1751,7 +1759,7 @@ currentPageComment;
       });
 
       this.stompClient.subscribe("/topic/deleteCommentProjet", (comment : Message)=> {
-        if(comment.body!=null){
+        if(comment!=null && comment.body!=null){
           this.deleteCommentaireFromSocket(JSON.parse(comment.body));
         }
       });
@@ -1762,6 +1770,62 @@ currentPageComment;
       },5000);
       });
 
+  }
+
+  exportDetailRdv($event,codeProjet : string) {
+    $event.stopPropagation();
+    $event.preventDefault();
+    this.spinner.show();
+    //console.log("filtre "+ this.dataSource.filter);
+    var result= this.etatProjetService.exportDetailRdv(codeProjet);
+
+    var d = new Date();
+
+    //console.log("day " + d.getDay());
+    var fileName = "RDV-"+codeProjet+"-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
+
+    result.subscribe((response: any) => {
+      this.updateProjetFromSAP(codeProjet);
+      let dataType = response.type;
+      let binaryData = [];
+      binaryData.push(response);
+      let downloadLink = document.createElement('a');
+      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
+      if (fileName)
+        downloadLink.setAttribute('download', fileName);
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    });
+  }
+
+
+  updateProjetFromSAP(codeProjet :string){
+
+    this.etatProjetService.updateProjetFromSAP(codeProjet).subscribe(
+      (data:Projet)=>{
+        this.spinner.hide();
+        if(data!=null && data.codeProjet!=null){
+          this.currentProjet = data;
+
+          var index= this.getIndexFromFiltrerdList(data.codeProjet);
+
+          this.projets[index] = data;
+        }
+
+
+        this.ref.detectChanges();
+
+      },
+      err=>{
+        //console.log("error "+ JSON.stringify(err));
+
+        this.ref.detectChanges();
+        this.spinner.hide();
+
+
+      }
+    )
+    //this.spinner.hide();
   }
 
 }

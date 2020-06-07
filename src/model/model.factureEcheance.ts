@@ -12,6 +12,7 @@ export class FactureEcheance {
   public  facture:Facture;
   public  echeance :Echeance;
   public  montant:number;
+  public affectedByUser:boolean;
 
 
 }

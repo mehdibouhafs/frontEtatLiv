@@ -29,7 +29,6 @@ import {EtatStockService} from './services/etatStock.service';
 import {NgSelectModule} from '@ng-select/ng-select';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import {EventService} from "./services/event.service";
-import { ContratComponent } from './contrat/contrat.component';
 import {ContratService} from "./services/contrat.service";
 import { ViewEcheanceComponent } from './view-echeance/view-echeance.component';
 import { ViewCommandesFournisseurComponent } from './view-commandes-fournisseur/view-commandes-fournisseur.component';
@@ -40,6 +39,7 @@ import { EtatStockProjetComponent } from './etat-stock-projet/etat-stock-projet.
 import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
 
 import { BalanceAgeeService } from './services/balanceAgee.service';
+import { ContratsComponent } from './contrats/contrats.component';
 registerLocaleData(localeFr, 'fr');
 
 
@@ -55,12 +55,12 @@ registerLocaleData(localeFr, 'fr');
     EtatStockProjetComponent,
     BalanceAgeeComponent,
     DashboardComponent,
-    ContratComponent,
     ViewEcheanceComponent,
     ViewCommandesFournisseurComponent,
     NavigationBarComponent,
     ViewFacturesComponent,
-    ViewPiecesComponent
+    ViewPiecesComponent,
+    ContratsComponent
   ],
   imports: [
     BrowserModule,

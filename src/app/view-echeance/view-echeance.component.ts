@@ -1,5 +1,7 @@
 import {
-  ChangeDetectionStrategy, Component, DoCheck, EventEmitter, HostListener, Input, IterableDiffers, OnChanges, OnInit,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, EventEmitter, HostListener, Input, IterableDiffers,
+  OnChanges, OnDestroy,
+  OnInit,
   Output,
   SimpleChanges, TemplateRef,
   ViewChild,
@@ -13,6 +15,9 @@ import {AuthenticationService} from "../services/authentification.service";
 import {CommentaireEcheance} from "../../model/model.commentaireEcheance";
 import {FactureEcheance} from "../../model/model.factureEcheance";
 import {BsModalRef, BsModalService} from "ngx-bootstrap";
+import {ShareEcheanceService} from "../services/shareEcheance.service";
+import {NgxSpinnerService} from "ngx-spinner";
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-view-echeance',
@@ -21,7 +26,7 @@ import {BsModalRef, BsModalService} from "ngx-bootstrap";
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ViewEcheanceComponent implements OnInit,OnChanges {
+export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
 
   displayedColumnsEcheance: string[] = ['du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
@@ -30,11 +35,13 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
   @ViewChild('echeanceTablePaginator', {static: true}) paginatorEcheance: MatPaginator;
   filtredDataEcheance: Array<Echeance>;
 
-  @Input() echeances : Array<Echeance>;
+  @Input() numContrat : any;
+
+  echeances : Array<Echeance> = new Array();
 
   @Output() errorUpdate= new EventEmitter<boolean>();
 
-  commentaireEcheances : Array<CommentaireEcheance>;
+  commentaireEcheances : Array<CommentaireEcheance> = new Array();
 
   selectedEcheance : Echeance;
 
@@ -44,11 +51,158 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
 
   roleEditEcheance:boolean;
 
-  constructor(private authService: AuthenticationService,private modalService: BsModalService,private router:Router,private contratService : ContratService) {
+  lengthEcheances:number;
+  pageSizeEcheances:number;
+  pageSizeOptionsEcheances:number[] = [5,10, 15,25,30];
+  currentPageEcheances : number;
+  totalPagesEcheances:number;
+  offsetEcheances:number;
+  numberOfElementsEcheances:number;
+
+  sortBy:any=null;
+
+  sortType:any=null;
+
+  subscription:any;
+
+  addEcheanceModalRef:BsModalRef;
+
+  addEcheanceByUserModalRef:BsModalRef;
+
+  newEcheance : Echeance;
+
+  constructor( private spinner: NgxSpinnerService,private ref: ChangeDetectorRef,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private modalService: BsModalService,private router:Router,private contratService : ContratService) {
+
+    this.subscription = this.shareEcheance.getEcheance()
+      .subscribe((echeance : Echeance) =>{
+
+        this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+
+      } )
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
+  getEcheances(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+
+
+    this.contratService.getEcheance(numContrat,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.echeances  = data.content;
+
+        this.lengthEcheances = data.totalElements;
+        this.currentPageEcheances = data.pageable.pageNumber+1;
+        this.totalPagesEcheances = data.totalPages;
+        this.offsetEcheances = data.pageable.offset;
+
+        for(var i=0;i<this.echeances.length;i++){
+          if(this.echeances[i].commentaire==null){
+            this.echeances[i].commentaire = new CommentaireEcheance();
+            this.echeances[i].commentaire.id=0;
+          }
+          if(this.echeances[i].factures!=null){
+            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
+            this.echeances[i].factures2=t.split(",");
+          }
+        }
+
+        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
+  }
+
+  getEcheancesByUserHideModal(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+
+
+    this.contratService.getEcheance(numContrat,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.echeances  = data.content;
+
+        this.lengthEcheances = data.totalElements;
+        this.currentPageEcheances = data.pageable.pageNumber+1;
+        this.totalPagesEcheances = data.totalPages;
+        this.offsetEcheances = data.pageable.offset;
+
+        for(var i=0;i<this.echeances.length;i++){
+          if(this.echeances[i].commentaire==null){
+            this.echeances[i].commentaire = new CommentaireEcheance();
+            this.echeances[i].commentaire.id=0;
+          }
+          if(this.echeances[i].factures!=null){
+            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
+            this.echeances[i].factures2=t.split(",");
+          }
+        }
+
+        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+
+        this.addEcheanceByUserModalRef.hide();
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
+  }
+
+
+  getEcheancesHidmodal(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+
+
+    this.contratService.getEcheance(numContrat,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.echeances  = data.content;
+
+        this.lengthEcheances = data.totalElements;
+        this.currentPageEcheances = data.pageable.pageNumber+1;
+        this.totalPagesEcheances = data.totalPages;
+        this.offsetEcheances = data.pageable.offset;
+
+        for(var i=0;i<this.echeances.length;i++){
+          if(this.echeances[i].commentaire==null){
+            this.echeances[i].commentaire = new CommentaireEcheance();
+            this.echeances[i].commentaire.id=0;
+          }
+          if(this.echeances[i].factures!=null){
+            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
+            this.echeances[i].factures2=t.split(",");
+          }
+        }
+
+        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+
+        this.addEcheanceModalRef.hide();
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
 
   }
 
   ngOnInit() {
+
+    this.currentPageEcheances=1;
+
+    this.pageSizeEcheances=5;
+
+    console.log("echeance tab on initi" + JSON.stringify(this.numContrat));
+
+    //this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+
 
     this.authService.getRoles().forEach(authority => {
 
@@ -59,13 +213,6 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
 
     this.getAllCommentaitreEcheance();
 
-    this.dataSourceEcheance = new MatTableDataSource(this.echeances);
-
-    //  this.dataSourceEcheance.paginator = this.paginatorEcheance;
-
-    this.dataSourceEcheance.paginator = this.paginatorEcheance;
-    this.dataSourceEcheance.sort=this.sortEcheance;
-    console.log("echeancesOnInit" + this.echeances);
   }
 
 
@@ -73,24 +220,23 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
   ngOnChanges(changes: SimpleChanges) {
 
     console.log("onChanges echeances" );
-    this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+    this.echeances=null;
+    this.dataSourceEcheance=null;
+    this.getEcheances(this.numContrat,1,5,this.sortBy,this.sortType);
 
-    //  this.dataSourceEcheance.paginator = this.paginatorEcheance;
-
-    this.dataSourceEcheance.paginator = this.paginatorEcheance;
-    this.dataSourceEcheance.sort=this.sortEcheance;
-    console.log("echeancesOnInit" + this.echeances);
   }
 
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    this.dataSourceEcheance.sortData(this.dataSourceEcheance.filteredData,this.dataSourceEcheance.sort);
-    // console.log("this.before [0] " + this.filtredData[0].codeProjet);
-    // console.log("sorting table");
-    //this.filtredData = this.dataSource.filteredData;
-
-    // console.log("this.filtredData[0] " + this.filtredData[0].codeProjet);*/
+    if(e.direction==""){
+      this.sortBy=null;
+      this.sortType=null;
+    }else{
+      this.sortBy=e.active;
+      this.sortType=e.direction;
+    }
+    this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
 
   }
 
@@ -99,17 +245,78 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
     this.router.navigate(['/etatRecouvrementNumDocument',value]);
   }
 
+  showAddEcheanceModal(editModal: TemplateRef<any>) {
+    this.newEcheance = new Echeance();
+    this.addEcheanceModalRef =  this.modalService.show(editModal, Object.assign({}, {class: 'modal-sm'}));
+  }
+
+  showAddEcheanceByUserModal(editModal: TemplateRef<any>) {
+    this.newEcheance = new Echeance();
+    this.addEcheanceByUserModalRef =  this.modalService.show(editModal, Object.assign({}, {class: 'modal-sm'}));
+  }
+
+  closeAddEcheanceByUserModal(){
+    this.addEcheanceByUserModalRef.hide();
+  }
+
+  closeAddEcheanceModal(){
+    this.addEcheanceModalRef.hide();
+  }
+
+  nbMonth :number=0;
+
+  onChangeDate(){
+    this.nbMonth = moment(new Date(this.newEcheance.au)).diff(new Date(this.newEcheance.du), 'months', true);
+    if(this.nbMonth<1){
+      this.newEcheance.periodeFacturation="UNKNOWN";
+    }
+
+  }
+
+  addNewEcheanceByUser(){
+
+    this.contratService.addEcheance(this.numContrat,this.newEcheance).subscribe((data: number) => {
+
+
+        this.shareEcheance.setFactureEcheance(null);
+        this.getEcheancesByUserHideModal(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+
+
+    }, err => {
+      console.log("ereur", err);
+    });
+
+  }
+
+  addNewEcheance(){
+
+    this.contratService.editEcheance(this.numContrat,this.newEcheance).subscribe((data: number) => {
+
+      if(data>0){
+        this.shareEcheance.setFactureEcheance(null);
+        this.getEcheancesHidmodal(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+      }else{
+        console.log("error ");
+      }
+
+
+    }, err => {
+      console.log("ereur", err);
+    });
+
+  }
+
 
 
   onEditEcheance(echeance : Echeance) {
 
 
     this.contratService.updateEcheance(echeance).subscribe((data: Echeance) => {
-    this.errorUpdate.emit(false);
+
 
     }, err => {
 
-     this.errorUpdate.emit(true);
+     console.log("error "+err);
 
     });
 
@@ -140,8 +347,9 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
   deleteEcheance(){
     this.contratService.deleteEcheance(this.selectedEcheance.id).subscribe(() => {
 
-      this.deleteEcheanceEmitter.emit(this.selectedEcheance);
-      this.deleteEcheanceModalRef.hide();
+
+      this.shareEcheance.setFactureEcheance(null);
+      this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
 
     }, err => {
       console.log("ereur", err);
@@ -149,5 +357,16 @@ export class ViewEcheanceComponent implements OnInit,OnChanges {
 
     });
   }
+
+  onPaginateChangeEcheances(event) {
+    console.log("onPaginateChangeEcheans ");
+    this.currentPageEcheances = event.pageIndex+1;
+    this.pageSizeEcheances = event.pageSize;
+    this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+
+
+  }
+
+
 
 }

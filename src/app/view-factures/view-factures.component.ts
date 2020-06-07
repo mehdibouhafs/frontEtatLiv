@@ -1,5 +1,6 @@
 import {
-  ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
   ViewEncapsulation
@@ -12,6 +13,8 @@ import {Contrat} from "../../model/model.contrat";
 import {BsModalRef, BsModalService} from "ngx-bootstrap";
 import * as moment from 'moment';
 import {AuthenticationService} from "../services/authentification.service";
+import {ShareEcheanceService} from "../services/shareEcheance.service";
+import {NgxSpinnerService} from "ngx-spinner";
 
 @Component({
   selector: 'app-view-factures',
@@ -28,9 +31,9 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   @ViewChild('factureEcheanceTablePaginator', {static: true}) paginatorFactureEcheance: MatPaginator;
   filtredDataFactureEcheance: Array<FactureEcheance>;
   currentFilter:any;
-  @Input() factureEcheances : Array<FactureEcheance>;
+  factureEcheances : Array<FactureEcheance>;
 
-  @Input()  allEcheances : Array<Echeance>;
+   allEcheances : Array<Echeance>;
 
   @Input() numContrat : any;
 
@@ -53,9 +56,42 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
 
   roleEditEcheance:boolean;
 
-  constructor(private authService: AuthenticationService,private contratService:ContratService,private modalService: BsModalService) { }
+
+  lengthFactureEcheances:number;
+  pageSizeFactureEcheances:number;
+  pageSizeOptionsFactureEcheances:number[] = [5,10, 15,25,30];
+  currentPageFactureEcheances : number;
+  totalPagesFactureEcheances:number;
+  offsetFactureEcheances:number;
+  numberOfElementsFactureEcheances:number;
+
+  sortBy:any=null;
+
+  sortType:any=null;
+
+  subscription :any;
+
+  constructor(private ref: ChangeDetectorRef,private spinner: NgxSpinnerService,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private contratService:ContratService,private modalService: BsModalService) {
+
+    this.subscription = this.shareEcheance.getFactureEcheance()
+      .subscribe((factureEcheance : FactureEcheance) =>{
+        console.log("loadd facture Echeance ");
+        this.loadAllEcheance(this.numContrat);
+        this.getFactureEcheance(this.numContrat,1,5,this.sortBy,this.sortType);
+
+
+      } )
+  }
 
   ngOnInit() {
+
+
+    this.currentPageFactureEcheances=1;
+    this.pageSizeFactureEcheances=5;
+
+    //this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
+
+    this.loadAllEcheance(this.numContrat);
 
     this.authService.getRoles().forEach(authority => {
 
@@ -64,19 +100,7 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
       }
     });
 
-    this.dataSourceFacturesEcheance = new MatTableDataSource(this.factureEcheances);
 
-    this.dataSourceFacturesEcheance.filterPredicate = function(data, filter: string): boolean {
-
-
-      return (data.facture.numFacture != null ? data.facture.numFacture : "").toString().toLowerCase()
-
-        === filter;
-    };
-    //  this.dataSourceEcheance.paginator = this.paginatorEcheance;
-
-    this.dataSourceFacturesEcheance.paginator = this.paginatorFactureEcheance;
-    this.dataSourceFacturesEcheance.sort=this.sortFactureEcheance;
   }
 
   applyFilter(filterValue: string) {
@@ -93,24 +117,26 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.dataSourceFacturesEcheance = new MatTableDataSource(this.factureEcheances);
-
-    this.dataSourceFacturesEcheance.filterPredicate = function(data, filter: string): boolean {
-
-      return (data.facture.numFacture != null ? data.facture.numFacture : "").toString().toLowerCase()
-
-        === filter;
-    };
-    //  this.dataSourceEcheance.paginator = this.paginatorEcheance;
-
-    this.dataSourceFacturesEcheance.paginator = this.paginatorFactureEcheance;
-    this.dataSourceFacturesEcheance.sort=this.sortFactureEcheance;
+    console.log("on change facture");
+    this.currentPageFactureEcheances=1;
+    this.pageSizeFactureEcheances=5;
+    this.dataSourceFacturesEcheance=null;
+    this.factureEcheances=null;
+    this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,5,this.sortBy,this.sortType);
   }
 
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    this.dataSourceFacturesEcheance.sortData(this.dataSourceFacturesEcheance.filteredData,this.dataSourceFacturesEcheance.sort);
+    if(e.direction==""){
+      this.sortBy=null;
+      this.sortType=null;
+    }else{
+      this.sortBy=e.active;
+      this.sortType=e.direction;
+    }
+    this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
+
 
   }
 
@@ -118,7 +144,12 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
 
     this.contratService.editEcheance(this.numContrat,this.newEcheance).subscribe((data: Echeance) => {
 
-      this.addNewEcheanceEmitter.emit(data);
+      this.shareEcheance.setEcheance(this.newEcheance);
+
+      this.loadAllEcheance(this.numContrat);
+
+      this.getFactureEcheance(this.numContrat,1,5,this.sortBy,this.sortType);
+
       this.addEcheanceModalRef.hide();
 
     }, err => {
@@ -128,11 +159,16 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   }
 
   editFactureEcheance(){
+    console.log("edit Page echeance: "+this.currentPageFactureEcheances);
 
 
     this.contratService.editFactureEcheance(this.numContrat,this.updatedFactureEcheance).subscribe((data: FactureEcheance) => {
 
-      this.editFactureEcheanceEmitter.emit(data);
+      this.shareEcheance.setEcheance(data.echeance);
+
+      console.log("current Page echeance"+this.currentPageFactureEcheances);
+      this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
+
       this.editFactureEcheanceModalRef.hide();
 
     }, err => {
@@ -152,6 +188,19 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
     this.updatedFactureEcheance.id=factureEcheance.id;
     this.updatedFactureEcheance.facture=factureEcheance.facture;
     this.updatedFactureEcheance.contrat=factureEcheance.contrat;
+    this.updatedFactureEcheance.echeance=null;
+
+    console.log(JSON.stringify(factureEcheance.echeance));
+
+    if(factureEcheance.echeance!=null){
+      for(var i=0;i<this.allEcheances.length;i++){
+        if(this.allEcheances[i].id=factureEcheance.echeance.id){
+          console.log("found ");
+          this.updatedFactureEcheance.echeance =this.allEcheances[i];
+          break;
+        }
+      }
+    }
 
     this.editFactureEcheanceModalRef =  this.modalService.show(editModal, Object.assign({}, {class: 'modal-sm'}));
   }
@@ -177,10 +226,52 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
     this.nbMonth = moment(new Date(this.newEcheance.au)).diff(new Date(this.newEcheance.du), 'months', true);
   }
 
+  onPaginateChangeFactureEcheances(event) {
+    console.log("onPaginateChangeFactureEcheans ");
+    this.currentPageFactureEcheances = event.pageIndex+1;
+    this.pageSizeFactureEcheances = event.pageSize;
+    this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
+
+
+  }
+
+  getFactureEcheance(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+
+    this.contratService.getFactureEcheance(numContrat,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+        this.factureEcheances = data.content;
+
+        this.lengthFactureEcheances= data.totalElements;
+        this.currentPageFactureEcheances = data.pageable.pageNumber+1;
+        this.dataSourceFacturesEcheance = new MatTableDataSource(this.factureEcheances);
+
+        this.dataSourceFacturesEcheance.paginator = this.paginatorFactureEcheance;
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
+  }
 
 
 
+  findIndexToUpdate(newItem) {
+    return newItem.id === this;
+  }
 
+  loadAllEcheance(numContrat : any){
+
+    this.contratService.getAllEcheancesForContrat(numContrat).subscribe(
+      (data: Array<Echeance>) => {
+        this.allEcheances = data;
+      }, err => {
+        console.log("error " + JSON.stringify(err));
+      }
+    )
+
+  }
 
 
 

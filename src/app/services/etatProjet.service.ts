@@ -82,6 +82,14 @@ export class EtatProjetService {
     );
   }
 
+  exportDetailRdv(codeProjet : string) {
+    return this.http.post(this.host + '/exportDetailRdv',codeProjet, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
+    );
+  }
+  updateProjetFromSAP(codeProjet:string){
+    return this.http.get(this.host+'/updateProjetFromSAP?codeProjet='+codeProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
   getEtatProjet(){
     return this.http.get(this.host+'/getEtatProjet',{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }

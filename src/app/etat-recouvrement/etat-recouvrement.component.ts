@@ -1061,6 +1061,8 @@ export class EtatRecouvrementComponent implements OnInit {
 
       this.currentDocument.commentaires.push(newCommentaire);
 
+      this.onEditDocument(null);
+
       this.currentDocument.commentaires.sort((a, b) => {
         return <any> new Date(b.date) - <any> new Date(a.date);
       });
@@ -1672,17 +1674,17 @@ export class EtatRecouvrementComponent implements OnInit {
         email = email+ "%0A";
 
         email = email + "%0A";
-        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": this.removeAnd(lastCommentaire1.user.sigle))+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))  ) +"%0A";
+        email = email +"Commentaires : %0A"+(lastCommentaire1.date==null ?"": moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire1.user.sigle == null ? " : ": this.removeAnd(lastCommentaire1.user.sigle))+" " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+ (lastCommentaire1.content  == null ? "": encodeURIComponent(lastCommentaire1.content).split("<br>").join("%0A")  ) +"%0A";
 
       }
         let lastCommentaire2 = new Commentaire();
       lastCommentaire2= currentDocument.commentaires[1];
       if(lastCommentaire2)
-        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": this.removeAnd(lastCommentaire2.user.sigle))+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))  ) +"%0A";
+        email = email + (lastCommentaire2.date==null ?"": moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire2.user.sigle == null ? " : ": this.removeAnd(lastCommentaire2.user.sigle))+" " +(lastCommentaire2.employer == null ? "": "  @"+lastCommentaire2.employer) + " "+ (lastCommentaire2.content  == null ? "": encodeURIComponent(lastCommentaire2.content).split("<br>").join("%0A") ) +"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= currentDocument.commentaires[2];
       if(lastCommentaire3)
-        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": this.removeAnd(lastCommentaire3.user.sigle))+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))  ) +"%0A";
+        email = email + (lastCommentaire3.date==null ?"": moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM'))+" "+(lastCommentaire3.user.sigle == null ? " : ": this.removeAnd(lastCommentaire3.user.sigle))+" " +(lastCommentaire3.employer == null ? "": "  @"+lastCommentaire3.employer) + " "+ (lastCommentaire3.content  == null ? "": encodeURIComponent(lastCommentaire3.content).split("<br>").join("%0A")  ) +"%0A";
     }
 
 

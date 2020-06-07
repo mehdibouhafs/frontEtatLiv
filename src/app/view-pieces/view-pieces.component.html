@@ -1,3 +1,4 @@
+<div *ngIf="piecesContrat!=null">
 <div class="row">
 
   <div class="col-md-4">
@@ -12,7 +13,7 @@
   <div class="col-md-4"></div>
 </div>
 <table mat-table  #pieceContratTable
-       #pieceContratTableSort="matSort" [dataSource]="dataSourcePieceContrat" class="mat-elevation-z8" matSort>
+       (matSortChange)="sortChange($event)" [dataSource]="dataSourcePieceContrat" class="mat-elevation-z8" matSort>
 
   <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
@@ -43,9 +44,15 @@
 
 
 </table>
-<mat-paginator #pieceContratTablePaginator="matPaginator"  [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
+
+<mat-paginator #pieceContratTablePaginator="matPaginator"
+                [length]="lengthPieces "
+                [pageSize]="pageSizePieces"
+                [pageSizeOptions]="pageSizeOptionsPieces "
+                (page)="onPaginateChangePieces($event) ">
+</mat-paginator>
 
 
-
-
+</div>
+<div *ngIf="piecesContrat==null"><h5>Chargement des pieces pour le contrat {{numContrat}} merci de patienter...</h5></div>
 
