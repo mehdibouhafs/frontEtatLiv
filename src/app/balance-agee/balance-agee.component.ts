@@ -152,6 +152,14 @@ montantNat:any;
   rowcolor: string;
   updatedDate: Date;
 
+  public ages: string[] = [
+    '3M',
+    '6M',
+    'A12M',
+    'Sup. 12M'
+];
+  selectedAge: any;
+  selectedAgeTMP: string;
 
   constructor(public datepipe: DatePipe,private activatedRoute:ActivatedRoute,private balanceAgeeService:BalanceAgeeService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
     this.service = this.authService.getServName();
@@ -361,7 +369,7 @@ this.dataSource = null;
 
     if (this.roleReadMyRecouvrement == true) {
 
-      this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.userNameAuthenticated).subscribe(
+      this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.userNameAuthenticated,this.selectedAge).subscribe(
         data => {
           this.pageProduit = data;
 
@@ -379,10 +387,36 @@ this.dataSource = null;
 
               p.client = produit.client;
               p.chargee_recouv = produit.chargee_recouv;
-              p.tois_mois = produit.tois_mois;
+              if(produit.tois_mois == null){
+                p.tois_mois = 0;
+              }
+              else{
+                p.tois_mois = produit.tois_mois;
+  
+              }
+  
+              if(produit.six_mois == null){
+                p.six_mois= 0;
+              }
+              else{
               p.six_mois = produit.six_mois;
-              p.douze_mois = produit.douze_mois;
-              p.sup_douze_mois = produit.sup_douze_mois;
+              }
+  
+              if(produit.douze_mois == null){
+                p.douze_mois= 0;
+              }
+              else{
+                p.douze_mois = produit.douze_mois;
+  
+              }
+  
+              if(produit.sup_douze_mois == null){
+                p.sup_douze_mois = 0;
+              }
+              else{
+                p.sup_douze_mois = produit.sup_douze_mois;
+  
+              }
               p.total = produit.total;
               p.last_update = produit.last_update;
               this.updatedDate =p.last_update;
@@ -546,6 +580,8 @@ totalBalance = totalBalance + element.total;
   initFilter(){
     this.selectedClient =  null;
     this.selectedCommercial = null;
+    this.selectedCR = null;
+    this.selectedAge= null;
     this.dataSource.filter = null;
     this.currentFilter="";
     this.getBalance();
@@ -655,7 +691,13 @@ totalBalance = totalBalance + element.total;
       this.selectedCRTMP = this.selectedCR;
     }
 
-    this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.selectedCRTMP).subscribe(
+    if(this.selectedAge == null){
+      this.selectedAgeTMP = "undefined";
+    }else{
+      this.selectedAgeTMP = this.selectedAge;
+    }
+  
+    this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.selectedCRTMP,this.selectedAgeTMP).subscribe(
       data => {
         this.pageProduit = data;
 
@@ -672,10 +714,36 @@ totalBalance = totalBalance + element.total;
 
             p.client = produit.client;
             p.chargee_recouv = produit.chargee_recouv;
-            p.tois_mois = produit.tois_mois;
+            if(produit.tois_mois == null){
+              p.tois_mois = 0;
+            }
+            else{
+              p.tois_mois = produit.tois_mois;
+
+            }
+
+            if(produit.six_mois == null){
+              p.six_mois= 0;
+            }
+            else{
             p.six_mois = produit.six_mois;
-            p.douze_mois = produit.douze_mois;
-            p.sup_douze_mois = produit.sup_douze_mois;
+            }
+
+            if(produit.douze_mois == null){
+              p.douze_mois= 0;
+            }
+            else{
+              p.douze_mois = produit.douze_mois;
+
+            }
+
+            if(produit.sup_douze_mois == null){
+              p.sup_douze_mois = 0;
+            }
+            else{
+              p.sup_douze_mois = produit.sup_douze_mois;
+
+            }
             p.total = produit.total;
 
 

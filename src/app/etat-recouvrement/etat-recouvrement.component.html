@@ -8,6 +8,17 @@
   <p style="font-size: 20px; color: white">Loading...</p>
 </ngx-spinner>
 
+<style>
+.sel-age .ng-select .ng-select-container {
+    background-color: #fff;
+    border-radius: 0px;
+    border: 1px solid #beb9b9;
+    min-height: 28px;
+    align-items: center;
+    width : 170px;
+}
+</style>
+
 <app-navigation-bar [recouvNav]="true"></app-navigation-bar>
 
 <div *ngIf="viewUpload" class="container" style="padding: 5px;">
@@ -144,23 +155,18 @@
 
 
 
-  <div class="col-md-2">
+  <div class="col-md-2 sel-age" style="width: 20% !important;">
 
     <label for="filtrerStatut">Statut :</label>
     <br/>
-    <select style="margin-left: 5px;width: 175px;height: 26px;" id="filtrerStatut" class="browser-default custom-select" name="selectStatut" [(ngModel)]="selectedStatut" (change)="selectFiltre()" >
-      <option value="undefined" selected>Filtrer par Statut </option>
-      <option value="Non Traitée par CR">Non Traitée par CR</option>
-      <option value="Non Deposée">Non Déposée</option>
-      <option value="Bloquée">Bloquée</option>
-      <option value="Validée par client">Validée par client</option>
-      <option value="En Cours de paiement">En Cours de paiement</option>
-      <option value="Payée">Payée</option>
-      <option value="Litige">Litige</option>
-      <option value="Retenue Garantie">Retenue Garantie</option>
-      <option value="Avoir à faire">Avoir à faire</option>
-      <option value="En cours de validation">En cours de validation</option>
-    </select>
+
+    <ng-select [items]="status"
+    placeholder="Select Statut"
+    multiple="true"
+    [(ngModel)]="selectedStatut"
+    (change)="selectFiltre()"
+    (clear)="clearSelect()">
+</ng-select>
 
   </div>
 
@@ -179,17 +185,19 @@
   </div>
 
   <div class="col-md-2">
-    <label for="client">Age :</label>
-    <br/>
+    <label for="age">Age :</label>
 
-    <select style="margin-left: 5px;width: 175px;height: 26px;" id="client" class="browser-default custom-select" name="age"  [(ngModel)]="selectedAge" (change)="selectFiltre()" >
-      <option value="undefined" selected>Filtrer par age </option>
-      <option *ngFor="let age of ages"
-              [ngValue]="age.name">{{age.name}}</option>
-    </select>
+<br/>
+<select style="margin-left: 5px;width: 175px;height: 26px;" id="age" class="browser-default custom-select" name="age"  [(ngModel)]="selectedAge" (change)="selectFiltre()" >
+  <option value="undefined" selected>Filtrer par age </option>
+  <option *ngFor="let age of ages"
+          [ngValue]="age">{{age}}</option>
+</select>
+
   </div>
-
-  <div class="col-md-2" [hidden]="service=='Commercial'">
+</div>
+<div class="row">
+    <div class="col-md-2" style="margin-top: 10px;" [hidden]="service=='Commercial'">
     <label for="com">Commercial :</label>
     <br/>
     <select style="margin-left: 5px;width: 175px;height: 26px;" id="com" class="browser-default custom-select" name="com"  [(ngModel)]="selectedCommercial" (change)="selectFiltre()" >
@@ -199,7 +207,7 @@
     </select>
   </div>
 
-  <div class="col-md-2">
+  <div class="col-md-2" style="margin-top: 10px;">
 
     <label for="annee">Année  :</label>
     <br/>
@@ -283,7 +291,6 @@
 
   <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
-
 
   <ng-container matColumnDef="option"  >
     <th mat-header-cell *matHeaderCellDef >  &nbsp; </th>

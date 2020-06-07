@@ -18,6 +18,7 @@ import {NgxSpinnerService} from 'ngx-spinner';
 import {Statitics} from '../../model/model.statistics';
 import {AuthenticationService} from '../services/authentification.service';
 import {User} from '../../model/model.user';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-etat-recouvrement',
@@ -25,6 +26,7 @@ import {User} from '../../model/model.user';
   styleUrls: ['./etat-recouvrement.component.css'],
   encapsulation: ViewEncapsulation.None
 })
+
 export class EtatRecouvrementComponent implements OnInit {
 
   statistics : Statitics;
@@ -41,7 +43,7 @@ export class EtatRecouvrementComponent implements OnInit {
 
   selectedFiles: FileList;
 
-  selectedStatut : any;
+  selectedStatut : string[];
 
   keys : Array<string>;
   Documents : Array<Document>;
@@ -72,20 +74,27 @@ export class EtatRecouvrementComponent implements OnInit {
 
   clients : Array<String> = new Array<string>();
 
-   ages = [
-    {
-      name: '3M'
-    },
-    {
-      name: '6M'
-    },
-    {
-      name: 'A12M'
-    },
-    {
-      name: 'Sup. 12M'
-    }
-  ];
+
+
+  public ages: string[] = [
+    '3M',
+    '6M',
+    'A12M',
+    'Sup. 12M'
+];
+public status:string[]=[
+  'Non Traitée par CR',
+  'Non Déposée',
+  'Bloquée',
+  'Validée par client',
+  'En Cours de paiement',
+  'Payée',
+  'Litige',
+   'Retenue Garantie',
+   'Avoir à faire',
+   'En cours de validation'
+
+];
   selectedClient :any;
   selectedAge: any;
 
@@ -108,6 +117,8 @@ export class EtatRecouvrementComponent implements OnInit {
   public dataSource: MatTableDataSource<Document>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild(NgSelectComponent, {static: true}) ngSelectComponent: NgSelectComponent;
+
   filtredData : Array<Document>;
 
 
@@ -169,7 +180,12 @@ export class EtatRecouvrementComponent implements OnInit {
   roleBuChefProjet:any;
   roleBuVolume:any;
   test: Date;
+  toSelectDoc: any;
 
+
+
+
+  @ViewChild('template', {static: false}) private template: TemplateRef<any>;
 
   constructor(private authService:AuthenticationService,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatRecouvrementService: EtatRecouvrementService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef,
               private activatedRoute:ActivatedRoute) {
@@ -224,46 +240,55 @@ export class EtatRecouvrementComponent implements OnInit {
 
   }
 
+  clearSelect(){
+
+    this.selectedStatut= [];
+  }
   initFilter(){
+    this.ngSelectComponent.handleClearClick();
 
     if(this.roleReadMyRecouvrement){
       if(this.service=="Commercial"){
         this.selectedChargeRecouvrement = "undefined";
-        this.selectedStatut = "undefined";
 
         this.selectedCommercial = this.userNameAuthenticated;
         this.selectedClient = "undefined";
         this.selectedChefProjet = "undefined";
         this.selectedAnneePiece ="undefined";
+        this.selectedAge = "undefined";
       }else{
         if(this.service == "Chef Projet"){
           this.selectedChargeRecouvrement = "undefined";
-          this.selectedStatut = "Bloquée";
+          this.selectedStatut.push("Bloquée");
 
           this.selectedCommercial = "undefined";
           this.selectedClient = "undefined";
           this.selectedChefProjet = this.userNameAuthenticated.toUpperCase();
           this.selectedAnneePiece ="undefined";
+          this.selectedAge = "undefined";
+
         }else{
           if(this.service == "Recouvrement"){
             console.log("Recourvrment initFiltrer" );
             //this.selectedChargeRecouvrement = this.userNameAuthenticated;
-            this.selectedStatut = "undefined";
             this.selectedCommercial = "undefined";
             this.selectedClient = "undefined";
             this.selectedChefProjet = "undefined";
             this.selectedAnneePiece ="undefined";
+            this.selectedAge = "undefined";
+
           }
         }
 
       }
     }else{
       this.selectedChargeRecouvrement = "undefined";
-      this.selectedStatut = "undefined";
       this.selectedCommercial = "undefined";
       this.selectedClient = "undefined";
       this.selectedChefProjet = "undefined";
       this.selectedAnneePiece ="undefined";
+      this.selectedAge = "undefined";
+
 
     }
     this.dataSource.filter = null;
@@ -533,7 +558,7 @@ export class EtatRecouvrementComponent implements OnInit {
   getAllDocument(cloture:boolean,chargeRecouvrement :string){
 
 
-    console.log("selectChargeRecouvrement " + this.selectedChargeRecouvrement);
+    console.log("selectStatut " + this.selectedChargeRecouvrement);
 
     this.etatRecouvrementService.getDocuments(cloture,this.selectedChargeRecouvrement,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,
       this.selectedClient,this.selectedAnneePiece,this.selectedAge).subscribe(
@@ -600,9 +625,10 @@ export class EtatRecouvrementComponent implements OnInit {
 
   }
 
+
   selectDocument(document : Document,template: TemplateRef<any>){
     this.motifRequired = false;
-
+console.log("TEMPLATE"+console.log(template));
     this.currentDocument = document;
 
     this.currentDocmentClone = new Document();
@@ -735,7 +761,7 @@ export class EtatRecouvrementComponent implements OnInit {
         this.roleBuChefProjet = true;
         this.authorized = false;
         if(this.service=="Chef Projet")
-          this.selectedStatut = "Bloquée";
+          this.selectedStatut.push("Bloquée");
 
       }
 
@@ -810,10 +836,12 @@ export class EtatRecouvrementComponent implements OnInit {
 
 
     if(age != null && clientBalance !=null){
-      this.selectedAge = age;
       this.selectedClient = clientBalance;
       setTimeout(()=>{    //<<<---    using ()=> syntax
         this.selectedClient = clientBalance;
+        this.selectedAge = age;
+        this.toSelectDoc = this.Documents[0];
+        this.selectDocument(this.toSelectDoc,this.template);
       }, 2000);
       this.selectFiltre();
     }else
@@ -821,6 +849,9 @@ export class EtatRecouvrementComponent implements OnInit {
       this.selectedClient = clientBalance;
       setTimeout(()=>{    //<<<---    using ()=> syntax
         this.selectedClient = clientBalance;
+        this.toSelectDoc = this.Documents[0];
+        this.selectDocument(this.toSelectDoc,this.template);
+
       }, 2000);
       this.selectFiltre();
     }
@@ -876,41 +907,44 @@ export class EtatRecouvrementComponent implements OnInit {
     if(this.roleReadMyRecouvrement){
       if(this.service=="Commercial"){
         this.selectedChargeRecouvrement = "undefined";
-        this.selectedStatut = "undefined";
-
         this.selectedCommercial = this.userNameAuthenticated;
         this.selectedClient = "undefined";
         this.selectedChefProjet = "undefined";
         this.selectedAnneePiece ="undefined";
+        this.selectedAge = "undefined";
+
       }else{
         if(this.service == "Chef Projet"){
           this.selectedChargeRecouvrement = "undefined";
-          this.selectedStatut = "Bloquée";
+          this.selectedStatut.push("Bloquée");
 
           this.selectedCommercial = "undefined";
           this.selectedClient = "undefined";
           this.selectedChefProjet = this.userNameAuthenticated;
           this.selectedAnneePiece ="undefined";
+          this.selectedAge = "undefined";
+
         }else{
           if(this.service == "Recouvrement"){
             console.log("Recourvrment initFiltrer" );
             //this.selectedChargeRecouvrement = this.userNameAuthenticated;
-            this.selectedStatut = "undefined";
             this.selectedCommercial = "undefined";
             this.selectedClient = "undefined";
             this.selectedChefProjet = "undefined";
             this.selectedAnneePiece ="undefined";
+            this.selectedAge = "undefined";
+
           }
         }
 
       }
     }else{
       this.selectedChargeRecouvrement = "undefined";
-      this.selectedStatut = "undefined";
       this.selectedCommercial = "undefined";
       this.selectedClient = "undefined";
       this.selectedChefProjet = "undefined";
       this.selectedAnneePiece ="undefined";
+      this.selectedAge = "undefined";
 
     }
 
@@ -2053,9 +2087,10 @@ export class EtatRecouvrementComponent implements OnInit {
 
   selectFiltre(){
 
+    console.log("SELECTED AGE "+JSON.stringify(this.selectedAge));
     console.log("checkEncaissement " + this.checkEncaissement()
     );
-    this.getAllDocument(this.documentCloture,this.selectedChargeRecouvrement);
+   this.getAllDocument(this.documentCloture,this.selectedChargeRecouvrement);
     this.sortAllArrays();
   }
 
