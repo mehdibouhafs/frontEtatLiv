@@ -157,7 +157,7 @@
 
   <div class="col-md-2 sel-age" style="width: 20% !important;">
 
-    <label for="filtrerStatut">Statut :</label>
+    <label >Statut :</label>
     <br/>
 
     <ng-select [items]="status"
@@ -202,7 +202,7 @@
     <br/>
     <select style="margin-left: 5px;width: 175px;height: 26px;" id="com" class="browser-default custom-select" name="com"  [(ngModel)]="selectedCommercial" (change)="selectFiltre()" >
       <option value="undefined" selected>Filtrer par commercial </option>
-      <option *ngFor="let com of commercials" 
+      <option *ngFor="let com of commercials"
               [ngValue]="com">{{com}}</option>
     </select>
   </div>

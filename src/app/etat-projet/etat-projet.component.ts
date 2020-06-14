@@ -799,7 +799,7 @@ currentPageComment;
     this.getAllCommericals();
     //console.log("this.selectedBu" + this.selectedBu);
 
-    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite){
+    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite ||this.roleBuValueSoftware){
 
     }else{
       this.selectedBu = "undefined";
