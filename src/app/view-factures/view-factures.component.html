@@ -16,36 +16,33 @@
 <table mat-table  #factureEcheanceTable
        (matSortChange)="sortChange($event)" [dataSource]="dataSourceFacturesEcheance" class="mat-elevation-z8" matSort>
 
-  <!--- Note that these columns can be defined in any order.
-        The actual rendered columns are set as a property on the row definition" -->
-
   <!-- Name Column -->
-  <ng-container matColumnDef="numFacture">
+  <ng-container matColumnDef="facture.numFacture">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> N°Facture </th>
     <td mat-cell *matCellDef="let element"><a style="cursor: pointer;text-decoration : underline;font-size: 14px;display: inline;" target="_blank" [routerLink]="['/etatRecouvrementNumDocument/',element.facture.numFacture]"> {{element.facture.numFacture }}</a> </td>
   </ng-container>
 
-  <ng-container matColumnDef="dateEnregistrement"  >
+  <ng-container matColumnDef="facture.dateEnregistrement"  >
     <th mat-header-cell *matHeaderCellDef mat-sort-header> Date Facture </th>
     <td mat-cell *matCellDef="let element"> {{element.facture.dateEnregistrement | date:'dd/MM/yyyy'}}   </td>
   </ng-container>
 
 
 
-  <ng-container matColumnDef="montantHT">
+  <ng-container matColumnDef="facture.montantHT">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant HT  </th>
     <td mat-cell *matCellDef="let element"  > {{element.facture.montantHT | currency:'DH':'symbol':undefined:'fr'}}  </td>
   </ng-container>
 
 
 
-  <ng-container matColumnDef="montantTTC">
+  <ng-container matColumnDef="facture.montantTTC">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant TTC   </th>
     <td mat-cell *matCellDef="let element"  > {{element.facture.montantTTC | currency:'DH':'symbol':undefined:'fr'}}  </td>
   </ng-container>
 
   <!-- Position Column -->
-  <ng-container matColumnDef="montantRestant">
+  <ng-container matColumnDef="facture.montantRestant">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant payé   </th>
     <td mat-cell *matCellDef="let element"  > {{element.facture.montant | currency:'DH':'symbol':undefined:'fr'}}  </td>
   </ng-container>
@@ -59,13 +56,13 @@
 
 
   <!-- Position Column -->
-  <ng-container matColumnDef="debutPeriode">
+  <ng-container matColumnDef="facture.debutPeriode">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Période du  </th>
     <td mat-cell *matCellDef="let element"  > {{element.facture.debutPeriode | date:'dd/MM/yyyy'}}  </td>
   </ng-container>
 
 
-  <ng-container matColumnDef="finPeriode">
+  <ng-container matColumnDef="facture.finPeriode">
     <th mat-header-cell *matHeaderCellDef  mat-sort-header> Période au  </th>
     <td mat-cell *matCellDef="let element"  > {{element.facture.finPeriode | date:'dd/MM/yyyy'}}  </td>
   </ng-container>
@@ -120,7 +117,7 @@
       <div class="form-group col-sm-12">
         <label for="au1"><i class="fa fa-calendar-times-o fa-lg"></i> Echeance Au :</label>
         <select id="au1" class="form-control" name="au1"  [(ngModel)]="updatedFactureEcheance.echeance"  >
-          <option [ngValue]="null" selected>Affecter une écheance </option>
+          <option [ngValue]="null" selected>Aucune échéance </option>
           <option *ngFor="let echeance of allEcheances"
                   [ngValue]="echeance" [ngStyle]= "(echeance!=null && echeance.addedByUser) && {'color':'red'}" style="font-size: 14px;">
             <div *ngIf="echeance.montant"  >[ Du {{echeance.du | date:'dd/MM/yyyy'}} , Au {{echeance.au | date:'dd/MM/yyyy'}}, Montant : {{echeance.montant | currency:'DH':'symbol':undefined:'fr'}} - {{echeance.periodeFacturation}}  ]</div>

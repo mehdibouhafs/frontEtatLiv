@@ -139,7 +139,7 @@
 
   <ng-template #addEcheanceModal>
     <div class="modal-header">
-      <p>Ajout d'une nouvelle écheance </p>
+      <p>Ajout d'un nouveau modèle </p>
       <button type="button" class="close pull-right" aria-label="Close" (click)="closeAddEcheanceModal()">
         <span aria-hidden="true">X</span>
       </button>
@@ -185,9 +185,9 @@
             <select id="periodeFacturation2" class="form-control" name="periodeFacturation" [(ngModel)]="newEcheance.periodeFacturation">
               <option value="UNKNOWN" >Période non défini</option>
               <option value="MENSUELLE" [disabled]="nbMonth<1">MENSUELLE</option>
-              <option value="TRIMESTRIELLE" [disabled]="nbMonth<=4">TRIMESTRIELLE</option>
-              <option value="SEMESTRIELLE" [disabled]="nbMonth<=6">SEMESTRIELLE</option>
-              <option value="ANNUELLE" [disabled]="nbMonth<12">ANNUELLE</option>
+              <option value="TRIMESTRIELLE" [disabled]="nbMonth<=3">TRIMESTRIELLE</option>
+              <option value="SEMESTRIELLE" [disabled]="nbMonth<=5">SEMESTRIELLE</option>
+              <option value="ANNUELLE" [disabled]="nbMonth<11">ANNUELLE</option>
 
             </select>
 
@@ -232,7 +232,7 @@
 
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-success btn-sm" (click)="addNewEcheance()">Creer Echeance</button>
+      <button type="button" class="btn btn-success btn-sm" (click)="addNewEcheance()">Créer modèle</button>
       <button type="button" class="btn btn-danger btn-sm" (click)="closeAddEcheanceModal()">Annuler</button>
 
 

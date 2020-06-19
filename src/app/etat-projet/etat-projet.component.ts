@@ -1485,19 +1485,26 @@ currentPageComment;
 
   showEtatRecouvrement(type,value){
 
+    var url=null;
 
     switch(type)
     {
-      case 'codeCommercial': this.router.navigate(['/etatRecouvrementCodeCommercial',value]); break;
+      case 'codeCommercial':  url =  '/#/etatRecouvrementCodeCommercial/'+value;break;
 
-      case 'chefProjet':this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
+      case 'chefProjet': this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
 
-      case 'codeClient':this.router.navigate(['/etatRecouvrementCodeClient',value]); break;
+      case 'codeClient':url =  '/#/etatRecouvrementCodeClient/'+value;break;
 
-      case 'codeProjet':this.router.navigate(['/etatRecouvrementCodeProjet',value]); break;
+      case 'codeProjet':url =  '/#/etatRecouvrementCodeProjet/'+value;break;
 
 
     }
+
+
+    if(url!=null){
+      window.open(url, "_blank");
+    }
+
 
   }
 

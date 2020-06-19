@@ -111,6 +111,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
         this.dataSourceEcheance = new MatTableDataSource(this.echeances);
 
+        if( this.deleteEcheanceModalRef!=null){
+          this.deleteEcheanceModalRef.hide();
+        }
+
         this.ref.detectChanges();
 
       },err=>{
@@ -229,14 +233,17 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    if(e.direction==""){
-      this.sortBy=null;
-      this.sortType=null;
-    }else{
-      this.sortBy=e.active;
-      this.sortType=e.direction;
+
+    if( e.active!="option" && e.active!="periodeFacturation" && e.active!="occurenceFacturation" && e.active !="commentaire") {
+      if (e.direction == "") {
+        this.sortBy = null;
+        this.sortType = null;
+      } else {
+        this.sortBy = e.active;
+        this.sortType = e.direction;
+      }
+      this.getEcheances(this.numContrat, this.currentPageEcheances, this.pageSizeEcheances, this.sortBy, this.sortType);
     }
-    this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
 
   }
 
@@ -247,6 +254,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   showAddEcheanceModal(editModal: TemplateRef<any>) {
     this.newEcheance = new Echeance();
+   /* this.newEcheance.du = moment("01/01/2019", "DD/MM/YYYY");
+    this.newEcheance.au = moment("31/12/2020", "DD/MM/YYYY");
+    this.newEcheance.periodeFacturation = "SEMESTRIELLE";
+    this.newEcheance.montant = 62371;*/
     this.addEcheanceModalRef =  this.modalService.show(editModal, Object.assign({}, {class: 'modal-sm'}));
   }
 

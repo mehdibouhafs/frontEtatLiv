@@ -74,16 +74,17 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    if(e.direction==""){
-      this.sortBy=null;
-      this.sortType=null;
-    }else{
-      this.sortBy=e.active;
-      this.sortType=e.direction;
+    if(e.active!="option") {
+      if (e.direction == "") {
+        this.sortBy = null;
+        this.sortType = null;
+      } else {
+        this.sortBy = e.active;
+        this.sortType = e.direction;
+      }
+
+      this.getCommandeFournisseur(this.numContrat, this.currentFilter, this.currentPageCommandeFournisseurs, this.pageSizeCommandeFournisseurs, this.sortBy, this.sortType);
     }
-
-    this.getCommandeFournisseur(this.numContrat, this.currentFilter,this.currentPageCommandeFournisseurs,this.pageSizeCommandeFournisseurs,this.sortBy,this.sortType);
-
   }
 
   onPaginateChangeCommandeFournisseurs(event) {

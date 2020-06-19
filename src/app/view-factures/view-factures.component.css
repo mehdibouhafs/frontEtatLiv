@@ -3,7 +3,7 @@
   margin: 0px auto;
 }
 
-.mat-column-debutPeriode{
+.mat-column-facture-debutPeriode{
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;
@@ -20,7 +20,7 @@
 }
 
 
-.mat-column-finPeriode{
+.mat-column-facture-finPeriode{
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;
@@ -69,7 +69,7 @@
 }
 
 
-.mat-column-montantHT{
+.mat-column-facture-montantHT{
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;
@@ -86,7 +86,7 @@
 }
 
 
-.mat-column-montantRestant{
+.mat-column-facture-montantRestant{
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;
@@ -102,7 +102,7 @@
   hyphens: auto;
 }
 
-.mat-column-montantTTC{
+.mat-column-facture-montantTTC{
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;
@@ -118,7 +118,7 @@
   hyphens: auto;
 }
 
-.mat-column-numFacture{
+.mat-column-facture-numFacture{
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;
@@ -149,7 +149,7 @@
   hyphens: auto;
 }
 
-.mat-column-dateEnregistrement{
+.mat-column-facture-dateEnregistrement{
   word-wrap: break-word !important;
   white-space: unset !important;
   flex: 0 0 28% !important;

@@ -25,7 +25,7 @@ import {NgxSpinnerService} from "ngx-spinner";
 })
 export class ViewFacturesComponent implements OnInit,OnChanges {
 
-  displayedColumnsFacturesEcheance: string[] = ['numFacture', 'dateEnregistrement','montantHT', 'montantTTC','montantRestant','debutPeriode','finPeriode','du','montant','option'];
+  displayedColumnsFacturesEcheance: string[] = ['facture.numFacture', 'facture.dateEnregistrement','facture.montantHT', 'facture.montantTTC','facture.montantRestant','facture.debutPeriode','facture.finPeriode','du','montant','option'];
   public dataSourceFacturesEcheance: MatTableDataSource<FactureEcheance>;
   @ViewChild('factureEcheanceTableSort', {static: true}) sortFactureEcheance: MatSort;
   @ViewChild('factureEcheanceTablePaginator', {static: true}) paginatorFactureEcheance: MatPaginator;
@@ -128,14 +128,18 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    if(e.direction==""){
-      this.sortBy=null;
-      this.sortType=null;
-    }else{
-      this.sortBy=e.active;
-      this.sortType=e.direction;
+
+    if(e.active!="du" && e.active!="option"){
+      if(e.direction==""){
+        this.sortBy=null;
+        this.sortType=null;
+      }else{
+        this.sortBy=e.active;
+        this.sortType=e.direction;
+      }
+      this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
     }
-    this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
+
 
 
   }
@@ -244,8 +248,6 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
         this.lengthFactureEcheances= data.totalElements;
         this.currentPageFactureEcheances = data.pageable.pageNumber+1;
         this.dataSourceFacturesEcheance = new MatTableDataSource(this.factureEcheances);
-
-        this.dataSourceFacturesEcheance.paginator = this.paginatorFactureEcheance;
         this.ref.detectChanges();
 
       },err=>{

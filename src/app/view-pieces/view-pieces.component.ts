@@ -67,15 +67,17 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
   @HostListener('matSortChange', ['$event'])
   sortChange(e) {
     // save cookie with table sort data here
-    if(e.direction==""){
-      this.sortBy=null;
-      this.sortType=null;
-    }else{
-      this.sortBy=e.active;
-      this.sortType=e.direction;
-    }
-    this.getPieces(this.numContrat,this.currentPagePieces,this.pageSizePieces,this.sortBy,this.sortType);
 
+    if( e.active!="option") {
+      if (e.direction == "") {
+        this.sortBy = null;
+        this.sortType = null;
+      } else {
+        this.sortBy = e.active;
+        this.sortType = e.direction;
+      }
+      this.getPieces(this.numContrat, this.currentPagePieces, this.pageSizePieces, this.sortBy, this.sortType);
+    }
 
   }
 
