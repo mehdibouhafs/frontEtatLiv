@@ -1,0 +1,201 @@
+
+<app-navigation-bar [echeancesNav]="true"></app-navigation-bar>
+
+<div *ngIf="echeances!=null">
+  <div class="row" style="padding-bottom: 10px;">
+
+    <div class="col-md-4">
+
+    </div>
+    <div class="col-md-2">
+    </div>
+
+    <div class="col-md-1"></div>
+
+
+    <div class="col-md-2">
+      <label style="font-size: 11px;" for="date"> Filtre par Date :</label>
+      <br/>
+      <input id="date" name="date" style="width: 175px;
+    height: 34px;"  type="date" class="form-control input-sm" [ngModel]="selectedDate| date:'yyyy-MM-dd'" (ngModelChange)="selectedDate = $event"
+             [value]="selectedDate | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="loadEcheances()" >
+
+    </div>
+
+    <div class="col-md-1">
+      <label style="margin-left: 8px;" for="init">Initialisation du filtre :</label>
+      <br/>
+      <button  id="raz" style="color: white;
+        background-color: #337ab7;font-size: 12px;width: 55px;
+        padding: 4px;
+      margin-left: 4px;"  class="btn " id="init"   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i>  </button>
+    </div>
+
+
+
+    <div class="col-md-1">
+      <label style="font-size: 11px;" for="export"> Export :</label>
+      <br/>
+      <button style="color: white;
+    background-color: #337ab7;font-size: 12px;
+    padding: 4px;" class="btn"  id="export" nmae="export" (click)="exportEcheancesNotLinked($event)" [disabled]="echeances==null || echeances.length ==0" id="btnXlsRpt"><i class="fa fa-download" aria-hidden="true"></i> Exporter l'état</button>
+
+
+    </div>
+
+    <div class="col-md-1">
+      <label style="font-size: 11px;" for="mail"> Envoi par mail :</label>
+      <br/>
+      <button class="btn btn-danger btn-sm" id="mail" name="mail"  style="margin-right: 5px;background-color: #ff4081;height: 30px;"   (click)="composeEmail()" [disabled]="selection.selected == null || selection.selected.length==0 "><i class="fa fa-mail-forward" aria-hidden="true">  Email</i> </button>
+
+    </div>
+  </div>
+
+  <table mat-table  #echeanceTable
+         (matSortChange)="sortChange($event)" [dataSource]="dataSourceEcheance" class="mat-elevation-z8" matSort>
+
+
+
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+    <ng-container matColumnDef="select">
+      <th mat-header-cell *matHeaderCellDef>
+        <mat-checkbox (change)="$event ? masterToggle() : null"
+                      [checked]="selection.hasValue() && isAllSelected()"
+                      [indeterminate]="selection.hasValue() && !isAllSelected()">
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()"
+                      (change)="$event ? selection.toggle(row) : null"
+                      [checked]="selection.isSelected(row)">
+        </mat-checkbox>
+      </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="contrat">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Contrat </th>
+      <td mat-cell *matCellDef="let element" >  {{element.contrat.numContrat}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="du">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Période Du </th>
+      <td mat-cell *matCellDef="let element" [ngStyle]= "(element!=null && element.addedByUser) && {'color':'red'}">  {{element.du | date:'dd/MM/yyyy'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="au"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Période Au </th>
+      <td mat-cell *matCellDef="let element" [ngStyle]= "(element!=null && element.addedByUser) && {'color':'red'}"> {{element.au | date:'dd/MM/yyyy'}}   </td>
+    </ng-container>
+
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="montantPrevision">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Prévisionnel  </th>
+      <td mat-cell *matCellDef="let element"  > {{element.montantPrevision | currency:'DH':'symbol':undefined:'fr'}}  </td>
+    </ng-container>
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="periodeFacturation">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Fréquence de facturation   </th>
+      <td mat-cell *matCellDef="let element"  >{{element.periodeFacturation}}   </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="factures">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header>N°Factures  </th>
+      <td mat-cell *matCellDef="let element"  > [ <div style="display: inline; font-size:14px" *ngFor="let fact of element.factures2 ; let i = index" [attr.data-index]="i">
+        <a style="cursor: pointer;text-decoration : underline;font-size: 14px;" target="_blank" [routerLink]="['/etatRecouvrementNumDocument/',fact]"  >{{fact}}<div style="display: inline;font-size:14px" *ngIf="i+1 < element.factures2.length">, </div> </a>
+      </div> ] </td>
+    </ng-container>
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="montantFacture">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Facturé  </th>
+      <td mat-cell *matCellDef="let element"  > {{element.montantFacture | currency:'DH':'symbol':undefined:'fr'}}  </td>
+    </ng-container>
+
+    <ng-container matColumnDef="montantRestFacture">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant R.A.Facturé  </th>
+      <td mat-cell *matCellDef="let element"  > {{element.montantRestFacture | currency:'DH':'symbol':undefined:'fr'}}  </td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="occurenceFacturation"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Périodicité </th>
+      <td mat-cell *matCellDef="let element"> <div *ngIf="element.occurenceFacturation=='DEBUTPERIODE'">Début de Période</div> <div *ngIf="element.occurenceFacturation=='FINPERIODE'">Fin de Période</div>   </td></ng-container>
+
+    <ng-container matColumnDef="commentaire"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Commentaire</th>
+      <td mat-cell *matCellDef="let element">
+
+        <select style="margin-left: 5px;width: 175px;"  class="browser-default custom-select"  [(ngModel)]="element?.commentaire.id" (change)="onEditEcheance(element)"  >
+          <option value="0">Veuillez selectionner un commentaire </option>
+          <option *ngFor="let com of commentaireEcheances"
+                  [ngValue]="com.id">{{com.comment}}</option>
+        </select>
+
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="option"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+      <td mat-cell *matCellDef="let element">  <a  *ngIf="roleEditEcheance==true" (click)="showDeleteFactureEcheanceModal(element,deleteEcheanceModal)"><i class="fa fa-remove" aria-hidden="true"></i></a>  </td></ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumnsEcheance; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumnsEcheance;" (click)="selection.toggle(row)" [ngStyle]= "(checkExpiredEcheanceNotFacture(row)) && {'background-color':'rgba(2, 255, 232, 0.19)'}" ></tr>
+
+
+  </table>
+
+  <mat-paginator #echeanceTablePaginator="matPaginator"
+                 [length]="lengthEcheances "
+                 [pageSize]="pageSizeEcheances "
+                 [pageSizeOptions]="pageSizeOptionsEcheances "
+                 (page)="onPaginateChangeEcheances($event) ">
+  </mat-paginator>
+
+  <ng-template #deleteEcheanceModal>
+    <div class="modal-header">
+      <h5>Suppression échéance</h5>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="annulationDeleteEcheance()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body rejection-body">
+
+      <div class="row">
+
+
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+
+          <label for="messageDelete"><i class="fa fa-calendar-times-o fa-lg"></i> Cause de suppression :</label>
+
+          <textarea class="form-control input-sm" id="messageDelete" name="messageDelete" [(ngModel)]="selectedEcheance.messageDelete"  placeholder="Ecrire la raison de suppression.." rows="2" (focusin)="blockedKey()" (focusout)="deBlockedKey()"></textarea>
+
+        </div>
+
+
+      </div>
+
+      <div class="body-title-container">
+        <h5 class="title-with-border d-inline" style="color: red">Etes-vous sure de vouloir supprimer l'échéance {{selectedEcheance.id}} [Du {{selectedEcheance.du | date:'dd/MM/yyyy'}} , Au {{selectedEcheance.au | date:'dd/MM/yyyy'}}] ?</h5>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success btn-sm" (click)="deleteEcheance()">Supprimer</button>
+      <button type="button" class="btn btn-danger btn-sm" (click)="annulationDeleteEcheance()">Annuler</button>
+    </div>
+  </ng-template>
+
+
+
+</div>
+
+<div *ngIf="echeances==null"><h5>Chargement des échéances du contrat {{numContrat}}, merci de patienter...</h5></div>
+

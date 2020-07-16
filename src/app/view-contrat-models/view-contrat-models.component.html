@@ -1,0 +1,62 @@
+
+<div *ngIf="contratModels!=null">
+
+
+  <table mat-table  #contratModelTable
+         (matSortChange)="sortChange($event)" [dataSource]="dataSourceContratModel" class="mat-elevation-z8" matSort>
+
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Nom </th>
+      <td mat-cell *matCellDef="let element" >  {{element.name}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="du">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Période Du </th>
+      <td mat-cell *matCellDef="let element" >  {{element.du | date:'dd/MM/yyyy'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="au"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Période Au </th>
+      <td mat-cell *matCellDef="let element" > {{element.au | date:'dd/MM/yyyy'}}   </td>
+    </ng-container>
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="periodeFacturation">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Fréquence de facturation   </th>
+      <td mat-cell *matCellDef="let element"  >{{element.periodeFacturation}}   </td>
+    </ng-container>
+
+    <ng-container matColumnDef="occurenceFacturation"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Périodicité </th>
+      <td mat-cell *matCellDef="let element"> <div *ngIf="element.occurenceFacturation=='DEBUTPERIODE'">Début de Période</div> <div *ngIf="element.occurenceFacturation=='FINPERIODE'">Fin de Période</div>   </td></ng-container>
+
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="montant">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant   </th>
+      <td mat-cell *matCellDef="let element"  > {{element.montant | currency:'DH':'symbol':undefined:'fr'}}  </td>
+    </ng-container>
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="montantPrevisionel">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Montant Prévisionnel  </th>
+      <td mat-cell *matCellDef="let element"  > {{element.montantPrevisionel | currency:'DH':'symbol':undefined:'fr'}}  </td>
+    </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumnContratModel; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumnContratModel;" ></tr>
+
+
+  </table>
+
+  <mat-paginator #echeanceTablePaginator="matPaginator"
+                 [length]="lengthContratModel"
+                 [pageSize]="pageSizeContratModel"
+                 [pageSizeOptions]="pageSizeOptionsContratModel"
+                 (page)="onPaginateChangeContratModel($event) ">
+  </mat-paginator>
+</div>

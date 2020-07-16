@@ -4,7 +4,7 @@
   <div class="col-md-4">
     <mat-form-field >
 
-      <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+      <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter" (focusin)="blockedKey()" (focusout)="deBlockedKey()">
       <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
 
     </mat-form-field>
@@ -96,7 +96,7 @@
 
 <ng-template #editFacturationEcheanceModal>
   <div class="modal-header">
-    <p>Modification d'une écheance </p>
+    <p>Modification de l'échéance </p>
     <button type="button" class="close pull-right" aria-label="Close" (click)="closeEditFactureEcheanceModal()">
       <span aria-hidden="true">X</span>
     </button>
@@ -105,18 +105,29 @@
 
     <div class="row">
       <div class="form-group col-sm-12">
-        <label for="numFacture"><i class="fa fa-file-text-o fa-lg"></i> N°facture :</label>
+        <label style="font-size: 13px;" for="numFacture"><i class="fa fa-file-text-o fa-lg"></i> N°facture :</label>
+        <p style="font-size: 13px;
+    color: black;
+    margin-left: 4px;" id="numFacture">{{updatedFactureEcheance.facture.numFacture}}</p>
 
-        <input id="numFacture" class="form-control input-sm"
-               [(ngModel)]="updatedFactureEcheance.facture.numFacture" name="numFacture" disabled>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-sm-12">
+        <label for="periode" style="font-size: 13px;"><i class="fa fa-calendar-check-o fa-lg"></i> Période de facturation  :  </label>
+        <p style="font-size: 13px;
+    color: black;
+    margin-left: 4px;" id="periode">Du {{updatedFactureEcheance.facture.debutPeriode | date:'dd/MM/yyyy'}} Au {{updatedFactureEcheance.facture.finPeriode | date:'dd/MM/yyyy'}}</p>
       </div>
     </div>
 
 
+
     <div class="row">
       <div class="form-group col-sm-12">
-        <label for="au1"><i class="fa fa-calendar-times-o fa-lg"></i> Echeance Au :</label>
-        <select id="au1" class="form-control" name="au1"  [(ngModel)]="updatedFactureEcheance.echeance"  >
+        <label style="font-size: 13px;" for="au1"><i class="fa fa-calendar-times-o fa-lg"></i> Echéance Au :</label>
+        <select style="font-size: 13px;" id="au1" class="form-control" name="au1"  [(ngModel)]="updatedFactureEcheance.echeance"  >
           <option [ngValue]="null" selected>Aucune échéance </option>
           <option *ngFor="let echeance of allEcheances"
                   [ngValue]="echeance" [ngStyle]= "(echeance!=null && echeance.addedByUser) && {'color':'red'}" style="font-size: 14px;">

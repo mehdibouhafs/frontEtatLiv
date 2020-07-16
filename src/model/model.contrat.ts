@@ -92,6 +92,14 @@ export class Contrat {
 
   public lastUpdate:Date;
 
+  public bu:string;
+
+  public reconductionTacite:boolean;
+
+  public delaiPreavisResiliation: string;
+
+  public nbEcheancesNonFactureEnRetard:number;
+
 
 
 

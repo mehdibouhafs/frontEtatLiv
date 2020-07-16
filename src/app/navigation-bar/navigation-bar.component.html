@@ -17,7 +17,7 @@ background-color: white" src="assets/logo.png" alt="Munisys">
       <li *ngIf="roleReadMyRecouvrement || roleReadAllRecouvrement || roleReadMyProjects "><a style="color: white" [ngStyle]="{'background-color':recouvBNav ? '#5ed0b0' : '' }" routerLink="/balanceAgee"><i class="fa fa-money" aria-hidden="true"></i> Balance Agée</a></li>
       <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleBuCommercial" [ngStyle]="{'background-color':stockNav ? '#5ed0b0' : '' }"><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
       <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleBuCommercial" [ngStyle]="{'background-color':stockPNav ? '#5ed0b0' : '' }"><a style="color: white" routerLink="/etatStockProjet"><i class="fa fa-table"></i> Stock / Projet </a></li>
-      <li *ngIf="roleReadAllProjects ||roleReadMyContrats || roleReadAllContrats" [ngStyle]="{'background-color':contratNav ? '#5ed0b0' : '' }"><a style="color: white" routerLink="/contrats"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>  Contrats <span class="badge badge-primary">New</span> </a></li>
+      <li *ngIf="roleReadAllProjects ||roleReadMyContrats || roleReadAllContrats" [ngStyle]="{'background-color':contratNav ? '#5ed0b0' : '' }"><a style="color: white" routerLink="/contrats"><i class="fa fa-file-pdf-o" aria-hidden="true"></i>  Contrats </a></li>
       <li *ngIf="roleReadAllProjects" [ngStyle]="{'background-color':reunionNav ? '#5ed0b0' : '' }"><a style="color: white" routerLink="/consultReunions"><i class="fa fa-calendar" aria-hidden="true"></i>  Reunions </a></li>
     </ul>
     <!--<button class="btn btn-danger navbar-btn">Button</button>-->

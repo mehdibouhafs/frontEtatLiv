@@ -7,6 +7,7 @@ import {CommandeFournisseur} from "../../model/model.commandeFournisseur";
 import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
 import {ContratService} from "../services/contrat.service";
 import {NgxSpinnerService} from "ngx-spinner";
+import {ShareBlockedKeyService} from "../services/shareBlockedKey.service";
 
 @Component({
   selector: 'app-view-commandes-fournisseur',
@@ -30,7 +31,7 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
 
   lengthCommandeFournisseurs:number;
   pageSizeCommandeFournisseurs:number;
-  pageSizeOptionsCommandeFournisseurs:number[] = [5,10, 15,25,30];
+  pageSizeOptionsCommandeFournisseurs:number[] = [10, 15,25,30];
   currentPageCommandeFournisseurs : number;
   totalPagesCommandeFournisseurs:number;
   offsetCommandeFournisseurs:number;
@@ -40,12 +41,12 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
 
   sortType:any=null;
 
-  constructor(private ref: ChangeDetectorRef,private spinner: NgxSpinnerService,private contratService:ContratService) { }
+  constructor(private shareBlockedkey : ShareBlockedKeyService,private ref: ChangeDetectorRef,private spinner: NgxSpinnerService,private contratService:ContratService) { }
 
   ngOnInit() {
 
     this.currentPageCommandeFournisseurs=1;
-    this.pageSizeCommandeFournisseurs=5;
+    this.pageSizeCommandeFournisseurs=10;
     /*this.getCommandeFournisseur(this.numContrat,null,this.currentPageCommandeFournisseurs,this.pageSizeCommandeFournisseurs
       ,this.sortBy,this.sortType);*/
 
@@ -57,7 +58,7 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
     this.dataSourceCommandeFournisseur.filter = filterValue;
     this.currentFilter = filterValue;
 
-    this.getCommandeFournisseur(this.numContrat, this.currentFilter,1,5,this.sortBy,this.sortType);
+    this.getCommandeFournisseur(this.numContrat, this.currentFilter,1,10,this.sortBy,this.sortType);
 
 
 
@@ -67,7 +68,7 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
     console.log("change commande fournisseru");
     this.dataSourceCommandeFournisseur=null;
     this.commandesFournisseurs=null;
-    this.getCommandeFournisseur(this.numContrat, null,1,5,this.sortBy,this.sortType);
+    this.getCommandeFournisseur(this.numContrat, null,1,10,this.sortBy,this.sortType);
 
   }
 
@@ -119,6 +120,15 @@ export class ViewCommandesFournisseurComponent implements OnInit, OnChanges  {
 
   }
 
+  blockedKey(){
+    console.log("focus in blockedKey");
+    this.shareBlockedkey.setBlockedKey(true);
+  }
+
+  deBlockedKey(){
+    console.log("focus in deblockedKey");
+    this.shareBlockedkey.setBlockedKey(false);
+  }
 
 
 }

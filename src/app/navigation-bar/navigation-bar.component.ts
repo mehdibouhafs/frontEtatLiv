@@ -32,6 +32,8 @@ export class NavigationBarComponent implements OnInit {
 
   roleReadAllContrats:boolean;
 
+  roleEditEcheance:boolean;
+
   @Input() projetNav :boolean;
 
   @Input() notifNav:boolean;
@@ -47,6 +49,8 @@ export class NavigationBarComponent implements OnInit {
   @Input() recouvBNav:boolean;
 
   @Input() reunionNav:boolean;
+
+  @Input() echeancesNav:boolean;
 
   authorized:boolean;
 
@@ -134,6 +138,7 @@ export class NavigationBarComponent implements OnInit {
       }
       if (authority == 'READ_MY_RECOUVREMENT') {
         this.roleReadMyRecouvrement = true;
+
       }
 
       if (authority == 'READ_MY_CONTRATS') {
@@ -146,6 +151,11 @@ export class NavigationBarComponent implements OnInit {
         this.roleReadAllContrats = true;
         this.authorized = true;
 
+      }
+
+      if (authority == 'EDIT_ECHEANCE_CONTRAT') {
+        this.roleEditEcheance= true;
+        this.authorized = true;
       }
 
 

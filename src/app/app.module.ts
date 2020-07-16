@@ -13,7 +13,10 @@ import {UserService} from './services/user.service';
 import {NgxPaginationModule} from 'ngx-pagination';
 import {AngularFontAwesomeModule} from 'angular-font-awesome';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatInputModule, MatPaginatorModule, MatProgressSpinnerModule, MatSortModule, MatTableModule} from '@angular/material';
+import {
+  MatCheckboxModule, MatInputModule, MatPaginatorModule, MatProgressSpinnerModule, MatSortModule,
+  MatTableModule
+} from '@angular/material';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ModalModule} from 'ngx-bootstrap';
 import { ReunionComponent } from './reunion/reunion.component';
@@ -40,6 +43,8 @@ import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
 
 import { BalanceAgeeService } from './services/balanceAgee.service';
 import { ContratsComponent } from './contrats/contrats.component';
+import { ViewContratModelsComponent } from './view-contrat-models/view-contrat-models.component';
+import { EcheancesComponent } from './echeances/echeances.component';
 registerLocaleData(localeFr, 'fr');
 
 
@@ -60,7 +65,9 @@ registerLocaleData(localeFr, 'fr');
     NavigationBarComponent,
     ViewFacturesComponent,
     ViewPiecesComponent,
-    ContratsComponent
+    ContratsComponent,
+    ViewContratModelsComponent,
+    EcheancesComponent
   ],
   imports: [
     BrowserModule,
@@ -75,6 +82,7 @@ registerLocaleData(localeFr, 'fr');
     MatPaginatorModule,
     MatSortModule,
     MatProgressSpinnerModule,
+    MatCheckboxModule,
     NgbModule,
     ModalModule.forRoot(),
     ReactiveFormsModule,

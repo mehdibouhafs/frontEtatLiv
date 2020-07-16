@@ -18,6 +18,10 @@ import {BsModalRef, BsModalService} from "ngx-bootstrap";
 import {ShareEcheanceService} from "../services/shareEcheance.service";
 import {NgxSpinnerService} from "ngx-spinner";
 import * as moment from 'moment';
+import {ShareBlockedKeyService} from "../services/shareBlockedKey.service";
+import {ShareContratModelService} from "../services/shareContratModel.service";
+import {SelectionModel} from "@angular/cdk/collections";
+
 
 @Component({
   selector: 'app-view-echeance',
@@ -29,7 +33,7 @@ import * as moment from 'moment';
 export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
 
-  displayedColumnsEcheance: string[] = ['du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
+  displayedColumnsEcheance: string[] = ['select','du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
   public dataSourceEcheance: MatTableDataSource<Echeance>;
   @ViewChild('echeanceTableSort', {static: true}) sortEcheance: MatSort;
   @ViewChild('echeanceTablePaginator', {static: true}) paginatorEcheance: MatPaginator;
@@ -53,11 +57,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   lengthEcheances:number;
   pageSizeEcheances:number;
-  pageSizeOptionsEcheances:number[] = [5,10, 15,25,30];
+  pageSizeOptionsEcheances:number[] = [10, 15,25,30];
   currentPageEcheances : number;
   totalPagesEcheances:number;
   offsetEcheances:number;
-  numberOfElementsEcheances:number;
 
   sortBy:any=null;
 
@@ -71,12 +74,17 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   newEcheance : Echeance;
 
-  constructor( private spinner: NgxSpinnerService,private ref: ChangeDetectorRef,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private modalService: BsModalService,private router:Router,private contratService : ContratService) {
+  echeanceNotLinked : string;
 
+  public selection = new SelectionModel<Echeance>(true, []);
+
+
+  constructor(private shareContratModel: ShareContratModelService,private shareBlockedkey : ShareBlockedKeyService, private spinner: NgxSpinnerService,private ref: ChangeDetectorRef,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private modalService: BsModalService,private router:Router,private contratService : ContratService) {
+    this.echeanceNotLinked="true";
     this.subscription = this.shareEcheance.getEcheance()
       .subscribe((echeance : Echeance) =>{
 
-        this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+      this.loadEcheances();
 
       } )
   }
@@ -86,7 +94,6 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
   }
 
   getEcheances(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
-
 
     this.contratService.getEcheance(numContrat,page,size,sortBy,sortType).subscribe(
       (data : any)=>{
@@ -111,7 +118,117 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
         this.dataSourceEcheance = new MatTableDataSource(this.echeances);
 
-        if( this.deleteEcheanceModalRef!=null){
+        this.dataSourceEcheance.data.forEach(row => {
+          this.selection.selected.forEach(echeance1 => {
+            if(row.id==echeance1.id){
+              this.selection.select(row);
+            }
+          })
+        });
+
+        if(this.deleteEcheanceModalRef){
+          this.deleteEcheanceModalRef.hide();
+        }
+
+        if(this.isAllSelected()){
+
+        }
+
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
+  }
+
+  getEcheancesNotLinked(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+
+
+    this.contratService.getEcheanceNotLinked(numContrat,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.echeances  = data.content;
+
+        this.lengthEcheances = data.totalElements;
+        this.currentPageEcheances = data.pageable.pageNumber+1;
+        this.totalPagesEcheances = data.totalPages;
+        this.offsetEcheances = data.pageable.offset;
+
+        for(var i=0;i<this.echeances.length;i++){
+          if(this.echeances[i].commentaire==null){
+            this.echeances[i].commentaire = new CommentaireEcheance();
+            this.echeances[i].commentaire.id=0;
+          }
+          if(this.echeances[i].factures!=null){
+            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
+            this.echeances[i].factures2=t.split(",");
+          }
+        }
+
+        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+
+        this.dataSourceEcheance.data.forEach(row => {
+          this.selection.selected.forEach(echeance1 => {
+            if(row.id==echeance1.id){
+              this.selection.select(row);
+            }
+          })
+        });
+
+        if(this.deleteEcheanceModalRef){
+          this.deleteEcheanceModalRef.hide();
+        }
+
+
+
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
+  }
+
+
+  getEcheancesLinked(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+
+
+
+    this.contratService.getEcheanceLinked(numContrat,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.echeances  = data.content;
+
+        this.lengthEcheances = data.totalElements;
+        this.currentPageEcheances = data.pageable.pageNumber+1;
+        this.totalPagesEcheances = data.totalPages;
+        this.offsetEcheances = data.pageable.offset;
+
+        for(var i=0;i<this.echeances.length;i++){
+          if(this.echeances[i].commentaire==null){
+            this.echeances[i].commentaire = new CommentaireEcheance();
+            this.echeances[i].commentaire.id=0;
+          }
+          if(this.echeances[i].factures!=null){
+            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
+            this.echeances[i].factures2=t.split(",");
+          }
+        }
+
+        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+
+        this.dataSourceEcheance.data.forEach(row => {
+          this.selection.selected.forEach(echeance1 => {
+            if(row.id==echeance1.id){
+              this.selection.select(row);
+            }
+          })
+        });
+
+        if( this.deleteEcheanceModalRef){
           this.deleteEcheanceModalRef.hide();
         }
 
@@ -150,7 +267,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
         this.dataSourceEcheance = new MatTableDataSource(this.echeances);
 
-        this.addEcheanceByUserModalRef.hide();
+        if( this.deleteEcheanceModalRef){
+          this.deleteEcheanceModalRef.hide();
+        }
+
         this.ref.detectChanges();
 
       },err=>{
@@ -187,7 +307,14 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
         this.dataSourceEcheance = new MatTableDataSource(this.echeances);
 
-        this.addEcheanceModalRef.hide();
+        if( this.deleteEcheanceModalRef){
+          this.deleteEcheanceModalRef.hide();
+        }
+
+        if(this.addEcheanceModalRef){
+          this.addEcheanceModalRef.hide();
+        }
+
         this.ref.detectChanges();
 
       },err=>{
@@ -199,11 +326,11 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   ngOnInit() {
 
+    console.log("ngOnInit");
+
     this.currentPageEcheances=1;
 
-    this.pageSizeEcheances=5;
-
-    console.log("echeance tab on initi" + JSON.stringify(this.numContrat));
+    this.pageSizeEcheances=10;
 
     //this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
 
@@ -226,7 +353,14 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
     console.log("onChanges echeances" );
     this.echeances=null;
     this.dataSourceEcheance=null;
-    this.getEcheances(this.numContrat,1,5,this.sortBy,this.sortType);
+    console.log("onChanges this.echeance not linked " + this.echeanceNotLinked );
+    this.currentPageEcheances=1;
+
+    this.pageSizeEcheances=10;
+    this.echeanceNotLinked="true";
+    this.loadEcheances();
+
+
 
   }
 
@@ -242,7 +376,7 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
         this.sortBy = e.active;
         this.sortType = e.direction;
       }
-      this.getEcheances(this.numContrat, this.currentPageEcheances, this.pageSizeEcheances, this.sortBy, this.sortType);
+      this.loadEcheances();
     }
 
   }
@@ -254,10 +388,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   showAddEcheanceModal(editModal: TemplateRef<any>) {
     this.newEcheance = new Echeance();
-   /* this.newEcheance.du = moment("01/01/2019", "DD/MM/YYYY");
-    this.newEcheance.au = moment("31/12/2020", "DD/MM/YYYY");
-    this.newEcheance.periodeFacturation = "SEMESTRIELLE";
-    this.newEcheance.montant = 62371;*/
+    /*this.newEcheance.du = moment("01/01/2019", "DD/MM/YYYY").toDate();
+    this.newEcheance.au = moment("31/12/2020", "DD/MM/YYYY").toDate();
+    this.newEcheance.periodeFacturation = "TRIMESTRIELLE";
+    this.newEcheance.montant = 550000;*/
     this.addEcheanceModalRef =  this.modalService.show(editModal, Object.assign({}, {class: 'modal-sm'}));
   }
 
@@ -290,8 +424,9 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
 
         this.shareEcheance.setFactureEcheance(null);
+        this.echeanceNotLinked="tous";
         this.getEcheancesByUserHideModal(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
-
+      this.nbMonth =0;
 
     }, err => {
       console.log("ereur", err);
@@ -305,7 +440,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
       if(data>0){
         this.shareEcheance.setFactureEcheance(null);
+        this.shareContratModel.setContratModel(null);
+        this.echeanceNotLinked = "tous";
         this.getEcheancesHidmodal(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+        this.nbMonth =0;
       }else{
         console.log("error ");
       }
@@ -360,7 +498,11 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
 
       this.shareEcheance.setFactureEcheance(null);
-      this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+      this.currentPageEcheances=1;
+      this.loadEcheances();
+
+
+
 
     }, err => {
       console.log("ereur", err);
@@ -373,10 +515,113 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
     console.log("onPaginateChangeEcheans ");
     this.currentPageEcheances = event.pageIndex+1;
     this.pageSizeEcheances = event.pageSize;
-    this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+
+    this.loadEcheances();
+
+  }
+
+
+  loadEcheances(){
+
+    if(this.echeanceNotLinked=="tous"){
+      console.log("null");
+      this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+    }else{
+
+      if(this.echeanceNotLinked=="true"){
+        console.log("notL inked");
+        this.getEcheancesNotLinked(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+      }else{
+        console.log("Linked");
+        this.getEcheancesLinked(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+      }
+    }
+
+
 
 
   }
+
+  filtrerEcheances(){
+    this.currentPageEcheances=1;
+
+    this.pageSizeEcheances=10;
+    this.echeances=null;
+    this.dataSourceEcheance=null;
+    console.log("filtrerEcheances echeanceNotLinked " + this.echeanceNotLinked);
+    //this.selection.clear();
+    this.loadEcheances();
+  }
+
+  blockedKey(){
+    console.log("focus in blockedKey");
+    this.shareBlockedkey.setBlockedKey(true);
+  }
+
+  deBlockedKey(){
+    console.log("focus in deblockedKey");
+    this.shareBlockedkey.setBlockedKey(false);
+  }
+
+  composeEmail(){
+
+   // console.log("selectedEcheance " +  JSON.stringify(this.selection));
+
+    //console.log("compose Email");
+
+
+
+    var email="mailto:?subject= Echéances selectionnées du contrat Num :"+ this.numContrat+ "&body= Bonjour,%0A"
+      +"Ce message concerne les échéances séléctionées du contrat cité en objet et dont le détail est ci-après :"+"%0A"+"%0A"
+
+
+    if(this.selection.selected!=null && this.selection.selected.length>0){
+        email = email+ "Ci-dessous la liste des échéances séléctionnées : %0A";
+
+
+       this.selection.selected.forEach(function(echeance){
+
+         email= email + (" Du " + (echeance.du!=null ? moment(echeance.du).format('DD/MM/YYYY HH:MM') : "Undéfini") + (" Au "+echeance.au!=null ? moment(echeance.au).format('DD/MM/YYYY HH:MM') : "Undéfini") + " ,Périodicité : " + echeance.periodeFacturation + " ,Occurence de facturation : "+ echeance.occurenceFacturation + " ,Nom modèle : "+ (echeance.nomModele!=null ? echeance.nomModele : "" )+" ,Montant/Montant Prévisionnel : "+ (echeance.montant!=null ? echeance.montant+" DH" : (echeance.montantPrevision!=null ?echeance.montantPrevision+" DH":"Undéfini")) +"%0A");
+       })
+
+    }
+
+    console.log("email " + email);
+
+    window.location.href = email;
+
+
+
+    //this.annulation3();
+  }
+
+  public checkExpiredEcheanceNotFacture( echeance : Echeance){
+
+    if(echeance!=null){
+      if( (echeance.factures== null || echeance.factures=="" || echeance.factures=="[]") && echeance.au!=null && moment(echeance.au) < moment() ){
+        return true;
+      }else{
+        return false;
+      }
+    }else{
+      return false;
+    }
+
+}
+
+  public isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSourceEcheance.data.length;
+    return numSelected === numRows;
+  }
+
+  public masterToggle() {
+    console.log("masterToggle");
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSourceEcheance.data.forEach(row => this.selection.select(row));
+  }
+
 
 
 

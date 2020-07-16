@@ -255,7 +255,11 @@ montantNat:any;
 
     this.sigleUserAuthenticated = this.authService.getSigle();
 
-    const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+    var codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+    if(codeProjet !=null && codeProjet.indexOf('$')>=0){
+      codeProjet =codeProjet.split('$').join("/");
+    }
+
     if(codeProjet!=null){
 
       this.selectFiltre();
@@ -392,30 +396,30 @@ this.dataSource = null;
               }
               else{
                 p.tois_mois = produit.tois_mois;
-  
+
               }
-  
+
               if(produit.six_mois == null){
                 p.six_mois= 0;
               }
               else{
               p.six_mois = produit.six_mois;
               }
-  
+
               if(produit.douze_mois == null){
                 p.douze_mois= 0;
               }
               else{
                 p.douze_mois = produit.douze_mois;
-  
+
               }
-  
+
               if(produit.sup_douze_mois == null){
                 p.sup_douze_mois = 0;
               }
               else{
                 p.sup_douze_mois = produit.sup_douze_mois;
-  
+
               }
               p.total = produit.total;
               p.last_update = produit.last_update;
@@ -696,7 +700,7 @@ totalBalance = totalBalance + element.total;
     }else{
       this.selectedAgeTMP = this.selectedAge;
     }
-  
+
     this.balanceAgeeService.getBalanceByFiltre(this.selectedClientTMP,this.selectedCRTMP,this.selectedAgeTMP).subscribe(
       data => {
         this.pageProduit = data;

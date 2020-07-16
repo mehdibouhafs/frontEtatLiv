@@ -1487,15 +1487,20 @@ currentPageComment;
 
     var url=null;
 
+    if(value.indexOf('/')>=0){
+      value = value.split('/').join("$");
+    }
+    console.log("value " + value);
+
     switch(type)
     {
-      case 'codeCommercial':  url =  '/#/etatRecouvrementCodeCommercial/'+value;break;
+      case 'codeCommercial':  url =  '/PDC360/#/etatRecouvrementCodeCommercial/'+value;break;
 
-      case 'chefProjet': this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
+      case 'chefProjet': url='/PDC360/#/etatRecouvrementChefProjet/'+value; break;
 
-      case 'codeClient':url =  '/#/etatRecouvrementCodeClient/'+value;break;
+      case 'codeClient':url =  '/PDC360/#/etatRecouvrementCodeClient/'+value;break;
 
-      case 'codeProjet':url =  '/#/etatRecouvrementCodeProjet/'+value;break;
+      case 'codeProjet':url =  '/PDC360/#/etatRecouvrementCodeProjet/'+value;break;
 
 
     }

@@ -15,6 +15,7 @@ import * as moment from 'moment';
 import {AuthenticationService} from "../services/authentification.service";
 import {ShareEcheanceService} from "../services/shareEcheance.service";
 import {NgxSpinnerService} from "ngx-spinner";
+import {ShareBlockedKeyService} from "../services/shareBlockedKey.service";
 
 @Component({
   selector: 'app-view-factures',
@@ -59,7 +60,7 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
 
   lengthFactureEcheances:number;
   pageSizeFactureEcheances:number;
-  pageSizeOptionsFactureEcheances:number[] = [5,10, 15,25,30];
+  pageSizeOptionsFactureEcheances:number[] = [10, 15,25,30];
   currentPageFactureEcheances : number;
   totalPagesFactureEcheances:number;
   offsetFactureEcheances:number;
@@ -71,13 +72,13 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
 
   subscription :any;
 
-  constructor(private ref: ChangeDetectorRef,private spinner: NgxSpinnerService,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private contratService:ContratService,private modalService: BsModalService) {
+  constructor(private shareBlockedkey : ShareBlockedKeyService,private ref: ChangeDetectorRef,private spinner: NgxSpinnerService,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private contratService:ContratService,private modalService: BsModalService) {
 
     this.subscription = this.shareEcheance.getFactureEcheance()
       .subscribe((factureEcheance : FactureEcheance) =>{
         console.log("loadd facture Echeance ");
         this.loadAllEcheance(this.numContrat);
-        this.getFactureEcheance(this.numContrat,1,5,this.sortBy,this.sortType);
+        this.getFactureEcheance(this.numContrat,1,10,this.sortBy,this.sortType);
 
 
       } )
@@ -87,7 +88,7 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
 
 
     this.currentPageFactureEcheances=1;
-    this.pageSizeFactureEcheances=5;
+    this.pageSizeFactureEcheances=10;
 
     //this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
 
@@ -119,10 +120,11 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     console.log("on change facture");
     this.currentPageFactureEcheances=1;
-    this.pageSizeFactureEcheances=5;
+    this.pageSizeFactureEcheances=10;
     this.dataSourceFacturesEcheance=null;
     this.factureEcheances=null;
-    this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,5,this.sortBy,this.sortType);
+    this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,10,this.sortBy,this.sortType);
+    this.loadAllEcheance(this.numContrat);
   }
 
   @HostListener('matSortChange', ['$event'])
@@ -152,7 +154,7 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
 
       this.loadAllEcheance(this.numContrat);
 
-      this.getFactureEcheance(this.numContrat,1,5,this.sortBy,this.sortType);
+      this.getFactureEcheance(this.numContrat,1,10,this.sortBy,this.sortType);
 
       this.addEcheanceModalRef.hide();
 
@@ -248,7 +250,12 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
         this.lengthFactureEcheances= data.totalElements;
         this.currentPageFactureEcheances = data.pageable.pageNumber+1;
         this.dataSourceFacturesEcheance = new MatTableDataSource(this.factureEcheances);
-        this.ref.detectChanges();
+
+        if(!this.ref['destroyed']) {
+          this.ref.detectChanges();
+        };
+
+        //this.ref.detectChanges();
 
       },err=>{
 
@@ -265,6 +272,8 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
 
   loadAllEcheance(numContrat : any){
 
+    console.log("loadAllEcheance numContrat: " + this.numContrat);
+
     this.contratService.getAllEcheancesForContrat(numContrat).subscribe(
       (data: Array<Echeance>) => {
         this.allEcheances = data;
@@ -273,6 +282,16 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
       }
     )
 
+  }
+
+  blockedKey(){
+    console.log("focus in blockedKey");
+    this.shareBlockedkey.setBlockedKey(true);
+  }
+
+  deBlockedKey(){
+    console.log("focus in deblockedKey");
+    this.shareBlockedkey.setBlockedKey(false);
   }
 
 

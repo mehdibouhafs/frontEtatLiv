@@ -59,11 +59,33 @@
 
   </div>
 
+  <div class="col-md-1">
+    <label style="margin-left: 8px;" for="clients">Initialisation du filtre :</label>
+    <br/>
+    <button  id="raz" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 55px;
+      padding: 4px;
+    margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i>  </button>
+
+  </div>
+
+  <div class="col-md-1">
+    <label style="margin-left: 8px;" for="echeances"> Echéances RAF :</label>
+    <br/>
+    <button  id="echeances" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 105px;
+      padding: 4px;height: 27px;
+    margin-left: 4px;"  class="btn "   (click)="goToEcheances()" ><i class="fa fa-calendar" aria-hidden="true"> Echéances RAF</i>  </button>
+
+  </div>
+
+
+
 
 </div>
 
 
-<div class="row">
+<div class="row" >
   <div class="col-md-2">
 
     <label style="margin-left: 8px;" for="numMarches">N° Marché :</label>
@@ -113,23 +135,36 @@
   </div>
 
   <div class="col-md-2">
-    <label style="margin-left: 8px;" for="clients">Initialisation du filtre :</label>
+
+    <label style="margin-left: 8px;" for="bus">Bu :</label>
     <br/>
-    <button  id="raz" style="color: white;
-      background-color: #337ab7;font-size: 12px;width: 55px;
-      padding: 4px;
-    margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i>  </button>
+    <select style="margin-left: 5px;width: 175px;height: 34px;" id="bus" class="browser-default custom-select" name="bus"  [(ngModel)]="selectedBu" (change)="getContratByFilter0()" >
+      <option value="null" selected>Filtrer par Bu </option>
+      <option *ngFor="let bu of bus"
+              [ngValue]="bu">{{bu}}</option>
+    </select>
 
   </div>
 
 
 
+  <div class="col-md-2">
+    <label style="font-size: 11px;" for="finContrat"> Date Fin Contrat :</label>
+    <br/>
+    <input id="finContrat" name="finContrat" style="width: 175px;
+    height: 34px;"  type="date" class="form-control input-sm" [ngModel]="selectedDateFinContrat| date:'yyyy-MM-dd'" (ngModelChange)="selectedDateFinContrat = $event"
+           [value]="selectedDateFinContrat | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="getContratByFilter0()" (focusin)="blockedKey()" (focusout)="deBlockedKey()">
+
+  </div>
+
 
 </div>
 
+
+
 <mat-form-field >
 
-  <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+  <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter" (focusin)="blockedKey()" (focusout)="deBlockedKey()">
   <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
 
 </mat-form-field>
@@ -192,6 +227,17 @@
     <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant RAF / An
     <td mat-cell *matCellDef="let element"> {{element.montantRestFactureAn | currency:'DH':'symbol':undefined:'fr'}}  </td></ng-container>
 
+  <ng-container matColumnDef="bu"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Bu
+    <td mat-cell *matCellDef="let element"> {{element.bu}} </td></ng-container>
+
+  <!-- Symbol Column -->
+  <ng-container matColumnDef="nbEcheancesNonFactureEnRetard"  >
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Nb échéance(s) RAF en Retard
+    <td mat-cell *matCellDef="let element"> <span class="badge">{{element.nbEcheancesNonFactureEnRetard}}</span>  </td></ng-container>
+
+
+
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngStyle]= "(currentContrat!=null && currentContrat.numContrat==row.numContrat) && {'background-color':'#62a7fd3d'}"></tr>
 
@@ -215,7 +261,7 @@
         </button>
         <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail  :
           <strong style="font-size: 13px;
-    color: #337ab7;">{{currentContrat.numContrat}} / {{currentContrat.description}} /{{currentContrat.nomPartenaire}} / {{currentContrat.numMarche}} </strong>
+    color: #337ab7;">{{titre}} </strong>
         </p>
 
       </div>
@@ -226,25 +272,24 @@
           <div class="card-header tab-card-header">
             <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
               <li class="nav-item active">
-                <a style="    background-color: #337ab7;
-    color: white;" class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-handshake-o" aria-hidden="true"></i>  Contrat : {{currentContrat.numContrat}}</a>
+                <a  class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab" aria-controls="One" aria-selected="true" aria-expanded="true"><i class="fa fa-handshake-o" aria-hidden="true"></i>  Contrat : {{currentContrat.numContrat}}</a>
               </li>
               <li class="nav-item">
-                <a style="    background-color: #337ab7;
-    color: white;" class="nav-link" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Echéances</a>
+                <a class="nav-link" id="six-tab" data-toggle="tab" href="#six" role="tab" aria-controls="Six" aria-selected="false" aria-expanded="false"><i class="fa fa-file" aria-hidden="true"></i> Modèles</a>
               </li>
               <li class="nav-item">
-                <a style="    background-color: #337ab7;
-    color: white;" class="nav-link" id="tree-tab" data-toggle="tab" href="#tree" role="tab" aria-controls="Tree" aria-selected="false" aria-expanded="false"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Commandes Fournisseurs</a>
+                <a class="nav-link" id="two-tab" data-toggle="tab" href="#two" role="tab" aria-controls="Two" aria-selected="false" aria-expanded="false"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Echéances</a>
               </li>
               <li class="nav-item">
-                <a style="    background-color: #337ab7;
-    color: white;" class="nav-link" id="fourth-tab" data-toggle="tab" href="#four" role="tab" aria-controls="Four" aria-selected="false" aria-expanded="false"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Factures</a>
+                <a  class="nav-link" id="tree-tab" data-toggle="tab" href="#tree" role="tab" aria-controls="Tree" aria-selected="false" aria-expanded="false"><i class="fa fa-shopping-cart" aria-hidden="true"></i> Commandes Fournisseurs</a>
               </li>
               <li class="nav-item">
-                <a style="    background-color: #337ab7;
-    color: white;" class="nav-link" id="five-tab" data-toggle="tab" href="#five" role="tab" aria-controls="Five" aria-selected="false" aria-expanded="false"><i class="fa fa-file" aria-hidden="true"></i>Pièces jointes</a>
+                <a  class="nav-link" id="fourth-tab" data-toggle="tab" href="#four" role="tab" aria-controls="Four" aria-selected="false" aria-expanded="false"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Factures</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" id="five-tab" data-toggle="tab" href="#five" role="tab" aria-controls="Five" aria-selected="false" aria-expanded="false"><i class="fa fa-file" aria-hidden="true"></i>Pièces jointes</a>
+              </li>
+
             </ul>
           </div>
 
@@ -399,6 +444,29 @@
 
                           </div>
 
+
+                          <div class="row">
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-flag fa-lg"></i> Bu :</label>
+                              <span style="max-width: 108px;"
+                                    class="labelModal"> {{currentContrat.bu}}</span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-calculator fa-lg"></i> Reconduction Tacite :</label>
+                              <span style="max-width: 108px;"
+                                    class="labelModal"> <div *ngIf="currentContrat.reconductionTacite">Oui</div> <div *ngIf="!currentContrat.reconductionTacite">Non</div></span>
+                            </div>
+
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-flag-checkered fa-lg"></i> Nb échéances RAF retard:</label>
+                              <span style="max-width: 108px;"
+                                    class="labelModal"> <span class="badge">{{currentContrat.nbEcheancesNonFactureEnRetard}}</span></span>
+                            </div>
+
+
+                          </div>
 
                         </div>
                       </div>
@@ -620,6 +688,32 @@
               </div>
             </div>
 
+            <div class="tab-pane fade" id="six" role="tabpanel" aria-labelledby="six-tab">
+
+              <div class="panel-group" >
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+
+                  </div>
+
+                  <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                        <div class="row">
+                          <app-view-contrat-models [numContrat]="currentContrat.numContrat"></app-view-contrat-models>
+
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -636,11 +730,9 @@
       </div>
 
 
-
-
       <div class="modal-footer" style="padding: 0px">
 
-        <div class="row">
+        <div class="row" style="margin-top: 15px">
 
           <div class="form-group col-xs-2 col-md-2">
             <p></p>
@@ -649,10 +741,10 @@
             <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index-1>=0 ? '#337ab7' : 'black'}"  (click)="goToPrecedent(currentContrat.numContrat,secondModal)" ><i class="fa fa-backward fa-lg"></i> Précédant</a>
           </div>
           <div class="form-group col-xs-4 col-md-2">
-            <label style="padding: 3px;"><span style="color: #3875d7">{{index+1}}</span> /<span style="color: red">{{this.lengthContrats}}</span> </label>
+            <label style="padding: 3px;"><span style="color: #3875d7">{{index+1}}</span> /<span style="color: red">{{lengthContrats}}</span> </label>
           </div>
           <div class="form-group col-xs-4 col-md-2">
-            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index+2<=this.lengthContrats ? '#337ab7' : 'black'}" (click)="goToSuivant(currentContrat.numContrat,secondModal)"> Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
+            <a  style="cursor: pointer;font-size: 13px;" [ngStyle]="{'color' : index+2<=lengthContrats ? '#337ab7' : 'black'}" (click)="goToSuivant(currentContrat.numContrat,secondModal)"> Suivant  <i class="fa fa-forward fa-lg"></i>  </a>
           </div>
           <div class="form-group col-xs-3 col-md-4">
 

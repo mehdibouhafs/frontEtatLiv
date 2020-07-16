@@ -4,7 +4,7 @@
   <div class="col-md-4">
   <mat-form-field >
 
-    <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filter" (focusin)="blockedKey()" (focusout)="deBlockedKey()">
     <!--<input matInput [ngModel]="globalFilter" (ngModelChange)="applyFilter($event)" placeholder="Filter">-->
 
   </mat-form-field>

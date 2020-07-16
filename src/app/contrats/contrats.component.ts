@@ -20,6 +20,7 @@ import {Commentaire} from "../../model/model.commentaire";
 import {NgbModalOptions} from "@ng-bootstrap/ng-bootstrap";
 import * as moment from "moment";
 import {User} from "../../model/model.user";
+import {ShareBlockedKeyService} from "../services/shareBlockedKey.service";
 
 @Component({
   selector: 'app-contrats',
@@ -28,8 +29,9 @@ import {User} from "../../model/model.user";
   encapsulation: ViewEncapsulation.None
 })
 export class ContratsComponent implements OnInit {
+  titre;
 
-  displayedColumns: string[] = ['option', 'numMarche','nomPartenaire', 'description','pilote', 'sousTraiter',  'periodeFacturationLabel','montantContrat', 'montantFactureAn', 'montantRestFactureAn'];
+  displayedColumns: string[] = ['option', 'numMarche','nomPartenaire', 'description','pilote', 'sousTraiter',  'periodeFacturationLabel','montantContrat', 'montantFactureAn', 'montantRestFactureAn','bu','nbEcheancesNonFactureEnRetard'];
   public dataSource: MatTableDataSource<Contrat>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild('pagination', {static: true}) paginator: MatPaginator;
@@ -45,11 +47,14 @@ export class ContratsComponent implements OnInit {
   numMarches : Array<string>;
   clients : Array<string>;
   pilotes : Array<string> ;
+  bus : Array<string>;
 
   selectedClient:any = null;
   selectedNumMarche:any=null;
   selectedPilote:any=null;
   selectedSousTraiter:any=null;
+  selectedBu:any=null;
+  selectedDateFinContrat:any=null;
   mc:any=null;
 
   statistics : StatiticsContrat;
@@ -78,7 +83,7 @@ export class ContratsComponent implements OnInit {
 
   modalRef: BsModalRef;
 
-  nestedModalRef: BsModalRef
+  nestedModalRef: BsModalRef;
 
   suivant: boolean;
 
@@ -115,10 +120,23 @@ export class ContratsComponent implements OnInit {
 
   sortType:any=null;
 
-  constructor(private activatedRoute:ActivatedRoute ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private contratService: ContratService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
+  subscription :any;
+  constructor(private shareBlockedkey : ShareBlockedKeyService,private activatedRoute:ActivatedRoute ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private contratService: ContratService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
 
+    this.subscription = this.shareBlockedkey.getBlockedKey()
+      .subscribe((blockedKey : boolean) =>{
+        console.log(" blockedKeyReceive "+ blockedKey);
+       this.blockedKey1 =blockedKey;
+
+
+      } )
 
   }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
+  }
+
   ngOnInit() {
     this.currentPage=1;
     this.pageSizeContrats = 10;
@@ -217,6 +235,9 @@ export class ContratsComponent implements OnInit {
         p.numContrat =contrat.numContrat;
         p.pilote=contrat.pilote;
         p.nomPartenaire = contrat.nomPartenaire;
+        p.nbEcheancesNonFactureEnRetard=contrat.nbEcheancesNonFactureEnRetard;
+        p.bu=contrat.bu;
+        p.reconductionTacite=contrat.reconductionTacite;
 
         switch (contrat.occurenceFacturationLabel){
           case"LE 01":p.occurenceFacturationLabel ="Début de période (Le 01)";break;
@@ -276,7 +297,13 @@ export class ContratsComponent implements OnInit {
 
   getStatistics(){
 
-    this.contratService.getStatisticsContrat(this.mc,this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter).subscribe(
+    var selectedDateFinContrat1=null;
+
+    if(this.selectedDateFinContrat!=null){
+      selectedDateFinContrat1= moment(this.selectedDateFinContrat).format("DD/MM/YYYY");
+    }
+
+    this.contratService.getStatisticsContrat(this.mc,this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter,this.selectedBu,selectedDateFinContrat1).subscribe(
       (data : StatiticsContrat)=>{
 
         this.statistics = data;
@@ -303,8 +330,13 @@ export class ContratsComponent implements OnInit {
   }
 
   getContratByFilter(){
+
+    var selectedDateFinContrat1=null;
+    if(this.selectedDateFinContrat!=null){
+      selectedDateFinContrat1= moment(this.selectedDateFinContrat).format("DD/MM/YYYY");
+    }
     this.contratService.contratsFilter2(this.currentPage,this.pageSizeContrats,this.mc,
-      this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter,this.sortBy,this.sortType).subscribe(
+      this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter,this.selectedBu,selectedDateFinContrat1,this.sortBy,this.sortType).subscribe(
       (data:any)=>{
 
         this.addContrats(data);
@@ -324,8 +356,15 @@ export class ContratsComponent implements OnInit {
   getContratByFilter0(){
     this.dataSource =null;
     this.contrats=null;
+
+    var selectedDateFinContrat1=null;
+
+    if(this.selectedDateFinContrat!=null){
+      selectedDateFinContrat1= moment(this.selectedDateFinContrat).format("DD/MM/YYYY");
+    }
+
     this.contratService.contratsFilter2(1,this.pageSizeContrats,this.mc,
-      this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter,this.sortBy,this.sortType).subscribe(
+      this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter,this.selectedBu,selectedDateFinContrat1,this.sortBy,this.sortType).subscribe(
       (data:any)=>{
 
         this.addContrats(data);
@@ -344,7 +383,7 @@ export class ContratsComponent implements OnInit {
 
 
   getContratByFilterSelectFirstElement(selectFirst:boolean){
-    this.contratService.contratsFilter2(this.currentPage,this.pageSizeContrats,this.mc,this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter,this.sortBy,this.sortType).subscribe(
+    this.contratService.contratsFilter2(this.currentPage,this.pageSizeContrats,this.mc,this.selectedNumMarche,this.selectedClient,this.selectedPilote,this.selectedSousTraiter,this.selectedBu,moment(this.selectedDateFinContrat).format("DD/MM/YYYY"),this.sortBy,this.sortType).subscribe(
       (data:any)=>{
 
         this.addContrats(data);
@@ -358,16 +397,18 @@ export class ContratsComponent implements OnInit {
         this.numberOfElementsContrats = data.numberOfElements;
         if(selectFirst){
           this.currentContrat = this.filtredData[0];
+
           this.index =  this.offsetContrats;
         }else{
           this.currentContrat = this.filtredData[this.filtredData.length-1];
           this.index =  (this.offsetContrats+this.numberOfElementsContrats)-1;
         }
+        this.buildTitleContrat();
         this.setPage(1);
 
         this.ref.detectChanges();
 
-        console.log("this.offsetContrats " + this.offsetContrats);
+       // console.log("this.offsetContrats " + this.offsetContrats);
 
       },err=>{
         console.log("erreur " + err);
@@ -378,6 +419,15 @@ export class ContratsComponent implements OnInit {
     this.contratService.getPilotes().subscribe(
       (data : Array<string>)=>{
         this.pilotes = data;
+      },err=>{
+        console.log("erreur "+err);
+      });
+  }
+
+  getAllBus(){
+    this.contratService.getAllBus().subscribe(
+      (data: Array<string>)=>{
+        this.bus = data;
       },err=>{
         console.log("erreur "+err);
       });
@@ -407,6 +457,8 @@ export class ContratsComponent implements OnInit {
     this.selectedPilote=null;
     this.selectedSousTraiter=null;
     this.dataSource.filter = null;
+    this.selectedBu=null;
+    this.selectedDateFinContrat=null;
     this.mc=null;
     this.getContratByFilter0();
   }
@@ -414,6 +466,9 @@ export class ContratsComponent implements OnInit {
 
   selectContrat(contrat : Contrat,template: TemplateRef<any>){
     this.currentContrat = contrat;
+
+    this.buildTitleContrat();
+
     this.setPage(1);
     var index = this.getIndexFromFiltrerdList(this.currentContrat.numContrat);
     console.log("this.offsetContrats " +this.offsetContrats);
@@ -578,6 +633,7 @@ export class ContratsComponent implements OnInit {
         if (precedIndex != null && precedIndex >= 0 && precedIndex < this.lengthContrats) {
           this.index = precedIndex;
           this.currentContrat = this.filtredData[previousIndex];
+          this.buildTitleContrat();
           this.setPage(1);
           this.mode = 1;
         }
@@ -631,6 +687,7 @@ export class ContratsComponent implements OnInit {
           console.log("his");
           this.index = suivantIndex;
           this.currentContrat = this.filtredData[nextIndex];
+          this.buildTitleContrat();
           //this.setPage(1);
           this.mode=1;
         }
@@ -642,6 +699,8 @@ export class ContratsComponent implements OnInit {
 
 
   }
+
+
 
 
 
@@ -880,6 +939,37 @@ export class ContratsComponent implements OnInit {
       }
     )
   }
+
+  buildTitleContrat(){
+    var array = new Array();
+
+    if(this.currentContrat.numContrat!=null ){
+      array.push(this.currentContrat.numContrat);
+    }
+    if(this.currentContrat.description!=null && this.currentContrat.description!=""){
+      array.push(this.currentContrat.description);
+    }
+    if(this.currentContrat.nomPartenaire!=null && this.currentContrat.nomPartenaire!=""){
+      array.push(this.currentContrat.nomPartenaire);
+    }
+    if(this.currentContrat.numMarche!=null && this.currentContrat.numMarche!=""){
+      array.push(this.currentContrat.numMarche);
+    }
+    if(this.currentContrat.codeProjet!=null && this.currentContrat.codeProjet!=""){
+      array.push(this.currentContrat.codeProjet);
+    }
+
+    this.titre = array.join("/");
+  }
+
+  goToEcheances() {
+    var url = '/PDC360/#/echeances';
+
+
+      window.open(url, "_blank");
+
+  }
+
 
 
 

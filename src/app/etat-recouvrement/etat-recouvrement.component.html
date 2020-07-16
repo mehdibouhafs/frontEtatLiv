@@ -396,7 +396,7 @@
 
 <ng-template #template style="width: 95%">
   <div *ngIf="mode==1">
-    <form  #f="ngForm" (ngSubmit)="onEditDocument(template)">
+    <form  #f="ngForm" (ngSubmit)="onEditDocument(template,false)">
       <div class="modal-header" [ngStyle]=" {'background-color' : currentDocument.isExpiredEcheance == true && currentDocument.typeDocument == 'Facture'  ? '#FF000F' : currentDocument.typeDocument == 'Facture'  ? '#4dff03' : '#CED3D0'}">
         <button type="button" class="close pull-right" aria-label="Close" (click)="checkCanceled(thirdModal)">
           <span style="font-size: 20px;" aria-hidden="true">&times;</span>

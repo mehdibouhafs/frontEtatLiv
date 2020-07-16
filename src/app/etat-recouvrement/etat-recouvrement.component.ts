@@ -84,7 +84,7 @@ export class EtatRecouvrementComponent implements OnInit {
 ];
 public status:string[]=[
   'Non Traitée par CR',
-  'Non Déposée',
+  'Non Deposée',
   'Bloquée',
   'Validée par client',
   'En Cours de paiement',
@@ -816,20 +816,44 @@ console.log("TEMPLATE"+console.log(template));
     this.sigleUserAuthenticated = this.authService.getSigle();
 
 
-    const codeCommercial = this.activatedRoute.snapshot.params['codeCommercial'];
+    var codeCommercial = this.activatedRoute.snapshot.params['codeCommercial'];
+
+
+    var age = this.activatedRoute.snapshot.params['age'];
+
+    var clientBalance = this.activatedRoute.snapshot.params['client'];
+
+    var codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+
+
+    var chefProjet = this.activatedRoute.snapshot.params['chefProjet'];
+
+    var codeClient = this.activatedRoute.snapshot.params['codeClient'];
+
+
+    if(codeCommercial!=null && codeCommercial.indexOf('$')>=0){
+      codeCommercial =codeCommercial.split('$').join("/");
+    }
     console.log("codeCommercial " + codeCommercial);
-
-    const age = this.activatedRoute.snapshot.params['age'];
-
-    const clientBalance = this.activatedRoute.snapshot.params['client'];
-
-    const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+    if(codeProjet!=null && codeProjet.indexOf('$')>=0){
+       codeProjet =codeProjet.split('$').join("/");
+    }
     console.log("codeProjet " + codeProjet);
 
-    const chefProjet = this.activatedRoute.snapshot.params['chefProjet'];
+    if(chefProjet!=null && chefProjet.indexOf('$')>=0){
+      chefProjet =chefProjet.split('$').join("/");
+    }
     console.log("chefProjet " + chefProjet);
-    const codeClient = this.activatedRoute.snapshot.params['codeClient'];
+    if(codeClient!=null && codeClient.indexOf('$')>=0){
+      codeClient = codeClient.split('$').join("/");
+    }
     console.log("codeClient " + codeClient);
+
+    if(clientBalance !=null && clientBalance.indexOf('$')>=0){
+      clientBalance =clientBalance.split('$').join("/");
+    }
+    console.log("clientBalance " + clientBalance);
+
 
     const numDocument = this.activatedRoute.snapshot.params['numDocument'];
 
@@ -1095,13 +1119,13 @@ console.log("TEMPLATE"+console.log(template));
 
       this.currentDocument.commentaires.push(newCommentaire);
 
-      this.onEditDocument(null);
+      this.onEditDocument(null,true);
 
       this.currentDocument.commentaires.sort((a, b) => {
         return <any> new Date(b.date) - <any> new Date(a.date);
       });
 
-      console.log(" this.currentDocument.commentaires " + this.currentDocument.commentaires);
+      //console.log(" this.currentDocument.commentaires " + this.currentDocument.commentaires);
 
       this.currentDocument.updated = true;
       this.setPage(1);
@@ -1152,11 +1176,6 @@ console.log("TEMPLATE"+console.log(template));
         return <any> new Date(b.date) - <any> new Date(a.date);
       });
 
-
-
-
-      console.log(" this.currentProjet.commentaires " + this.currentDocument.commentaires);
-
       this.currentDocument.updated = true;
       this.setPage(1);
       this.motifAction = null;
@@ -1167,7 +1186,7 @@ console.log("TEMPLATE"+console.log(template));
       userUpdate.username = this.userAuthenticated;
       this.currentDocument.updatedBy = userUpdate;
 
-      console.log("edit2 "+ JSON.stringify(this.currentDocument));
+      //console.log("edit2 "+ JSON.stringify(this.currentDocument));
 
       this.etatRecouvrementService.updateDocument(this.currentDocument).subscribe((data: Document) => {
         this.currentDocument.updated = false;
@@ -1187,14 +1206,9 @@ console.log("TEMPLATE"+console.log(template));
 
   }
   errorUpdate : boolean;
-  onEditDocument(template: TemplateRef<any>) {
+  onEditDocument(template: TemplateRef<any>,fromAddComment:boolean) {
 
-
-
-    console.log("new Document to send " + JSON.stringify(this.currentDocument));
-
-
-    if(this.newContentComment != null ){
+    if(this.newContentComment != null && !fromAddComment){
       console.log("here newContentComment");
       this.addComment();
     }
@@ -1205,7 +1219,7 @@ console.log("TEMPLATE"+console.log(template));
     userUpdate.username = this.userAuthenticated;
     this.currentDocument.updatedBy = userUpdate;
 
-    console.log("updatedy "+ JSON.stringify(this.currentDocument.updatedBy ));
+   // console.log("updatedy "+ JSON.stringify(this.currentDocument.updatedBy ));
 
     this.etatRecouvrementService.updateDocument(this.currentDocument).subscribe((data: Document) => {
       this.currentDocument.updated = false;
@@ -1246,7 +1260,7 @@ console.log("TEMPLATE"+console.log(template));
       if (this.currentDocument.updated && !this.typdeBloquageRequired && !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired) {
         //this.showDialog();
         //this.showAnnulationModificationModal(template);
-        this.onEditDocument(null);
+        this.onEditDocument(null,false);
         //this.suivant = false;
         if (precedIndex != null && precedIndex >= 0 && precedIndex < this.filtredData.length) {
           this.currentDocument = this.filtredData[precedIndex];
@@ -1278,7 +1292,7 @@ console.log("TEMPLATE"+console.log(template));
       if(this.currentDocument.updated && !this.typdeBloquageRequired && !this.motifRequired && !this.motifChangementDeDateRequired && !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired){
         //this.showDialog();
         //this.showAnnulationModificationModal(template);
-        this.onEditDocument(null);
+        this.onEditDocument(null,false);
 
         if(suivantIndex != null && suivantIndex >= 0 && suivantIndex<this.filtredData.length){
           console.log("here updated ");
@@ -1598,7 +1612,7 @@ console.log("TEMPLATE"+console.log(template));
   checkCanceled(thirdModal: TemplateRef<any>){
 
     if(this.currentDocument.updated &&  !this.typdeBloquageRequired && !this.motifRequired &&  !this.motifChangementDeDateRequired &&  !this.montantRetenuGarantieRequired && !this.dateFinGarentieRequired){
-      this.onEditDocument(null);
+      this.onEditDocument(null,false);
       this.modalRef.hide();
     }else{
       this.motifRequired=false;

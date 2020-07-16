@@ -87,7 +87,7 @@ export class EtatProjetService {
     );
   }
   updateProjetFromSAP(codeProjet:string){
-    return this.http.get(this.host+'/updateProjetFromSAP?codeProjet='+codeProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.post(this.host+'/updateProjetFromSAP',codeProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
   getEtatProjet(){

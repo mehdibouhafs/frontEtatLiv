@@ -8,9 +8,11 @@ import {CommentaireEcheance} from "./model.commentaireEcheance";
 import {Contrat} from "./model.contrat";
 
 
-export class Echeance {
+export class ContratModel {
 
  public id : number;
+
+ public name:string;
 
   public  du : Date;
 
@@ -18,30 +20,18 @@ export class Echeance {
 
   public montant : number;
 
-  public  montantPrevision :number;
+  public  montantPrevisionel :number;
 
   public occurenceFacturation : string;
 
   public periodeFacturation : string;
 
-  public montantFacture:number;
 
-  public montantRestFacture :number;
-
-  public factures:string;
-
-  public factures2 : Array<String>;
-
-  public commentaire : CommentaireEcheance;
 
   public contrat : Contrat;
 
   public messageDelete:string;
 
   public addedByUser : boolean;
-
-  public nomModele :string;
-
-
 
 }

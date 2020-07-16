@@ -12,6 +12,7 @@ export class ShareEcheanceService {
 
   private factures = new Subject<FactureEcheance>();
 
+
   getEcheance(): Observable<Echeance> {
     return this.echeance.asObservable();
   }

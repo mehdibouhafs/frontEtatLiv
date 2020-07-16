@@ -53,6 +53,80 @@ export class ContratService {
     return this.http.get(this.host+"/getEcheance?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
+
+  getContratModel(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+
+    return this.http.get(this.host+"/getContratModel?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+
+  getEcheanceNotLinked(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+
+    return this.http.get(this.host+"/getEcheanceNotLinked?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getEcheancesNotLinked(date:string,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+
+    if(date!=null && date!=""){
+      res.push("date="+date);
+    }
+
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+
+    return this.http.get(this.host+"/getEcheancesNotLinked?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getEcheanceLinked(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    var str = res.join("&");
+
+
+    return this.http.get(this.host+"/getEcheanceLinked?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
   getFactureEcheance(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
 
     var res = new Array();
@@ -121,11 +195,23 @@ export class ContratService {
     return this.http.get(this.host+"/getPilotes",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
+  getAllBus(){
+
+    return this.http.get(this.host+"/getBus",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getNbEcheanceRetard(){
+
+    return this.http.get(this.host+"/getNbEcheanceRetard",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getAllEcheanceAFacturer(){
+
+    return this.http.get(this.host+"/getAllEcheanceAFacturer",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
 
 
-
-
-  contratsFilter2(page:number,size:number,mc:string,numMarche:string,nomPartenaire:string,pilote:string,sousTraiter:any,sortBy :string,sortType :string){
+  contratsFilter2(page:number,size:number,mc:string,numMarche:string,nomPartenaire:string,pilote:string,sousTraiter:any,bu:string,dateFinContrat : string,sortBy :string,sortType :string){
 
     var res = new Array();
 
@@ -156,6 +242,14 @@ export class ContratService {
       res.push("sortType="+sortType);
     }
 
+    if(bu!=null && bu!="null"){
+      res.push("bu="+bu);
+    }
+
+    if(dateFinContrat!=null && dateFinContrat!=""){
+      res.push("dateFinContrat="+dateFinContrat);
+    }
+
     var str = res.join("&");
 
     console.log("res " + res);
@@ -163,7 +257,7 @@ export class ContratService {
     return this.http.get(this.host+'/contratsFilter2?'+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
-  getStatisticsContrat(mc:string,numMarche:string,nomPartenaire:string,pilote:string,sousTraiter:any){
+  getStatisticsContrat(mc:string,numMarche:string,nomPartenaire:string,pilote:string,sousTraiter:any,bu:string,dateFinContrat:string){
 
     var res = new Array();
 
@@ -186,6 +280,14 @@ export class ContratService {
 
     if(sousTraiter!=null && sousTraiter!="null"){
       res.push("sousTraiter="+sousTraiter);
+    }
+
+    if(bu!=null && bu!="null"){
+      res.push("bu="+bu);
+    }
+
+    if(dateFinContrat!=null && dateFinContrat!="null"){
+      res.push("dateFinContrat="+dateFinContrat);
     }
 
     var str = res.join("&");
@@ -306,11 +408,32 @@ export class ContratService {
       res.push("sousTraiter="+sousTraiter);
     }
 
+
+
     var str = res.join("&");
 
     console.log("res " + res);
 
     return this.http.get(this.host+'/contratsFilter?'+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+
+  exportEcheancesNotLinked(date:any) {
+    var res = new Array();
+
+    if(date!=null && date!="null" ){
+      res.push("date="+date);
+    }
+
+    var str="";
+    if(res.length>0){
+      str = "?"+res.join("&");
+    }
+
+
+    console.log("res " + res);
+    return this.http.get(this.host + '/exportEcheancesNotLinked'+str, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
+    );
   }
 
 

@@ -7,6 +7,7 @@ import {Piece} from "../../model/model.piece";
 import {MatPaginator, MatSort, MatTableDataSource} from "@angular/material";
 import {ContratService} from "../services/contrat.service";
 import {NgxSpinnerService} from "ngx-spinner";
+import {ShareBlockedKeyService} from "../services/shareBlockedKey.service";
 
 @Component({
   selector: 'app-view-pieces',
@@ -27,7 +28,7 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
 
   lengthPieces:number;
   pageSizePieces:number;
-  pageSizeOptionsPieces:number[] = [5,10, 15,25,30];
+  pageSizeOptionsPieces:number[] = [10, 15,25,30];
   currentPagePieces : number;
   totalPagesPieces:number;
   offsetPieces:number;
@@ -38,11 +39,11 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
   sortType:any=null;
 
 
-  constructor(private ref: ChangeDetectorRef,private spinner: NgxSpinnerService, private contratService:ContratService) { }
+  constructor(private shareBlockedkey : ShareBlockedKeyService,private ref: ChangeDetectorRef,private spinner: NgxSpinnerService, private contratService:ContratService) { }
 
   ngOnInit() {
     this.currentPagePieces=1;
-    this.pageSizePieces=5;
+    this.pageSizePieces=10;
     //this.getPieces(this.numContrat,this.currentPagePieces,this.pageSizePieces,this.sortBy,this.sortType);
 
   }
@@ -61,7 +62,7 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
     //console.log("PieceOnInit" + this.piecesContrat);
     this.dataSourcePieceContrat=null;
     this.piecesContrat=null;
-    this.getPieces(this.numContrat,1,5,this.sortBy,this.sortType);
+    this.getPieces(this.numContrat,1,10,this.sortBy,this.sortType);
   }
 
   @HostListener('matSortChange', ['$event'])
@@ -135,6 +136,16 @@ export class ViewPiecesComponent implements OnInit,OnChanges {
         console.log("error "  +JSON.stringify(err));
       });
 
+  }
+
+  blockedKey(){
+    console.log("focus in blockedKey");
+    this.shareBlockedkey.setBlockedKey(true);
+  }
+
+  deBlockedKey(){
+    console.log("focus in deblockedKey");
+    this.shareBlockedkey.setBlockedKey(false);
   }
 
 

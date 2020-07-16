@@ -9,6 +9,7 @@ import {DashboardComponent} from "./dashboard/dashboard.component";
 import {EtatStockProjetComponent} from './etat-stock-projet/etat-stock-projet.component';
 import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
 import {ContratsComponent} from "./contrats/contrats.component";
+import {EcheancesComponent} from "./echeances/echeances.component";
 
 
 
@@ -33,6 +34,7 @@ const routes: Routes = [
   {path:"login",component:AuthentificationComponent},
   {path:"consultReunions",component:ReunionComponent},
   {path:"contrats",component:ContratsComponent},
+  {path:"echeances",component:EcheancesComponent},
 
 ];
 
