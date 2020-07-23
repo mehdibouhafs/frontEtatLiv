@@ -81,6 +81,30 @@
     </ng-container>
 
     <!-- Name Column -->
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Nom </th>
+      <td mat-cell *matCellDef="let element" >  {{element.contrat.description}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="numMarche">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Num marché </th>
+      <td mat-cell *matCellDef="let element" >  {{element.contrat.numMarche}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="nomPartenaire">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Client </th>
+      <td mat-cell *matCellDef="let element" >  {{element.contrat.nomPartenaire}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="pilote">
+      <th mat-header-cell *matHeaderCellDef  mat-sort-header> Pilote </th>
+      <td mat-cell *matCellDef="let element" >  {{element.contrat.pilote}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
     <ng-container matColumnDef="du">
       <th mat-header-cell *matHeaderCellDef  mat-sort-header> Période Du </th>
       <td mat-cell *matCellDef="let element" [ngStyle]= "(element!=null && element.addedByUser) && {'color':'red'}">  {{element.du | date:'dd/MM/yyyy'}} </td>

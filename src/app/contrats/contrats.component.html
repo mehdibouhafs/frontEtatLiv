@@ -49,7 +49,7 @@
     padding: 4px;" (click)="refreshContrats()" ><i class="fa fa-refresh" aria-hidden="true"></i> Dernière MAJ: &nbsp; <span class="pull-right" style="margin-top: 2px;font-size: 11px;" *ngIf="lastUpdate"> {{lastUpdate  | date:'dd/MM/yyyy HH:mm'}}</span></button>
   </div>
 
-  <div class="col-md-2">
+  <div class="col-md-1">
     <label style="font-size: 11px;" for="clients"> Export :</label>
     <br/>
     <button style="color: white;
@@ -64,15 +64,26 @@
     <br/>
     <button  id="raz" style="color: white;
       background-color: #337ab7;font-size: 12px;width: 55px;
+    height: 29px;
       padding: 4px;
     margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i>  </button>
 
   </div>
 
   <div class="col-md-1">
-    <label style="margin-left: 8px;" for="echeances"> Echéances RAF :</label>
+    <label style="margin-left: 8px;" for="echeances"> Plan de facturation :</label>
     <br/>
     <button  id="echeances" style="color: white;
+      background-color: #337ab7;font-size: 12px;width: 115px;
+      padding: 4px;height: 27px;
+    margin-left: 4px;"  class="btn "   (click)="goToEcheances()" ><i class="fa fa-calendar" aria-hidden="true"> Plan Facturation</i>  </button>
+
+  </div>
+
+  <div class="col-md-1">
+    <label style="margin-left: 8px;" for="echeancesRAF"> Echèances RAF :</label>
+    <br/>
+    <button  id="echeancesRAF" style="color: white;
       background-color: #337ab7;font-size: 12px;width: 105px;
       padding: 4px;height: 27px;
     margin-left: 4px;"  class="btn "   (click)="goToEcheances()" ><i class="fa fa-calendar" aria-hidden="true"> Echéances RAF</i>  </button>
@@ -208,7 +219,7 @@
 
   <!-- Symbol Column -->
   <ng-container matColumnDef="periodeFacturationLabel"  >
-    <th mat-header-cell *matHeaderCellDef mat-sort-header> Période de Facturation
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Fréquence de Facturation
     <td mat-cell *matCellDef="let element"> {{element.periodeFacturationLabel}}  </td></ng-container>
 
   <!-- Weight Column -->
@@ -287,9 +298,12 @@
                 <a  class="nav-link" id="fourth-tab" data-toggle="tab" href="#four" role="tab" aria-controls="Four" aria-selected="false" aria-expanded="false"><i class="fa fa-file-pdf-o" aria-hidden="true"></i> Factures</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="five-tab" data-toggle="tab" href="#five" role="tab" aria-controls="Five" aria-selected="false" aria-expanded="false"><i class="fa fa-file" aria-hidden="true"></i>Pièces jointes</a>
+                <a class="nav-link" id="five-tab" data-toggle="tab" href="#five" role="tab" aria-controls="Five" aria-selected="false" aria-expanded="false"><i class="fa fa-file" aria-hidden="true"></i> Pièces jointes </a>
               </li>
 
+              <li class="nav-item">
+                <a class="nav-link" id="seven-tab" data-toggle="tab" href="#seven" role="tab" aria-controls="Seven" aria-selected="false" aria-expanded="false"><i class="fa fa-info" aria-hidden="true"></i> Infos </a>
+              </li>
             </ul>
           </div>
 
@@ -332,79 +346,35 @@
                           <div class="row">
 
                             <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-calendar fa-lg"></i>  Du :</label>
+                              <label> <i class="fa fa-calendar fa-lg"></i>  Date d'effet :</label>
                               <span style="max-width: 108px;"
                                     class="labelModal"> {{currentContrat.du | date:'dd/MM/yyyy'}}</span>
                             </div>
 
                             <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-calendar fa-lg"></i>  Au :</label>
+                              <label> <i class="fa fa-calendar fa-lg"></i>  Date échèance :</label>
                               <span style="max-width: 108px;"
                                     class="labelModal"> {{currentContrat.au | date:'dd/MM/yyyy'}}</span>
                             </div>
 
+
+
                             <div class="form-group col-sm-4">
                               <label> <i class="fa fa-money fa-lg"></i>  Montant annuel :</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.montantAnnuel  | currency:'DH':'symbol':undefined:'fr'}}</span>
-                            </div>
-
-
-                          </div>
-
-                          <div class="row">
-
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-money fa-lg"></i>  Montant cablage  :</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.montantCablage  | currency:'DH':'symbol':undefined:'fr'}}</span>
-                            </div>
-
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-money fa-lg"></i>  Montant contrat :</label>
                               <span style="max-width: 108px;"
                                     class="labelModal"> {{currentContrat.montantContrat  | currency:'DH':'symbol':undefined:'fr'}}</span>
                             </div>
 
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-money fa-lg"></i>  Montant Assistance N° :</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.montantAssitanceAn  | currency:'DH':'symbol':undefined:'fr'}}</span>
-                            </div>
-
 
                           </div>
 
-                          <div class="row">
-
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-money fa-lg"></i>  Montant value RS :</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.montantValueRs  | currency:'DH':'symbol':undefined:'fr'}}</span>
-                            </div>
-
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-money fa-lg"></i>  Montant value SI :</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.montantValueSi}}</span>
-                            </div>
-
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-money fa-lg"></i> Montant value SW :</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.montantValueSw}}</span>
-                            </div>
 
 
-                          </div>
+
 
                           <div class="row">
 
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-building fa-lg"></i>  Nom sous Traitant:</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.nomSousTraitant }}</span>
-                            </div>
+
 
                             <div class="form-group col-sm-4">
                               <label> <i class="fa fa-flag-o fa-lg"></i>  Num marché :</label>
@@ -413,15 +383,10 @@
                             </div>
 
                             <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-calendar fa-lg"></i> Periode facturation :</label>
+                              <label> <i class="fa fa-calendar fa-lg"></i> Fréquence de facturation :</label>
                               <span style="max-width: 108px;"
                                     class="labelModal"> {{currentContrat.periodeFacturation}}</span>
                             </div>
-
-
-                          </div>
-
-                          <div class="row">
 
                             <div class="form-group col-sm-4">
                               <label> <i class="fa fa-user fa-lg"></i> Pilote du contrat :</label>
@@ -429,8 +394,14 @@
                                     class="labelModal"> {{currentContrat.pilote}}</span>
                             </div>
 
+
+                          </div>
+
+                          <div class="row">
+
+
                             <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-calculator fa-lg"></i>  Occurence facturation :</label>
+                              <label> <i class="fa fa-calculator fa-lg"></i>  Début/Fin Période :</label>
                               <span style="max-width: 108px;"
                                     class="labelModal"> {{currentContrat.occurenceFacturation}}</span>
                             </div>
@@ -441,17 +412,18 @@
                                     class="labelModal"> {{currentContrat.statut}}</span>
                             </div>
 
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-flag fa-lg"></i> Bu :</label>
+                              <span style="max-width: 108px;"
+                                    class="labelModal"> {{currentContrat.bu}}</span>
+                            </div>
+
 
                           </div>
 
 
                           <div class="row">
 
-                            <div class="form-group col-sm-4">
-                              <label> <i class="fa fa-flag fa-lg"></i> Bu :</label>
-                              <span style="max-width: 108px;"
-                                    class="labelModal"> {{currentContrat.bu}}</span>
-                            </div>
 
                             <div class="form-group col-sm-4">
                               <label> <i class="fa fa-calculator fa-lg"></i> Reconduction Tacite :</label>
@@ -465,7 +437,21 @@
                                     class="labelModal"> <span class="badge">{{currentContrat.nbEcheancesNonFactureEnRetard}}</span></span>
                             </div>
 
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-flag-checkered fa-lg"></i> StatutContrat :</label>
+                              <span style="max-width: 108px;"
+                                    class="labelModal"> {{currentContrat.statutContrat}}</span>
+                            </div>
 
+
+                          </div>
+
+                          <div class="row">
+                            <div class="form-group col-sm-4">
+                              <label> <i class="fa fa-flag-checkered fa-lg"></i> Délai Préavis (mois) :</label>
+                              <span style="max-width: 108px;"
+                                    class="labelModal"> {{currentContrat.delaiPreavis}}</span>
+                            </div>
                           </div>
 
                         </div>
@@ -702,6 +688,36 @@
 
                         <div class="row">
                           <app-view-contrat-models [numContrat]="currentContrat.numContrat"></app-view-contrat-models>
+
+                        </div>
+
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="seven" role="tabpanel" aria-labelledby="seven-tab">
+
+              <div class="panel-group" >
+                <div class="panel panel-primary">
+                  <div class="panel-heading">
+
+                  </div>
+
+                  <div class="panel-group">
+                    <div class="panel panel-default">
+                      <div class="panel-body" style="min-height: 598px;max-height: 598px">
+
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="info2"><i class="fa fa-truck  fa-lg"></i> Infos :</label>
+
+                            <textarea style="  margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentContrat.info" disabled  rows="15" (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                          </div>
 
                         </div>
 

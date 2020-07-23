@@ -30,7 +30,7 @@ import {SelectionModel} from "@angular/cdk/collections"
 })
 export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
 
-  displayedColumnsEcheance: string[] = ['select','contrat','du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
+  displayedColumnsEcheance: string[] = ['select','contrat','description','numMarche','nomPartenaire','pilote','du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
   public dataSourceEcheance: MatTableDataSource<Echeance>;
   @ViewChild('echeanceTableSort', {static: true}) sortEcheance: MatSort;
   @ViewChild('echeanceTablePaginator', {static: true}) paginatorEcheance: MatPaginator;
@@ -370,10 +370,15 @@ export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
   public checkExpiredEcheanceNotFacture( echeance : Echeance){
 
     if(echeance!=null){
-      if( (echeance.factures== null || echeance.factures=="" || echeance.factures=="[]") && echeance.au!=null && moment(echeance.au) < moment() ){
-        return true;
+
+      if( echeance.factures== null || echeance.factures=="" || echeance.factures=="[]" && echeance.du!=null && echeance.occurenceFacturation == "DEBUTPERIODE" && moment(echeance.du) < moment()){
+          return true;
       }else{
-        return false;
+        if( (echeance.factures== null || echeance.factures=="" || echeance.factures=="[]") && echeance.au!=null && moment(echeance.au) < moment() ){
+          return true;
+        }else{
+          return false;
+        }
       }
     }else{
       return false;

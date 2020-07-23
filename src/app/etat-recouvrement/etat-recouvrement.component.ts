@@ -1695,7 +1695,7 @@ console.log("TEMPLATE"+console.log(template));
       "Montant ouvert: " +   (currentDocument.montantOuvert  == null ? "": currentDocument.montantOuvert +" DH" )  + "%0A" +
       "Charg%C3%A9 recouvrement: " +  (currentDocument.chargerRecouvrement  == null ? "": currentDocument.chargerRecouvrement )  + "%0A" +
 
-      "Age Pi%C3%A9ce:" +   (currentDocument.agePiece  == null ? "": currentDocument.agePiece ) + "%0A" +
+      "Date de facturation: " +  (currentDocument.datePiece  == null ? "": moment(currentDocument.datePiece).format('DD/MM/YYYY') )+"%0A" +
       "Montant pay%C3%A9: " +  (currentDocument.montantPayer  == null ? "": currentDocument.montantPayer + " DH" )  + "%0A" +
       "Condition de paiement: " +  (currentDocument.conditionDePaiement  == null ? "": currentDocument.conditionDePaiement )  + "%0A"+
       "Statut: " +  (currentDocument.statut  == null || currentDocument.statut== 'undefined' ? "": currentDocument.statut ) ;

@@ -42,6 +42,10 @@ export class Echeance {
 
   public nomModele :string;
 
+  public bc:boolean;
+
+  public majContrat:boolean;
+
 
 
 }

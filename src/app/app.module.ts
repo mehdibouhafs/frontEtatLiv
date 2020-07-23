@@ -45,6 +45,7 @@ import { BalanceAgeeService } from './services/balanceAgee.service';
 import { ContratsComponent } from './contrats/contrats.component';
 import { ViewContratModelsComponent } from './view-contrat-models/view-contrat-models.component';
 import { EcheancesComponent } from './echeances/echeances.component';
+import { EcheancesRafComponent } from './echeances-raf/echeances-raf.component';
 registerLocaleData(localeFr, 'fr');
 
 
@@ -67,7 +68,8 @@ registerLocaleData(localeFr, 'fr');
     ViewPiecesComponent,
     ContratsComponent,
     ViewContratModelsComponent,
-    EcheancesComponent
+    EcheancesComponent,
+    EcheancesRafComponent
   ],
   imports: [
     BrowserModule,

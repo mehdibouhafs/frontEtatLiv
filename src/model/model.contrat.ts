@@ -96,9 +96,13 @@ export class Contrat {
 
   public reconductionTacite:boolean;
 
-  public delaiPreavisResiliation: string;
+  public delaiPreavis: number;
 
   public nbEcheancesNonFactureEnRetard:number;
+
+  public statutContrat:string;
+
+  public info:string;
 
 
 
