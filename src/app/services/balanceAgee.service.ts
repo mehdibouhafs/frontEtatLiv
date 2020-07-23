@@ -29,8 +29,18 @@ export class BalanceAgeeService {
 
   }
 
+  getBalanceByStatus(status: any){
+    return this.http.get(this.host+"/getBalanceByStatus?status="+status,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
   getBalanceByFiltre(client: any,cr:any,age:any){
     return this.http.get(this.host+"/getBalanceByFiltre?client="+client+"&cr="+cr+"&age="+age,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  getBalanceByAM(client: any,cr:any,am:any){
+    return this.http.get(this.host+"/getBalanceByAM?client="+client+"&cr="+cr+"&am="+am,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
   }
 

@@ -19,6 +19,7 @@ import {Statitics} from '../../model/model.statistics';
 import {AuthenticationService} from '../services/authentification.service';
 import {User} from '../../model/model.user';
 import { NgSelectComponent } from '@ng-select/ng-select';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-etat-recouvrement',
@@ -95,6 +96,9 @@ public status:string[]=[
    'En cours de validation'
 
 ];
+
+
+
   selectedClient :any;
   selectedAge: any;
 
@@ -181,7 +185,10 @@ public status:string[]=[
   roleBuVolume:any;
   test: Date;
   toSelectDoc: any;
-
+  disabled = false;
+  ShowFilter = false;
+  limitSelection = false;
+  dropdownSettings: any = {};
 
 
 
@@ -725,7 +732,14 @@ console.log("TEMPLATE"+console.log(template));
 
   ngOnInit() {
 
+    this.dropdownSettings = {
+      singleSelection: false,
+      selectAllText: 'Select All',
+      unSelectAllText: 'UnSelect All',
+      itemsShowLimit: 3,
+      allowSearchFilter: this.ShowFilter
 
+  };
 
     this.service = this.authService.getServName();
 
@@ -861,12 +875,14 @@ console.log("TEMPLATE"+console.log(template));
 
     if(age != null && clientBalance !=null){
       this.selectedClient = clientBalance;
+      this.selectedAge = age;
       setTimeout(()=>{    //<<<---    using ()=> syntax
         this.selectedClient = clientBalance;
         this.selectedAge = age;
-        this.toSelectDoc = this.Documents[0];
         this.selectDocument(this.toSelectDoc,this.template);
-      }, 2000);
+        this.toSelectDoc = this.Documents[0];
+
+      }, 3000);
       this.selectFiltre();
     }else
     if(clientBalance!=null){

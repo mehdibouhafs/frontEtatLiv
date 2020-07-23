@@ -10,13 +10,13 @@ import {
 } from '@angular/core';
 import {EtatProjetService} from '../services/etatProjet.service';
 import {EtatProjet} from '../../model/model.etatProjet';
+import {Router} from '@angular/router';
 import {HttpEventType, HttpResponse} from '@angular/common/http';
 import {Detail} from '../../model/model.detail';
 import {Projet} from '../../model/model.projet';
 import {Commentaire} from '../../model/model.commentaire';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
-import {ActivatedRoute, Router} from '@angular/router';
 
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {Employer} from '../../model/model.employer';
@@ -37,12 +37,12 @@ import * as SockJS from 'sockjs-client';
 import {Client, Frame, Message,Stomp} from "@stomp/stompjs";
 
 @Component({
-  selector: 'app-etat-projet',
-  templateUrl: './etat-projet.component.html',
-  styleUrls: ['./etat-projet.component.css'],
+  selector: 'app-etat-projet-dep',
+  templateUrl: './etat-projet-dep.component.html',
+  styleUrls: ['./etat-projet-dep.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class EtatProjetComponent implements OnInit,OnDestroy {
+export class EtatProjetDepComponent implements OnInit,OnDestroy {
 
    pageProjet :any;
    currentPage : number = 1;
@@ -100,7 +100,7 @@ export class EtatProjetComponent implements OnInit,OnDestroy {
 
   actionModal : string;
 
-  displayedColumns: string[] = ['option','client','bu','codeProjet','projet','age',  'commercial', 'chefProjet','montantCmd','restAlivrer','livrerNonFacture','livreFacturePayer','montantStock'];
+  displayedColumns: string[] = ['option','client','bu','codeProjet','projet','age',  'commercial', 'chefProjet','montantStock'];
   public dataSource: MatTableDataSource<Projet>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -179,16 +179,9 @@ export class EtatProjetComponent implements OnInit,OnDestroy {
   roleBuCommercial;
   roleBuValueSoftware;
   stompClient;
-  dropdownSettings: any = {};
 
+  constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
 
-  public typep:string[]=[
-    'Déploiement',
-    'Commercial'
-  
-  ];
-  ShowFilter: any;
-  constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private activatedRoute:ActivatedRoute,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
 
   }
 
@@ -376,10 +369,9 @@ currentPageComment;
  }
 
 
-
- 
   getAllProjet(cloture:boolean,bu1 : string){
 
+    console.log("teeest")
     if(this.selectedClient == null){
       this.selectedClientTmp = "undefined";
     }else{
@@ -407,13 +399,13 @@ currentPageComment;
       this.bu2 = "undefined";
     }
 
-    this.etatProjetService.getProjets(cloture,bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClientTmp,this.selectedAffectation).subscribe(
+    this.etatProjetService.getProjetsDep(cloture,bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClientTmp,this.selectedAffectation).subscribe(
       data=>{
         this.pageProjet = data;
 
         this.keys = new Array<string>();
 
-        console.log("PROJET OBJECT "+JSON.stringify(this.pageProjet[0]));
+
 
         this.keys.push("codeProjet");
 
@@ -498,6 +490,7 @@ currentPageComment;
             p.statutProjet = projet.statutProjet;
             p.tauxAvancement= projet.tauxAvancement;
             p.type= projet.type;
+
             if (projet.commentaires != null && projet.commentaires.length > 0) {
               p.commentaires = projet.commentaires;
             }
@@ -513,11 +506,8 @@ currentPageComment;
             p.preRequis = projet.preRequis;
             p.intervenant = projet.intervenant;
             p.codeCommercial = projet.codeCommercial;
-
-            p.montantStock = projet.montantStock;
-
+            p.montantStock = 0;
             p.decloturedByUser = projet.decloturedByUser;
-            p.flag = projet.flag;
 
             if(p.dateFinProjet!=null){
 
@@ -537,7 +527,7 @@ currentPageComment;
 
             p.details = details;
             this.projets.push(p);
-            
+
 
           });
         }
@@ -685,14 +675,6 @@ currentPageComment;
 
     this.connectAndReconnect();
 
-    this.dropdownSettings = {
-      singleSelection: false,
-      selectAllText: 'Select All',
-      unSelectAllText: 'UnSelect All',
-      itemsShowLimit: 3,
-      allowSearchFilter: this.ShowFilter
-
-  };
     this.service = this.authService.getServName();
 
     this.userAuthenticated = this.authService.getUserName();
@@ -819,7 +801,7 @@ currentPageComment;
     this.getAllCommericals();
     //console.log("this.selectedBu" + this.selectedBu);
 
-    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite ||this.roleBuValueSoftware){
+    if(this.roleBuVolume || this.roleBuSystem ||this.roleBuChefProjet ||this.roleBuCommercial ||this.roleBuReseauSecurite){
 
     }else{
       this.selectedBu = "undefined";
@@ -876,7 +858,7 @@ currentPageComment;
       this.selectedClient= "undefined";
     }
 
-    this.etatProjetService.getProjets(this.projetCloture,this.bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClient,this.selectedAffectation).subscribe(
+    this.etatProjetService.getProjetsDep(this.projetCloture,this.bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClient,this.selectedAffectation).subscribe(
       data=>{
         //console.log("data Search " + JSON.stringify(data));
         this.pageProjet = data;
@@ -1401,7 +1383,7 @@ currentPageComment;
 
     //console.log("compose Email");
 
-    var codeProjet = projet.codeProjet;
+    var codeProjet = projet.codeProjet.split('DEP-',2)[1].replace(","," ");
 
     var nomProjet = projet.projet;
 
@@ -1412,16 +1394,9 @@ currentPageComment;
       + "Commercial: "+(projet.commercial  == null ? "": projet.commercial ) +"%0A"+
     "Chef projet: "+ (projet.chefProjet  == null ? "": projet.chefProjet ) +"%0A"+
     "BU: "+ (projet.bu  == null ? "": projet.bu ) +"%0A"+
-    "Date CMD: "+moment(projet.dateCmd).format('DD/MM/YYYY')  +"%0A"+
+    "Date Dépôt: "+moment(projet.dateCmd).format('DD/MM/YYYY')  +"%0A"+
       "AGE: "+ (projet.age  == null ? "": projet.age )+"%0A"+
       "Synthèse du projet:"+ (projet.syntheseProjet  == null ? "": projet.syntheseProjet )+"%0A"+
-      "Montant CMD: "+(projet.montantCmd  == null ? "": projet.montantCmd +" DH")+"%0A"+
-    "LIV: "+(projet.livraison  == null ? "": projet.livraison +" DH") +"%0A"+
-      "RAL: "+ (projet.restAlivrer  == null ? "": projet.restAlivrer +" DH")  +"%0A"+
-    "LNF: "+ (projet.livrerNonFacture  == null ? "": projet.livrerNonFacture +" DH")  +"%0A"+
-    "Montant factur%C3%A9: "+ (projet.livreFacturePayer  == null ? "": projet.livreFacturePayer +" DH")  +"%0A"+
-    "Montant pay%C3%A9: "+(projet.montantPayer  == null ? "": projet.montantPayer +" DH")  +"%0A"+
-    "Montant Stock: "+(projet.montantStock  == null ? "": projet.montantStock +" DH")  +"%0A"+
     "Taux facturation: "+ (projet.facturation == null ? "":(Math.round(projet.facturation * 100)/100).toFixed(2) +"%")+"%0A"+" %0A"+" %0A";
 
 
@@ -1432,16 +1407,16 @@ currentPageComment;
       if(lastCommentaire1){
         email = email+ "%0A";
 
-        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content).split("<br>").join("%0A")+"%0A";
+        email = email +"Commentaires : %0A"+ moment(lastCommentaire1.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire1.user.sigle == null ? "": this.removeAnd(lastCommentaire1.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire1.content.split("<br>").join("%0A"))+"%0A";
       }
        let lastCommentaire2 = new Commentaire();
       lastCommentaire2= projet.commentaires[1];
       if(lastCommentaire2)
-      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content).split("<br>").join("%0A")+"%0A";
+      email = email + moment(lastCommentaire2.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire2.user.sigle == null ? "": this.removeAnd(lastCommentaire2.user.sigle))+" : " +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire2.content.split("<br>").join("%0A"))+"%0A";
       let lastCommentaire3 = new Commentaire();
       lastCommentaire3= projet.commentaires[2];
       if(lastCommentaire3)
-      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content).split("<br>").join("%0A")+"%0A";
+      email = email + moment(lastCommentaire3.date).format('DD/MM/YYYY HH:MM')+" "+(lastCommentaire3.user.sigle == null ? "": this.removeAnd(lastCommentaire3.user.sigle))+" : "  +(lastCommentaire1.employer == null ? "": "  @"+lastCommentaire1.employer) + " "+encodeURIComponent(lastCommentaire3.content.split("<br>").join("%0A"))+"%0A";
     }
     //console.log("email " + email);
 
@@ -1475,7 +1450,7 @@ currentPageComment;
   }
 
   selectFiltre() {
-    //console.log("this.selectedBu " + this.selectedBu);
+    console.log("this.selectedBu " + this.selectedBu);
 
     this.selectedAffectation = "undefined";
     if (this.selectedChefProjet != "undefined" || this.selectedStatut != "undefined" || this.selectedClient != "undefined"
@@ -1505,31 +1480,19 @@ currentPageComment;
 
   showEtatRecouvrement(type,value){
 
-    var url=null;
-
-    if(value.indexOf('/')>=0){
-      value = value.split('/').join("$");
-    }
-    console.log("value " + value);
 
     switch(type)
     {
-      case 'codeCommercial':  url =  '/PDC360/#/etatRecouvrementCodeCommercial/'+value;break;
+      case 'codeCommercial'://console.log("codeCommercial "+ value); this.router.navigate(['/etatRecouvrementCodeCommercial',value]); break;
 
-      case 'chefProjet': url='/PDC360/#/etatRecouvrementChefProjet/'+value; break;
+      case 'chefProjet'://console.log("chefProjet "+ value);this.router.navigate(['/etatRecouvrementChefProjet',value]); break;
 
-      case 'codeClient':url =  '/PDC360/#/etatRecouvrementCodeClient/'+value;break;
+      case 'codeClient'://console.log("codeClient "+ value);this.router.navigate(['/etatRecouvrementCodeClient',value]); break;
 
-      case 'codeProjet':url =  '/PDC360/#/etatRecouvrementCodeProjet/'+value;break;
+      case 'codeProjet'://console.log("codeProjet "+ value);this.router.navigate(['/etatRecouvrementCodeProjet',value]); break;
 
 
     }
-
-
-    if(url!=null){
-      window.open(url, "_blank");
-    }
-
 
   }
 
@@ -1690,148 +1653,88 @@ currentPageComment;
   }
 
   addCommentaireFromSocket(commentaire : CommentaireSocket){
-
-    if(commentaire!=null){
-      var projet : Projet;
-      for(var i=0;i<this.filtredData.length;i++){
-        //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
-        if(commentaire.joinId!=null && this.filtredData[i].codeProjet == commentaire.joinId){
-          //console.log("eqals");
-          projet = this.filtredData[i];
-
-          //this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
-          if (this.filtredData[i].commentaires == null) {
-            this.filtredData[i].commentaires = new Array<Commentaire>();
-          }
-
-          this.filtredData[i].commentaires.push(commentaire);
-
-
-          this.filtredData[i].commentaires.sort((a, b) => {
-            return <any> new Date(b.date) - <any> new Date(a.date);
-          });
-
-
-          if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
-            //console.log("same projet " + JSON.stringify(projet));
-            this.currentProjet = projet;
-            this.setPage(this.currentPageComment);
-            this.ref.detectChanges();
-          }
-          return;
-
-        }
-    }
-
-
-
-
-
-    }
-
-  }
-
-
-  exportDetailRdv($event,codeProjet : string) {
-    $event.stopPropagation();
-    $event.preventDefault();
-    this.spinner.show();
-    //console.log("filtre "+ this.dataSource.filter);
-    var result= this.etatProjetService.exportDetailRdv(codeProjet);
-
-    var d = new Date();
-
-    //console.log("day " + d.getDay());
-    var fileName = "RDV-"+codeProjet+"-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
-
-    result.subscribe((response: any) => {
-      this.updateProjetFromSAP(codeProjet);
-      let dataType = response.type;
-      let binaryData = [];
-      binaryData.push(response);
-      let downloadLink = document.createElement('a');
-      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
-      if (fileName)
-        downloadLink.setAttribute('download', fileName);
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-    });
-  }
-
-  updateProjetFromSAP(codeProjet :string){
-
-    this.etatProjetService.updateProjetFromSAP(codeProjet).subscribe(
-      (data:Projet)=>{
-        this.spinner.hide();
-        if(data!=null && data.codeProjet!=null){
-          this.currentProjet = data;
-
-          var index= this.getIndexFromFiltrerdList(data.codeProjet);
-
-          this.projets[index] = data;
+  //console.log("addCommentration " + commentaire);
+  var projet : Projet;
+    for(var i=0;i<this.filtredData.length;i++){
+      //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
+      if(this.filtredData[i].codeProjet == commentaire.joinId){
+        //console.log("eqals");
+        projet = this.filtredData[i];
+        this.currentProjet.commentaires = this.currentProjet.commentaires.filter(item => item !== commentaire);
+        if (this.filtredData[i].commentaires == null) {
+          this.filtredData[i].commentaires = new Array<Commentaire>();
         }
 
+         this.filtredData[i].commentaires.push(commentaire);
 
-        this.ref.detectChanges();
 
-      },
-      err=>{
-        //console.log("error "+ JSON.stringify(err));
+        this.filtredData[i].commentaires.sort((a, b) => {
+          return <any> new Date(b.date) - <any> new Date(a.date);
+        });
 
-        this.ref.detectChanges();
-        this.spinner.hide();
 
+        if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
+          //console.log("same projet " + JSON.stringify(projet));
+          this.currentProjet = projet;
+          this.setPage(this.currentPageComment);
+          this.ref.detectChanges();
+        }
+       return;
 
       }
-    )
-    //this.spinner.hide();
+
+
+
+
+    }
+
   }
 
   deleteCommentaireFromSocket(commentaire : CommentaireSocket){
-    console.log("deleteCommentaire " + JSON.stringify(commentaire));
+    //console.log("deleteCommentaire " + JSON.stringify(commentaire));
     var projet : Projet;
-    if(commentaire!=null){
-      for(var i=0;i<this.filtredData.length;i++){
+    for(var i=0;i<this.filtredData.length;i++){
+      //console.log("this.filtredData[i] " + this.filtredData[i].codeProjet);
+      if(this.filtredData[i].codeProjet == commentaire.joinId && this.filtredData[i].commentaires!=null && this.filtredData[i].commentaires.length>0){
 
-        if(this.filtredData[i].codeProjet == commentaire.joinId && this.filtredData[i].commentaires!=null && this.filtredData[i].commentaires.length>0){
-          if(commentaire.id!=null){
-            var commentaireSimple = new Commentaire();
-            commentaireSimple.id = commentaire.id;
-            commentaireSimple.content = commentaire.content;
-            commentaireSimple.date = commentaire.date;
-            commentaireSimple.employer = commentaire.employer;
-            commentaireSimple.user = commentaire.user;
 
-            for(var j =0;i<this.filtredData[i].commentaires.length;j++){
-              if(this.filtredData[i].commentaires[j].id===commentaire.id){
-                this.filtredData[i].commentaires.splice(j,1);
-                break;
-              }
-            }
+        var commentaireSimple = new Commentaire();
+        commentaireSimple.id = commentaire.id;
+        commentaireSimple.content = commentaire.content;
+        commentaireSimple.date = commentaire.date;
+        commentaireSimple.employer = commentaire.employer;
+        commentaireSimple.user = commentaire.user;
 
-            if(this.filtredData[i].commentaires!=null && this.filtredData[i].commentaires.length>0){
-              this.filtredData[i].commentaires = this.filtredData[i].commentaires.filter(item => item !== commentaireSimple);
-            }
-
-            projet = this.filtredData[i];
-            if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
-              this.currentProjet.commentaires = this.filtredData[i].commentaires;
-              //console.log("here" + this.currentProjet.commentaires.length);
-              this.setPage(this.currentPageComment);
-              this.ref.detectChanges();
-            }
-            return;
+        for(var j =0;i<this.filtredData[i].commentaires.length;j++){
+          if(this.filtredData[i].commentaires[j].id===commentaire.id){
+            this.filtredData[i].commentaires.splice(j,1);
+            break;
           }
-
-
         }
-    }
 
+        //this.filtredData[i].commentaires = this.filtredData[i].commentaires.filter(item => item !== commentaireSimple);
+
+        //console.log("length comm2 " +  this.filtredData[i].commentaires.length);
+        projet = this.filtredData[i];
+        if(this.currentProjet!=null && this.currentProjet.codeProjet == projet.codeProjet){
+          //console.log("here" + this.currentProjet.commentaires.length);
+          this.currentProjet.commentaires = this.filtredData[i].commentaires;
+          //console.log("here" + this.currentProjet.commentaires.length);
+          this.setPage(this.currentPageComment);
+          this.ref.detectChanges();
+        }
+        return;
+
+      }
 
     }
 
   }
 
+  getCode(cp: any){
+
+    return cp.split("DEP", 1); 
+  }
 
   connectAndReconnect(){
     this.stompClient = this.etatProjetService.connect();
@@ -1839,7 +1742,7 @@ currentPageComment;
     this.stompClient.connect({'Authorization': this.authService.getToken()},'',  (frame: Frame) => {
       //console.log('CONNECT CONNECT');
       this.stompClient.subscribe("/topic/addCommentProjet", (comment : Message)=> {
-        if(comment!=null && comment.body!=null){
+        if(comment.body!=null){
           //console.log("commentReceived " + comment.body);
           this.addCommentaireFromSocket(JSON.parse(comment.body));
         }
@@ -1847,7 +1750,7 @@ currentPageComment;
       });
 
       this.stompClient.subscribe("/topic/deleteCommentProjet", (comment : Message)=> {
-        if(comment!=null && comment.body!=null){
+        if(comment.body!=null){
           this.deleteCommentaireFromSocket(JSON.parse(comment.body));
         }
       });
@@ -1858,62 +1761,6 @@ currentPageComment;
       },5000);
       });
 
-  }
-
-  exportDetailRdv($event,codeProjet : string) {
-    $event.stopPropagation();
-    $event.preventDefault();
-    this.spinner.show();
-    //console.log("filtre "+ this.dataSource.filter);
-    var result= this.etatProjetService.exportDetailRdv(codeProjet);
-
-    var d = new Date();
-
-    //console.log("day " + d.getDay());
-    var fileName = "RDV-"+codeProjet+"-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
-
-    result.subscribe((response: any) => {
-      this.updateProjetFromSAP(codeProjet);
-      let dataType = response.type;
-      let binaryData = [];
-      binaryData.push(response);
-      let downloadLink = document.createElement('a');
-      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
-      if (fileName)
-        downloadLink.setAttribute('download', fileName);
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-    });
-  }
-
-
-  updateProjetFromSAP(codeProjet :string){
-
-    this.etatProjetService.updateProjetFromSAP(codeProjet).subscribe(
-      (data:Projet)=>{
-        this.spinner.hide();
-        if(data!=null && data.codeProjet!=null){
-          this.currentProjet = data;
-
-          var index= this.getIndexFromFiltrerdList(data.codeProjet);
-
-          this.projets[index] = data;
-        }
-
-
-        this.ref.detectChanges();
-
-      },
-      err=>{
-        //console.log("error "+ JSON.stringify(err));
-
-        this.ref.detectChanges();
-        this.spinner.hide();
-
-
-      }
-    )
-    //this.spinner.hide();
   }
 
 }

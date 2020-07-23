@@ -77,7 +77,7 @@ export class EtatStockProjetComponent implements OnInit {
 
   actionModal: string;
 
-  displayedColumns: string[] = ['option','magasin','client', 'num_lot', 'commercial','chef_projet', 'montant','annee'];
+  displayedColumns: string[] = ['option','type_magasin','client', 'num_lot', 'commercial','chef_projet', 'montant','annee'];
   public dataSource: MatTableDataSource<StockProjet>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -135,7 +135,16 @@ montantNat:any;
   service: string;
 
   userInSession: string;
+
+  type: any;
+
   stock = [
+    {
+      name: 'Déploiement'
+    },
+    {
+      name: 'Déploiement Rabat'
+    },
     {
       name: 'Stock commercial'
     },
@@ -186,6 +195,8 @@ montantNat:any;
   comments: any;
   commentsListe: any;
   selectedChefProjetTMP: any;
+  selectedTypeTMP: any;
+  selectedType: any;
 
 
   constructor(public datepipe: DatePipe,private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
@@ -285,6 +296,19 @@ montantNat:any;
     this.sigleUserAuthenticated = this.authService.getSigle();
 
     const codeProjet = this.activatedRoute.snapshot.params['codeProjet'];
+    const magasin = this.activatedRoute.snapshot.params['mag'];
+
+if(codeProjet!=null && magasin!= null){
+  this.selectedType = magasin;
+  this.selectedTypeTMP= magasin;
+
+  this.selectedLot = codeProjet;
+  this.selectedLotTMP = codeProjet;
+  this.selectFiltre();
+
+}
+else{
+
     if(codeProjet!=null){
 
       this.selectedLot = codeProjet;
@@ -293,7 +317,7 @@ montantNat:any;
     }else{
 
       this.getAllProduits();
-    }
+    }}
 
     this.getAllClients();
     this.getDistinctLot();
@@ -360,14 +384,19 @@ montantNat:any;
             p.num_lot = produit.num_lot;
             p.client = produit.client;
             p.commercial = produit.commercial;
+            if(produit.type_magasin == 'Déploiement'){
+              p.montant = 0
+            }
+            else{
             p.montant = produit.montant;
+          }
             p.annee = produit.annee;
             p.chef_projet = produit.chef_projet;
               p.commentaires = produit.commentaires;
               p.magasin = produit.magasin;
               p.date_rec = produit.date_rec;
               p.nom_lot = produit.nom_lot;
-
+              p.type_magasin = produit.type_magasin;
 
 
                  this.years = this.pageProduit
@@ -383,6 +412,10 @@ montantNat:any;
 
                  this.commercial = this.pageProduit
                  .map(item => ((!item.commercial)? "AUCUN COMM": item.commercial))
+                 .filter((value, index, self) => self.indexOf(value) === index)
+
+                 this.type = this.pageProduit
+                 .map(item => item.type_magasin)
                  .filter((value, index, self) => self.indexOf(value) === index)
 
 
@@ -775,6 +808,12 @@ montantNat:any;
       this.selectedClientTMP = this.selectedClient;
     }
 
+    if(this.selectedType == null){
+      this.selectedTypeTMP = "undefined";
+    }else{
+      this.selectedTypeTMP = this.selectedType;
+    }
+
 
     if(this.selectedCommercial == null){
       this.selectedCommercialTMP = "undefined";
@@ -818,7 +857,7 @@ montantNat:any;
     }
 
 
-    this.etatStockService.getAllStockProjetByFiltre(this.selectedYearTMP,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasinTMP,this.selectedCommercialTMP,this.selectedChefProjetTMP).subscribe(
+    this.etatStockService.getAllStockProjetByFiltre(this.selectedYearTMP,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasinTMP,this.selectedCommercialTMP,this.selectedChefProjetTMP,this.selectedTypeTMP).subscribe(
       data => {
         this.pageProduit = data;
       console.log("HELLO FILTER"+this.selectedMagasinTMP+ " client "+this.selectedClient)
@@ -831,13 +870,18 @@ montantNat:any;
             p.num_lot = produit.num_lot;
             p.client = produit.client;
             p.commercial = produit.commercial;
+            if(produit.type_magasin == 'Déploiement'){
+              p.montant = 0
+            }
+            else{
             p.montant = produit.montant;
-            p.annee = produit.annee;
+          }            p.annee = produit.annee;
             p.chef_projet = produit.chef_projet;
               p.commentaires = produit.commentaires;
               p.magasin = produit.magasin;
               p.date_rec = produit.date_rec;
               p.nom_lot = produit.nom_lot;
+              p.type_magasin= produit.type_magasin;
 
             if(produit.commentaires != null && produit.commentaires.length>0){
               p.commentaires = produit.commentaires;
@@ -878,7 +922,7 @@ montantNat:any;
         console.log("error " + JSON.stringify(err));
       })
 
-    this.sortAll();
+    //this.sortAll();
 
   }
 
@@ -923,7 +967,7 @@ montantNat:any;
 
     this.Totalnatures = [];
 
-    this.etatStockService.getMontantByNature(this.currentProduit.num_lot,this.currentProduit.magasin).subscribe(
+    this.etatStockService.getMontantByNature(this.currentProduit.num_lot,this.currentProduit.type_magasin).subscribe(
       data=>{
 
 

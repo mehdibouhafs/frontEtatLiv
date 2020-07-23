@@ -9,6 +9,14 @@
 </ngx-spinner>
 
 <style>
+
+.multiselect-dropdown[_ngcontent-pbk-c5] .dropdown-btn[_ngcontent-pbk-c5] {
+    border: 1px solid #727171 !important;
+    width: 80% !important;
+    padding: 5px 12px !important;
+    border-radius: 2px !important;
+}
+    
 .sel-age .ng-select .ng-select-container {
     background-color: #fff;
     border-radius: 0px;
@@ -160,13 +168,20 @@
     <label >Statut :</label>
     <br/>
 
-    <ng-select [items]="status"
-    placeholder="Select Statut"
-    multiple="true"
-    [(ngModel)]="selectedStatut"
-    (change)="selectFiltre()"
-    (clear)="clearSelect()">
-</ng-select>
+<ng-multiselect-dropdown
+name="status"
+[placeholder]="'Select Statut'"
+[data]="status"
+[disabled]="disabled"
+[settings]="dropdownSettings"
+[(ngModel)]="selectedStatut"
+(onSelect)="selectFiltre()"
+(onSelectAll)="selectFiltre()"
+(onDeSelect)="selectFiltre()"
+(onDeSelectALL)="selectFiltre()"
+>
+</ng-multiselect-dropdown>
+
 
   </div>
 

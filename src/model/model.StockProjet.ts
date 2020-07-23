@@ -4,6 +4,7 @@ import {Commentaire} from './model.commentaire';
 import {CommentaireProduit} from './model.commentaireProduit';
 import {User} from "./model.user";
 import { CommentaireStock } from './model.commentaireStock';
+import { Type } from '@angular/compiler';
 
 export class StockProjet {
 
@@ -17,6 +18,7 @@ export class StockProjet {
   public nom_lot: string;
   public magasin: string;
   public date_rec:string;
+  public type_magasin:string;
   public  commentaires :  Array<CommentaireStock>;
 
 

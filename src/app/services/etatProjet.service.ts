@@ -24,6 +24,10 @@ export class EtatProjetService {
     return this.http.get(this.host+"/getProjectsWithStatut?idEtatProjet=1&cloturer="+cloture+"&bu1="+bu1+"&bu2="+bu2+"&statut="+statut+"&chefProjet="+chefProjet+"&commercial="+commercial+"&client="+client+"&affectationChefProjet="+affectationChefProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
+  getProjetsDep(cloture : boolean,bu1 : string,bu2 : string,statut:string,commercial:string,chefProjet:string,client:string,affectationChefProjet :string) {
+    return this.http.get(this.host+"/getProjetsDep?idEtatProjet=1&cloturer="+cloture+"&bu1="+bu1+"&bu2="+bu2+"&statut="+statut+"&chefProjet="+chefProjet+"&commercial="+commercial+"&client="+client+"&affectationChefProjet="+affectationChefProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
   declotureProjet(projet : Projet){
     return this.http.put(this.host+"/declotureProjet",projet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
@@ -133,6 +137,14 @@ export class EtatProjetService {
     var stompClient = Stomp.over(socket);
 
     return stompClient;
+  }
+
+  exportDetailRdv(codeProjet : string) {
+    return this.http.post(this.host + '/exportDetailRdv',codeProjet, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
+    );
+  }
+  updateProjetFromSAP(codeProjet:string){
+    return this.http.post(this.host+'/updateProjetFromSAP',codeProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
 

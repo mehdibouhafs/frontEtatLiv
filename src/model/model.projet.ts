@@ -4,6 +4,7 @@ import {EtatProjet} from './model.etatProjet';
 import {Reunion} from './model.reunion';
 import {Employer} from './model.employer';
 import {User} from './model.user';
+import { Type } from '@angular/compiler';
 
 export class Projet {
 
@@ -135,5 +136,8 @@ export class Projet {
 
   public statutProjet : string;
 
+  public type: string;
+  public flag: string;
+  
 
 }
