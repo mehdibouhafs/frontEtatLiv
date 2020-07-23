@@ -1,6 +1,15 @@
 <div [hidden]="authorized==false">
 
   <style>
+
+.multiselect-dropdown[_ngcontent-pbk-c5] .dropdown-btn[_ngcontent-pbk-c5] {
+    border: 1px solid #727171 !important;
+    width: 80% !important;
+    padding: 5px 12px !important;
+    border-radius: 2px !important;
+    line-height: 2 !important;
+}
+
     
     .balance_table .mat-column-client {
     width: 30% !important;
@@ -142,6 +151,18 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
 
     <div class="col-md-2">
   
+        <label for="com">Commercial :</label>
+        <br/>
+        <select style="margin-left: 5px;width: 215px;height: 36px;border: 1px solid #aaacaa;border-radius: 4px;" id="com" class="browser-default custom-select" name="com"  [(ngModel)]="selectedAM" (change)="selectFiltreAM()" >
+        <option value="undefined" selected>Filtrer par AM </option>
+        <option *ngFor="let c of com" 
+                [ngValue]="c">{{c}}</option>
+      </select>
+    
+      </div>
+
+    <div class="col-md-2">
+  
         <label for="com">Age :</label>
         <br/>
         <ng-select id="age"
@@ -159,6 +180,26 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
     
       </div>
   
+      <div class="col-md-2">
+
+        <label for="filtrerStatut">Statut :</label>
+        <br/>
+    
+
+    <ng-multiselect-dropdown
+name="status"
+[placeholder]="'Select Statut'"
+[data]="status"
+[disabled]="disabled"
+[settings]="dropdownSettings"
+[(ngModel)]="selectedStatut"
+(onSelect)="selectFiltreStatus()"
+(onFilterChange)="selectFiltreStatus()">
+</ng-multiselect-dropdown>
+    
+      </div>
+
+
     <div class="col-md-2">
       <button style="color: white;
         background-color: #337ab7;font-size: 12px;width: 55px;
@@ -213,26 +254,26 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
     <ng-container matColumnDef="sup_douze_mois"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Sup. 12 Mois
         <td mat-cell *matCellDef="let element"><a *ngIf="element.sup_douze_mois  != 0" target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClientAge/Sup. 12M',element.client]"
-          style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.sup_douze_mois == 0">{{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
+          style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{checkValue(element.sup_douze_mois) | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.sup_douze_mois == 0">{{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
            
           <!-- Symbol Column -->
             <ng-container matColumnDef="douze_mois">
               <th mat-header-cell *matHeaderCellDef mat-sort-header> A 12 Mois
               <td mat-cell *matCellDef="let element"><a *ngIf="element.douze_mois != 0" target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClientAge/A12M',element.client]"
-                style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}}  </a> <span *ngIf="element.douze_mois == 0">{{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
+                style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{checkValue(element.douze_mois) | currency:'DH':'symbol':undefined:'fr'}}  </a> <span *ngIf="element.douze_mois == 0">{{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
     
       <!-- Symbol Column -->
       <ng-container matColumnDef="six_mois"  >
         <th mat-header-cell *matHeaderCellDef mat-sort-header> 6 Mois
         <td mat-cell *matCellDef="let element"> <a *ngIf="element.six_mois != 0" target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClientAge/6M',element.client]"
-          style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{element.six_mois | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.six_mois == 0">{{element.six_mois | currency:'DH':'symbol':undefined:'fr'}} </span> </td></ng-container>
+          style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{checkValue(element.six_mois) | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.six_mois == 0">{{element.six_mois | currency:'DH':'symbol':undefined:'fr'}} </span> </td></ng-container>
 
 
         <!-- Weight Column -->
     <ng-container matColumnDef="tois_mois"  >
       <th mat-header-cell *matHeaderCellDef  mat-sort-header> 3 Mois</th>
       <td mat-cell *matCellDef="let element"><a *ngIf="element.tois_mois != 0" target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClientAge/3M',element.client]"
-        style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{element.tois_mois | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.tois_mois == 0">{{element.tois_mois | currency:'DH':'symbol':undefined:'fr'}} </span> </td>
+        style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{checkValue(element.tois_mois) | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.tois_mois == 0">{{element.tois_mois | currency:'DH':'symbol':undefined:'fr'}} </span> </td>
   
       </ng-container>
   

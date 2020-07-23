@@ -10,13 +10,13 @@ import {
 } from '@angular/core';
 import {EtatProjetService} from '../services/etatProjet.service';
 import {EtatProjet} from '../../model/model.etatProjet';
+import {Router} from '@angular/router';
 import {HttpEventType, HttpResponse} from '@angular/common/http';
 import {Detail} from '../../model/model.detail';
 import {Projet} from '../../model/model.projet';
 import {Commentaire} from '../../model/model.commentaire';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
-import {ActivatedRoute, Router} from '@angular/router';
 
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {Employer} from '../../model/model.employer';
@@ -37,12 +37,12 @@ import * as SockJS from 'sockjs-client';
 import {Client, Frame, Message,Stomp} from "@stomp/stompjs";
 
 @Component({
-  selector: 'app-etat-projet',
-  templateUrl: './etat-projet.component.html',
-  styleUrls: ['./etat-projet.component.css'],
+  selector: 'app-etat-projet-dep',
+  templateUrl: './etat-projet-dep.component.html',
+  styleUrls: ['./etat-projet-dep.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class EtatProjetComponent implements OnInit,OnDestroy {
+export class EtatProjetDepComponent implements OnInit,OnDestroy {
 
    pageProjet :any;
    currentPage : number = 1;
@@ -100,7 +100,7 @@ export class EtatProjetComponent implements OnInit,OnDestroy {
 
   actionModal : string;
 
-  displayedColumns: string[] = ['option','client','bu','codeProjet','projet','age',  'commercial', 'chefProjet','montantCmd','restAlivrer','livrerNonFacture','livreFacturePayer','montantStock'];
+  displayedColumns: string[] = ['option','client','bu','codeProjet','projet','age',  'commercial', 'chefProjet','montantStock'];
   public dataSource: MatTableDataSource<Projet>;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -179,16 +179,9 @@ export class EtatProjetComponent implements OnInit,OnDestroy {
   roleBuCommercial;
   roleBuValueSoftware;
   stompClient;
-  dropdownSettings: any = {};
 
+  constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
 
-  public typep:string[]=[
-    'Déploiement',
-    'Commercial'
-  
-  ];
-  ShowFilter: any;
-  constructor(private authService:AuthenticationService,private currency :CurrencyPipe,private activatedRoute:ActivatedRoute,private spinner: NgxSpinnerService,private pagerService:PagerService,private etatProjetService: EtatProjetService, private router : Router,private modalService: BsModalService, viewContainerRef:ViewContainerRef,private ref: ChangeDetectorRef ) {
 
   }
 
@@ -376,10 +369,9 @@ currentPageComment;
  }
 
 
-
- 
   getAllProjet(cloture:boolean,bu1 : string){
 
+    console.log("teeest")
     if(this.selectedClient == null){
       this.selectedClientTmp = "undefined";
     }else{
@@ -407,13 +399,13 @@ currentPageComment;
       this.bu2 = "undefined";
     }
 
-    this.etatProjetService.getProjets(cloture,bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClientTmp,this.selectedAffectation).subscribe(
+    this.etatProjetService.getProjetsDep(cloture,bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClientTmp,this.selectedAffectation).subscribe(
       data=>{
         this.pageProjet = data;
 
         this.keys = new Array<string>();
 
-        console.log("PROJET OBJECT "+JSON.stringify(this.pageProjet[0]));
+
 
         this.keys.push("codeProjet");
 
@@ -498,6 +490,7 @@ currentPageComment;
             p.statutProjet = projet.statutProjet;
             p.tauxAvancement= projet.tauxAvancement;
             p.type= projet.type;
+
             if (projet.commentaires != null && projet.commentaires.length > 0) {
               p.commentaires = projet.commentaires;
             }
@@ -513,11 +506,8 @@ currentPageComment;
             p.preRequis = projet.preRequis;
             p.intervenant = projet.intervenant;
             p.codeCommercial = projet.codeCommercial;
-
-            p.montantStock = projet.montantStock;
-
+            p.montantStock = 0;
             p.decloturedByUser = projet.decloturedByUser;
-            p.flag = projet.flag;
 
             if(p.dateFinProjet!=null){
 
@@ -537,7 +527,7 @@ currentPageComment;
 
             p.details = details;
             this.projets.push(p);
-            
+
 
           });
         }
@@ -685,14 +675,6 @@ currentPageComment;
 
     this.connectAndReconnect();
 
-    this.dropdownSettings = {
-      singleSelection: false,
-      selectAllText: 'Select All',
-      unSelectAllText: 'UnSelect All',
-      itemsShowLimit: 3,
-      allowSearchFilter: this.ShowFilter
-
-  };
     this.service = this.authService.getServName();
 
     this.userAuthenticated = this.authService.getUserName();
@@ -876,7 +858,7 @@ currentPageComment;
       this.selectedClient= "undefined";
     }
 
-    this.etatProjetService.getProjets(this.projetCloture,this.bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClient,this.selectedAffectation).subscribe(
+    this.etatProjetService.getProjetsDep(this.projetCloture,this.bu1,this.bu2,this.selectedStatut,this.selectedCommercial,this.selectedChefProjet,this.selectedClient,this.selectedAffectation).subscribe(
       data=>{
         //console.log("data Search " + JSON.stringify(data));
         this.pageProjet = data;
@@ -1401,7 +1383,7 @@ currentPageComment;
 
     //console.log("compose Email");
 
-    var codeProjet = projet.codeProjet;
+    var codeProjet = projet.codeProjet.split('DEP-',2)[1].replace(","," ");
 
     var nomProjet = projet.projet;
 
@@ -1412,16 +1394,9 @@ currentPageComment;
       + "Commercial: "+(projet.commercial  == null ? "": projet.commercial ) +"%0A"+
     "Chef projet: "+ (projet.chefProjet  == null ? "": projet.chefProjet ) +"%0A"+
     "BU: "+ (projet.bu  == null ? "": projet.bu ) +"%0A"+
-    "Date CMD: "+moment(projet.dateCmd).format('DD/MM/YYYY')  +"%0A"+
+    "Date Dépôt: "+moment(projet.dateCmd).format('DD/MM/YYYY')  +"%0A"+
       "AGE: "+ (projet.age  == null ? "": projet.age )+"%0A"+
       "Synthèse du projet:"+ (projet.syntheseProjet  == null ? "": projet.syntheseProjet )+"%0A"+
-      "Montant CMD: "+(projet.montantCmd  == null ? "": projet.montantCmd +" DH")+"%0A"+
-    "LIV: "+(projet.livraison  == null ? "": projet.livraison +" DH") +"%0A"+
-      "RAL: "+ (projet.restAlivrer  == null ? "": projet.restAlivrer +" DH")  +"%0A"+
-    "LNF: "+ (projet.livrerNonFacture  == null ? "": projet.livrerNonFacture +" DH")  +"%0A"+
-    "Montant factur%C3%A9: "+ (projet.livreFacturePayer  == null ? "": projet.livreFacturePayer +" DH")  +"%0A"+
-    "Montant pay%C3%A9: "+(projet.montantPayer  == null ? "": projet.montantPayer +" DH")  +"%0A"+
-    "Montant Stock: "+(projet.montantStock  == null ? "": projet.montantStock +" DH")  +"%0A"+
     "Taux facturation: "+ (projet.facturation == null ? "":(Math.round(projet.facturation * 100)/100).toFixed(2) +"%")+"%0A"+" %0A"+" %0A";
 
 
@@ -1475,7 +1450,7 @@ currentPageComment;
   }
 
   selectFiltre() {
-    //console.log("this.selectedBu " + this.selectedBu);
+    console.log("this.selectedBu " + this.selectedBu);
 
     this.selectedAffectation = "undefined";
     if (this.selectedChefProjet != "undefined" || this.selectedStatut != "undefined" || this.selectedClient != "undefined"
@@ -1715,62 +1690,6 @@ currentPageComment;
 
   }
 
-
-  exportDetailRdv($event,codeProjet : string) {
-    $event.stopPropagation();
-    $event.preventDefault();
-    this.spinner.show();
-    //console.log("filtre "+ this.dataSource.filter);
-    var result= this.etatProjetService.exportDetailRdv(codeProjet);
-
-    var d = new Date();
-
-    //console.log("day " + d.getDay());
-    var fileName = "RDV-"+codeProjet+"-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
-
-    result.subscribe((response: any) => {
-      this.updateProjetFromSAP(codeProjet);
-      let dataType = response.type;
-      let binaryData = [];
-      binaryData.push(response);
-      let downloadLink = document.createElement('a');
-      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
-      if (fileName)
-        downloadLink.setAttribute('download', fileName);
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-    });
-  }
-
-  updateProjetFromSAP(codeProjet :string){
-
-    this.etatProjetService.updateProjetFromSAP(codeProjet).subscribe(
-      (data:Projet)=>{
-        this.spinner.hide();
-        if(data!=null && data.codeProjet!=null){
-          this.currentProjet = data;
-
-          var index= this.getIndexFromFiltrerdList(data.codeProjet);
-
-          this.projets[index] = data;
-        }
-
-
-        this.ref.detectChanges();
-
-      },
-      err=>{
-        //console.log("error "+ JSON.stringify(err));
-
-        this.ref.detectChanges();
-        this.spinner.hide();
-
-
-      }
-    )
-    //this.spinner.hide();
-  }
-
   deleteCommentaireFromSocket(commentaire : CommentaireSocket){
     //console.log("deleteCommentaire " + JSON.stringify(commentaire));
     var projet : Projet;
@@ -1812,6 +1731,10 @@ currentPageComment;
 
   }
 
+  getCode(cp: any){
+
+    return cp.split("DEP", 1); 
+  }
 
   connectAndReconnect(){
     this.stompClient = this.etatProjetService.connect();

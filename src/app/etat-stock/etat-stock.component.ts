@@ -160,6 +160,10 @@ export class EtatStockComponent implements OnInit {
   codeProjet : string;
   nature : string;
   selectedNatureTMP: string;
+  selectedColor: string;
+  selectedType:string;
+  selectedTypeTMP:string;
+  typeP: Array<string> = new Array<string>();;
 
 
   constructor(private activatedRoute:ActivatedRoute,private etatProjetService:EtatProjetService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private etatStockService: EtatStockService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
@@ -179,6 +183,7 @@ export class EtatStockComponent implements OnInit {
     this.numsLots.sort();
     this.clients.sort();
     this.magasins.sort();
+    this.typeP.sort();
   }
 
   ngOnInit() {
@@ -285,6 +290,23 @@ export class EtatStockComponent implements OnInit {
 
      this.nature = this.activatedRoute.snapshot.params['nature'];
 
+     const mag = this.activatedRoute.snapshot.params['mag']; 
+
+     if(mag!= null && this.codeProjet!= null){
+     //<<<---    using ()=> syntax
+        this.selectedType = mag;
+        this.selectedTypeTMP = mag;
+  
+        this.selectedLot = this.codeProjet;
+        this.selectedLotTMP = this.codeProjet;
+
+   
+
+      this.selectFiltre();
+
+     }
+else{
+
      if(this.nature!=null && this.codeProjet!=null){
       console.log("test filtre nature ok"+this.nature)
       this.selectedNature = this.nature;
@@ -304,7 +326,7 @@ export class EtatStockComponent implements OnInit {
       }
 
       
-    }
+    }}
 
    
 
@@ -314,12 +336,25 @@ export class EtatStockComponent implements OnInit {
 
     this.getAllClients();
     this.getDistinctLot();
+    this.getDistinctType();
   }
 
   getDistinctLot(){
     this.etatStockService.getDistinctLot().subscribe(
       (data: Array<string>)=>{
         this.numsLots = data;
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        //console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
+
+  getDistinctType(){
+    this.etatStockService.getDistinctType().subscribe(
+      (data: Array<string>)=>{
+        this.typeP = data;
       },error => {
         this.authService.logout();
         this.router.navigateByUrl('/login');
@@ -376,7 +411,7 @@ export class EtatStockComponent implements OnInit {
             p.sousDomaine = produit.sousDomaine;
             p.marque = produit.marque;
             p.numLot = produit.numLot;
-
+            p.type_magasin = produit.type_magasin;
             p.client = produit.client;
             p.commercial = produit.commercial;
             p.chefProjet = produit.chefProjet;
@@ -385,13 +420,35 @@ export class EtatStockComponent implements OnInit {
             p.qte = produit.qte;
             p.qteRal = produit.qteRal;
             p.pmp = produit.pmp;
+            if(produit.type_magasin == 'Déploiement'){
+              p.montant = 0
+            }
+            else{
             p.montant = produit.montant;
+            }
             p.dateEntre = produit.dateEntre;
             p.commentaireArtcileProjet = produit.commentaireArtcileProjet;
             p.commentaireLot = produit.commentaireLot;
             p.commentaireReference = produit.commentaireReference;
             p.lastUpdate = produit.lastUpdate;
 
+            console.log(produit.type_magasin);
+            if(produit.nomMagasin == 'Stock Disponible'){
+              p.color = '#4caf5061'
+            }
+            else{
+            if(produit.nomMagasin == 'Stock commercial' || produit.nomMagasin == 'Rabat - stock commercial' || produit.nomMagasin == 'Déploiement' || produit.magasin == 'Déploiement Rabat' ){
+              p.color = 'rgba(246, 54, 54, 0.2)'
+            }
+            else{
+              if(produit.nomMagasin == 'Stock Approvisionnement'){
+                p.color = '#f6f63663'
+              }
+            }
+          }
+        
+
+          
 
             if (produit.commentaires != null && produit.commentaires.length > 0) {
               p.commentaires = produit.commentaires;
@@ -401,6 +458,8 @@ export class EtatStockComponent implements OnInit {
             this.addToArray(p.sousNature,'sousNature');this.addToArray(p.domaine,'domaine');
             this.addToArray(p.sousDomaine,'sousDomaine');this.addToArray(p.numLot,'numLot');
             this.addToArray(p.nomMagasin,'magasin');
+
+       
 
 
 
@@ -773,8 +832,9 @@ export class EtatStockComponent implements OnInit {
       this.selectedNatureTMP = this.selectedNature;
     }
 
+
     console.log("selectedNatureTMP "+this.selectedNatureTMP );
-    this.etatStockService.getAllStockByFiltre(this.selectedNatureTMP,this.selectedSousNature,this.selectedDomaine,this.selectedSousDomaine,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasin).subscribe(
+    this.etatStockService.getAllStockByFiltre(this.selectedNatureTMP,this.selectedSousNature,this.selectedDomaine,this.selectedSousDomaine,this.selectedLotTMP,this.selectedClientTMP,this.selectedMagasin,this.selectedType).subscribe(
       data => {
         this.pageProduit = data;
 
@@ -810,13 +870,33 @@ export class EtatStockComponent implements OnInit {
             p.qte = produit.qte;
             p.qteRal = produit.qteRal;
             p.pmp = produit.pmp;
+            p.type_magasin = produit.type_magasin;
+            if(produit.type_magasin == 'Déploiement'){
+              p.montant = 0
+            }
+            else{
             p.montant = produit.montant;
+            }
             p.dateEntre = produit.dateEntre;
             p.commentaireArtcileProjet = produit.commentaireArtcileProjet;
             p.commentaireLot = produit.commentaireLot;
             p.commentaireReference = produit.commentaireReference;
             p.lastUpdate = produit.lastUpdate;
-
+console.log("TYPE MAG"+produit.nomMagasin)
+            
+            if(produit.nomMagasin == 'Stock Disponible'){
+              p.color = '#4caf5061'
+            }
+            else{
+            if(produit.nomMagasin == 'Stock commercial' || produit.nomMagasin == 'Rabat - stock commercial' || produit.type_magasin == 'Déploiement' ){
+              p.color = 'rgba(246, 54, 54, 0.2)'
+            }
+            else{
+              if(produit.nomMagasin == 'Stock Approvisionnement'){
+                p.color = '#f6f63663'
+              }
+            }
+          }
 
             if (produit.commentaires != null && produit.commentaires.length > 0) {
               p.commentaires = produit.commentaires;
@@ -832,6 +912,8 @@ export class EtatStockComponent implements OnInit {
               this.addToArray(p.nomMagasin, 'magasin');
             }
 
+ 
+
             this.produits.push(p);
 
 
@@ -842,7 +924,7 @@ export class EtatStockComponent implements OnInit {
 
         this.dataSource = new MatTableDataSource(this.produits);
         this.dataSource.filterPredicate = function(data, filter: string): boolean {
-
+ 
 
           return (data.client != null ? data.client : "").toLowerCase().includes(filter) ||
             (data.chefProjet != null ? data.chefProjet : "").toLowerCase().includes(filter) ||

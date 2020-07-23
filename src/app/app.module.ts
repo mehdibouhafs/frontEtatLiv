@@ -38,8 +38,10 @@ import { ViewFacturesComponent } from './view-factures/view-factures.component';
 import { ViewPiecesComponent } from './view-pieces/view-pieces.component';
 import { EtatStockProjetComponent } from './etat-stock-projet/etat-stock-projet.component';
 import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
-
+import { EtatProjetDepComponent } from './etat-projet-dep/etat-projet-dep.component';
 import { BalanceAgeeService } from './services/balanceAgee.service';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+
 registerLocaleData(localeFr, 'fr');
 
 
@@ -51,6 +53,7 @@ registerLocaleData(localeFr, 'fr');
     AuthentificationComponent,
     ReunionComponent,
     EtatRecouvrementComponent,
+    EtatProjetDepComponent,
     EtatStockComponent,
     EtatStockProjetComponent,
     BalanceAgeeComponent,
@@ -77,6 +80,7 @@ registerLocaleData(localeFr, 'fr');
     MatProgressSpinnerModule,
     NgbModule,
     ModalModule.forRoot(),
+    NgMultiSelectDropDownModule.forRoot(),
     ReactiveFormsModule,
     NgxSpinnerModule,
     NgSelectModule

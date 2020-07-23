@@ -34,6 +34,8 @@ export class NavigationBarComponent implements OnInit {
 
   @Input() projetNav :boolean;
 
+  @Input() projetDepNav :boolean;
+
   @Input() notifNav:boolean;
 
   @Input() contratNav:boolean;

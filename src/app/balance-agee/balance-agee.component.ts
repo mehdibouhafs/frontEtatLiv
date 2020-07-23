@@ -23,6 +23,8 @@ import { StockProjet } from 'src/model/model.StockProjet';
 import { CommentaireStock } from 'src/model/model.commentaireStock';
 import { BalanceAgee } from 'src/model/model.balanceAgee';
 import { BalanceAgeeService } from '../services/balanceAgee.service';
+import { EtatRecouvrementService } from '../services/etatRecouvrement.service';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-balance-agee',
@@ -137,6 +139,20 @@ montantNat:any;
   authorized : boolean;
 
 
+  public status:string[]=[
+    'Non Traitée par CR',
+    'Non Deposée',
+    'Bloquée',
+    'Validée par client',
+    'En Cours de paiement',
+    'Payée',
+    'Litige',
+     'Retenue Garantie',
+     'Avoir à faire',
+     'En cours de validation'
+  
+  ];
+
   roleBuReseauSecurite:any;
   roleBuSystem:any;
   roleBuChefProjet:any;
@@ -151,6 +167,8 @@ montantNat:any;
   idB: any = null;
   rowcolor: string;
   updatedDate: Date;
+  selectedAM : string;
+  selectedAMTMP: string;
 
   public ages: string[] = [
     '3M',
@@ -160,8 +178,12 @@ montantNat:any;
 ];
   selectedAge: any;
   selectedAgeTMP: string;
+  selectedStatutTMP: any;
+  selectedStatut: any;
+  commercial: string[];
+  com: string[];
 
-  constructor(public datepipe: DatePipe,private activatedRoute:ActivatedRoute,private balanceAgeeService:BalanceAgeeService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
+  constructor(public datepipe: DatePipe,private activatedRoute:ActivatedRoute,private etatRecouvrementService: EtatRecouvrementService,private balanceAgeeService:BalanceAgeeService ,private authService: AuthenticationService, private currency: CurrencyPipe, private spinner: NgxSpinnerService, private pagerService: PagerService, private router: Router, private modalService: BsModalService, viewContainerRef: ViewContainerRef, private ref: ChangeDetectorRef) {
     this.service = this.authService.getServName();
 
     this.userInSession = this.authService.getLastName();
@@ -284,9 +306,30 @@ montantNat:any;
 
 
 
+  getAllCommericals(){
+    this.com = [];
+    this.etatRecouvrementService.getDistinctCommercialDocument().subscribe(
+      (data: Array<string>)=>{
+        this.commercial = data;
+
+        this.commercial.forEach(commercial => {
+          console.log("ACCOUNT MANAGER" +commercial)
+          this.com.push(commercial);
+        });
+        console.log(JSON.stringify("TABLE AM" + this.com))
+      },error => {
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error "  +JSON.stringify(error));
+      }
+    )
+  }
 
   getBalance() {
+    this.getAllCommericals();
 this.dataSource = null;
+
+
     if (this.roleReadAllRecouvrement == true) {
 
     this.balanceAgeeService.getBalance().subscribe(
@@ -500,6 +543,7 @@ this.dataSource = null;
 
   sortAllArrays(){
     this.clients.sort();
+    this.com.sort();
 
 
   }
@@ -587,6 +631,7 @@ totalBalance = totalBalance + element.total;
     this.selectedAge= null;
     this.dataSource.filter = null;
     this.currentFilter="";
+    this.getAllCommericals();
     this.getBalance();
   }
 
@@ -677,6 +722,236 @@ totalBalance = totalBalance + element.total;
 
     this.selectFiltre();
   }
+  
+
+  selectFiltreStatus(){
+    console.log("filter ");
+    if(this.selectedClient == null){
+      this.selectedClientTMP = "undefined";
+    }else{
+      this.selectedClientTMP = this.selectedClient;
+    }
+
+    if(this.selectedCR == null){
+      this.selectedCRTMP = "undefined";
+    }else{
+      this.selectedCRTMP = this.selectedCR;
+    }
+
+    if(this.selectedAge == null){
+      this.selectedAgeTMP = "undefined";
+    }else{
+      this.selectedAgeTMP = this.selectedAge;
+    }
+
+
+  
+    console.log("selectedStatutTMP "+this.selectedStatut);
+    this.balanceAgeeService.getBalanceByStatus(this.selectedStatut).subscribe(
+      data => {
+        this.pageProduit = data;
+
+        console.log("THIS BALANCE "+JSON.stringify(this.pageProduit))
+
+        if (this.pageProduit != null) {
+
+          this.produits = new Array<BalanceAgee>();
+          this.pageProduit.forEach(produit => {
+            let p = new BalanceAgee();
+          this.pageProduit.client
+          var array = produit.split(',');
+          p.id_balance = array[1]+1;
+
+            p.client = array[1];
+            p.chargee_recouv = array[2]
+    
+              p.tois_mois = parseFloat(array[5]);
+
+            p.six_mois = parseFloat(array[6]);
+          
+              p.douze_mois = parseFloat(array[7]);
+
+        
+
+    
+              p.sup_douze_mois = parseFloat(array[8]);
+
+            
+            p.total = parseFloat(array[4]);
+            
+
+
+            this.addToArray(p.client,'client');
+
+
+
+
+            this.produits.push(p);
+
+
+          });
+        }
+
+
+
+        this.sortAllArrays();
+        this.clientsList = this.clients;
+
+        this.ref.detectChanges()
+        this.dataSource = new MatTableDataSource(this.produits);
+
+        this.dataSource.filterPredicate = function(data, filter: string): boolean {
+
+
+          return (data.client != null ? data.client : "").toLowerCase()
+            === filter;
+        };
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        if (this.currentFilter != null)
+          this.applyFilter(this.currentFilter);
+        this.getStatistics();
+
+
+
+      }, err => {
+        // alert("erreur " + err);
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error " + JSON.stringify(err));
+      }
+    )
+
+
+
+    this.sortAll();
+
+  }
+
+
+
+  selectFiltreAM(){
+    console.log("filter ");
+    if(this.selectedClient == null){
+      this.selectedClientTMP = "undefined";
+    }else{
+      this.selectedClientTMP = this.selectedClient;
+    }
+
+    if(this.selectedCR == null){
+      this.selectedCRTMP = "undefined";
+    }else{
+      this.selectedCRTMP = this.selectedCR;
+    }
+
+    if(this.selectedAM == null){
+      this.selectedAMTMP = "undefined";
+    }else{
+      this.selectedAMTMP = this.selectedAM;
+    }
+
+
+  
+    console.log("selectedStatutTMP "+this.selectedStatut);
+    this.balanceAgeeService.getBalanceByAM(this.selectedClientTMP,this.selectedCRTMP,this.selectedAMTMP).subscribe(
+      data => {
+        this.pageProduit = data;
+
+        console.log("THIS BALANCE "+JSON.stringify(this.pageProduit))
+
+        if (this.pageProduit != null) {
+
+          this.produits = new Array<BalanceAgee>();
+          this.pageProduit.forEach(produit => {
+            let p = new BalanceAgee();
+          this.pageProduit.client
+
+          p.id_balance = produit.id_balance;
+
+            p.client = produit.client;
+            p.chargee_recouv = produit.chargee_recouv;
+            if(produit.tois_mois == null){
+              p.tois_mois = 0;
+            }
+            else{
+              p.tois_mois = produit.tois_mois;
+
+            }
+
+            if(produit.six_mois == null){
+              p.six_mois= 0;
+            }
+            else{
+            p.six_mois = produit.six_mois;
+            }
+
+            if(produit.douze_mois == null){
+              p.douze_mois= 0;
+            }
+            else{
+              p.douze_mois = produit.douze_mois;
+
+            }
+
+            if(produit.sup_douze_mois == null){
+              p.sup_douze_mois = 0;
+            }
+            else{
+              p.sup_douze_mois = produit.sup_douze_mois;
+
+            }
+            p.total = produit.total;
+            
+
+
+            this.addToArray(p.client,'client');
+
+
+
+
+            this.produits.push(p);
+
+
+          });
+        }
+
+
+
+        this.sortAllArrays();
+        this.clientsList = this.clients;
+
+        this.ref.detectChanges()
+        this.dataSource = new MatTableDataSource(this.produits);
+
+        this.dataSource.filterPredicate = function(data, filter: string): boolean {
+
+
+          return (data.client != null ? data.client : "").toLowerCase()
+            === filter;
+        };
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        if (this.currentFilter != null)
+          this.applyFilter(this.currentFilter);
+        this.getStatistics();
+
+
+
+      }, err => {
+        // alert("erreur " + err);
+        this.authService.logout();
+        this.router.navigateByUrl('/login');
+        console.log("error " + JSON.stringify(err));
+      }
+    )
+
+
+
+    this.sortAll();
+
+  }
+
+
 
 
 
@@ -917,6 +1192,15 @@ this.montantNat = null;
     this.nestedModalRef.hide();
   }
 
+  checkValue(el: any){
+
+    if(!isNaN(el)){
+      return el;
+    }
+
+    if(isNaN(el)){ 
+    return 0;
+    }  }
 
 
   removeAnd(str : string){
