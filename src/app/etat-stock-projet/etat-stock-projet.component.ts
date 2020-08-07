@@ -555,34 +555,20 @@ else{
   getStatistics(){
     this.filtredData = this.dataSource.filteredData;
     let totalCom = 0;
-    let totalDispo = 0;
-    let totalAppro = 0;
-    let totalStock=0;
-    let totalObsoleteCom=0;
-    let totalRepCom =0;
+    let totalDep =0;
+    let totalStock = 0;
 
     this.filtredData.forEach(element=>{
 
 
-      if(element.magasin == 'Stock commercial' || element.magasin == 'Rabat - stock commercial' ){
+      if(element.type_magasin == 'Commercial'){
         totalCom = totalCom + element.montant;
       }
 
-      if(element.magasin == 'Stock Disponible'){
-        totalDispo = totalDispo + element.montant;
-      }
 
 
-      if(element.magasin == 'Stock Approvisionnement'){
-        totalAppro = totalAppro + element.montant;
-      }
-
-      if(element.magasin == 'Obsolète Stock Commercial'){
-        totalObsoleteCom = totalObsoleteCom + element.montant;
-      }
-
-      if(element.magasin == 'Réparation commerciale'){
-        totalRepCom = totalRepCom + element.montant;
+      if(element.type_magasin == 'Déploiement'){
+        totalDep = 0;
       }
 
       totalStock = totalStock + element.montant;
@@ -594,11 +580,8 @@ else{
 
     this.statitics = new StatiticsStock();
     this.statitics.totalCom = totalCom;
-    this.statitics.totalDispo  = totalDispo;
-    this.statitics.totalAppro = totalAppro;
+    this.statitics.totalDispo  = totalDep;
     this.statitics.totalStock = totalStock;
-    this.statitics.totalObsoleteCom = totalObsoleteCom;
-    this.statitics.totalRepCom = totalRepCom;
   }
 
   blockedKey1 : boolean;
@@ -632,6 +615,8 @@ else{
     this.selectedMagasin =  null;
     this.selectedYear= null;
     this.selectedCommercial = null;
+    this.selectedType = null;
+    this.selectedChefProjet = null;
 
     this.dataSource.filter = null;
     this.currentFilter="";
@@ -887,6 +872,37 @@ else{
               p.commentaires = produit.commentaires;
             }
 
+            this.years = this.pageProduit
+            .map(item => item.annee)
+            .filter((value, index, self) => self.indexOf(value) === index)
+
+             this.client = this.pageProduit
+            .map(item => ((!item.client)? "AUCUN CLIENT": item.client))
+            .filter((value, index, self) => self.indexOf(value) === index)
+           this.lot = this.pageProduit
+            .map(item => item.num_lot)
+            .filter((value, index, self) => self.indexOf(value) === index)
+
+            this.commercial = this.pageProduit
+            .map(item => ((!item.commercial)? "AUCUN COMM": item.commercial))
+            .filter((value, index, self) => self.indexOf(value) === index)
+
+            this.type = this.pageProduit
+            .map(item => item.type_magasin)
+            .filter((value, index, self) => self.indexOf(value) === index)
+
+
+            this.chefProjets = this.pageProduit
+            .map(item => ((!item.chef_projet)? "AUCUN CDP": item.chef_projet))
+            .filter((value, index, self) => self.indexOf(value) === index)
+
+            this.chefProjets = this.chefProjets.filter(item => item !== "AUCUN CDP");
+
+            this.commercial = this.commercial.filter(item => item !== "AUCUN COMM");
+
+            this.client = this.client.filter(item => item !== "AUCUN CLIENT");
+
+
 
             this.produits.push(p);
 
@@ -895,6 +911,7 @@ else{
         }
         //this.lastUpdate = this.produits[0].lastUpdate;
        // this.sortAllArrays();
+
 
         this.dataSource = new MatTableDataSource(this.produits);
         this.dataSource.filterPredicate = function(data, filter: string): boolean {

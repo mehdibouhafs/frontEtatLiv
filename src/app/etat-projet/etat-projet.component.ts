@@ -1860,60 +1860,8 @@ currentPageComment;
 
   }
 
-  exportDetailRdv($event,codeProjet : string) {
-    $event.stopPropagation();
-    $event.preventDefault();
-    this.spinner.show();
-    //console.log("filtre "+ this.dataSource.filter);
-    var result= this.etatProjetService.exportDetailRdv(codeProjet);
-
-    var d = new Date();
-
-    //console.log("day " + d.getDay());
-    var fileName = "RDV-"+codeProjet+"-"+moment(new Date()).format("DD-MM-YYYY")+"-"+d.getHours()+"-"+d.getMinutes()+".xlsx";
-
-    result.subscribe((response: any) => {
-      this.updateProjetFromSAP(codeProjet);
-      let dataType = response.type;
-      let binaryData = [];
-      binaryData.push(response);
-      let downloadLink = document.createElement('a');
-      downloadLink.href = window.URL.createObjectURL(new Blob(binaryData, {type: dataType}));
-      if (fileName)
-        downloadLink.setAttribute('download', fileName);
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-    });
-  }
 
 
-  updateProjetFromSAP(codeProjet :string){
 
-    this.etatProjetService.updateProjetFromSAP(codeProjet).subscribe(
-      (data:Projet)=>{
-        this.spinner.hide();
-        if(data!=null && data.codeProjet!=null){
-          this.currentProjet = data;
-
-          var index= this.getIndexFromFiltrerdList(data.codeProjet);
-
-          this.projets[index] = data;
-        }
-
-
-        this.ref.detectChanges();
-
-      },
-      err=>{
-        //console.log("error "+ JSON.stringify(err));
-
-        this.ref.detectChanges();
-        this.spinner.hide();
-
-
-      }
-    )
-    //this.spinner.hide();
-  }
 
 }

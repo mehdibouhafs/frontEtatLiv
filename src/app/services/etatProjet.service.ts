@@ -139,13 +139,6 @@ export class EtatProjetService {
     return stompClient;
   }
 
-  exportDetailRdv(codeProjet : string) {
-    return this.http.post(this.host + '/exportDetailRdv',codeProjet, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
-    );
-  }
-  updateProjetFromSAP(codeProjet:string){
-    return this.http.post(this.host+'/updateProjetFromSAP',codeProjet,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
-  }
 
 
 
