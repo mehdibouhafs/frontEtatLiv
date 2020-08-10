@@ -10,6 +10,7 @@ import {EtatStockProjetComponent} from './etat-stock-projet/etat-stock-projet.co
 import { BalanceAgeeComponent } from './balance-agee/balance-agee.component';
 import {ContratsComponent} from "./contrats/contrats.component";
 import {EcheancesComponent} from "./echeances/echeances.component";
+import {EcheancesRafComponent} from "./echeances-raf/echeances-raf.component";
 
 
 
@@ -35,6 +36,7 @@ const routes: Routes = [
   {path:"consultReunions",component:ReunionComponent},
   {path:"contrats",component:ContratsComponent},
   {path:"echeances",component:EcheancesComponent},
+  {path:"echeancesRAF",component:EcheancesRafComponent},
 
 ];
 

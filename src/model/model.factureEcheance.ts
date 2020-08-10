@@ -14,5 +14,7 @@ export class FactureEcheance {
   public  montant:number;
   public affectedByUser:boolean;
 
+  public  montantHT:number;
+
 
 }

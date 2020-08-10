@@ -971,6 +971,14 @@ export class ContratsComponent implements OnInit {
   }
 
 
+  goToEcheancesRAF() {
+    var url = '/PDC360/#/echeancesRAF';
+
+
+    window.open(url, "_blank");
+
+  }
+
 
 
 

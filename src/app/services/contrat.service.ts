@@ -36,7 +36,7 @@ export class ContratService {
     return this.http.get(this.host+"/getContrat?numContrat="+numContrat,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
-  getEcheance(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+  getEcheance(numContrat : number,nameModele:string,page: number,size:number,sortBy :string,sortType :string){
 
     var res = new Array();
     res.push("numContrat="+numContrat);
@@ -45,6 +45,9 @@ export class ContratService {
     if(sortBy!=null && sortType!="null" ){
       res.push("sortBy="+sortBy);
       res.push("sortType="+sortType);
+    }
+    if(nameModele!=null && nameModele!="null"){
+      res.push("nameModele="+nameModele);
     }
 
     var str = res.join("&");
@@ -72,7 +75,7 @@ export class ContratService {
   }
 
 
-  getEcheanceNotLinked(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+  getEcheanceNotLinked(numContrat : number,nameModele:string,page: number,size:number,sortBy :string,sortType :string){
 
     var res = new Array();
     res.push("numContrat="+numContrat);
@@ -83,13 +86,38 @@ export class ContratService {
       res.push("sortType="+sortType);
     }
 
+    if(nameModele!=null && nameModele!="null"){
+      res.push("nameModele="+nameModele);
+    }
+
     var str = res.join("&");
 
 
     return this.http.get(this.host+"/getEcheanceNotLinked?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
-  getEcheancesNotLinked(date:string,page: number,size:number,sortBy :string,sortType :string){
+  getEcheanceNotLinkedDelay(numContrat : number,nameModele:string,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+    res.push("numContrat="+numContrat);
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    if(nameModele!=null && nameModele!="null"){
+      res.push("nameModele="+nameModele);
+    }
+
+    var str = res.join("&");
+
+
+    return this.http.get(this.host+"/getEcheanceNotLinkedDelay?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getEcheancesNotLinked(date:string,nameModele:string,page: number,size:number,sortBy :string,sortType :string){
 
     var res = new Array();
 
@@ -104,13 +132,42 @@ export class ContratService {
       res.push("sortType="+sortType);
     }
 
+    if(nameModele!=null && nameModele!="null"){
+      res.push("nameModele="+nameModele);
+    }
+
     var str = res.join("&");
 
 
     return this.http.get(this.host+"/getEcheancesNotLinked?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
-  getEcheanceLinked(numContrat : number,page: number,size:number,sortBy :string,sortType :string){
+  getEcheancesNotLinkedDelay(date:string,nameModele:string,page: number,size:number,sortBy :string,sortType :string){
+
+    var res = new Array();
+
+    if(date!=null && date!=""){
+      res.push("date="+date);
+    }
+
+    res.push("page="+page);
+    res.push("size="+size);
+    if(sortBy!=null && sortType!="null" ){
+      res.push("sortBy="+sortBy);
+      res.push("sortType="+sortType);
+    }
+
+    if(nameModele!=null && nameModele!="null"){
+      res.push("nameModele="+nameModele);
+    }
+
+    var str = res.join("&");
+
+
+    return this.http.get(this.host+"/getEcheancesNotLinkedDelay?"+str,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+  getEcheanceLinked(numContrat : number,nameModele:string,page: number,size:number,sortBy :string,sortType :string){
 
     var res = new Array();
     res.push("numContrat="+numContrat);
@@ -119,6 +176,10 @@ export class ContratService {
     if(sortBy!=null && sortType!="null" ){
       res.push("sortBy="+sortBy);
       res.push("sortType="+sortType);
+    }
+
+    if(nameModele!=null && nameModele!="null"){
+      res.push("nameModele="+nameModele);
     }
 
     var str = res.join("&");
@@ -351,6 +412,11 @@ export class ContratService {
 
   }
 
+  genereateEcheanceAutomatique(numContrat :any,factureEcheance : FactureEcheance){
+    return this.http.put(this.host+'/genereateEcheanceAutomatique/'+numContrat,factureEcheance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
   editEcheance(numContrat :any,echeance : Echeance){
     return this.http.put(this.host+'/editEcheance/'+numContrat,echeance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
@@ -368,6 +434,11 @@ export class ContratService {
 
   deleteEcheance(idEcheance : any){
     return this.http.delete(this.host+'/deleteEcheance/'+idEcheance,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
+  }
+
+  deleteModele(idModele : any){
+    return this.http.delete(this.host+'/deleteModele/'+idModele,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
   }
 
@@ -434,6 +505,29 @@ export class ContratService {
     console.log("res " + res);
     return this.http.get(this.host + '/exportEcheancesNotLinked'+str, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
     );
+  }
+
+  exportEcheancesNotLinkedDelay(date:any) {
+    var res = new Array();
+
+    if(date!=null && date!="null" ){
+      res.push("date="+date);
+    }
+
+    var str="";
+    if(res.length>0){
+      str = "?"+res.join("&");
+    }
+
+
+    console.log("res " + res);
+    return this.http.get(this.host + '/exportEcheancesNotLinkedDelay'+str, {responseType: 'blob' as 'json',headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})},
+    );
+  }
+
+  getAllDistinctNameContratModeles(contrat : number){
+    return this.http.get(this.host+'/getAllDistinctNameContratModeles?numContrat='+contrat,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+
   }
 
 

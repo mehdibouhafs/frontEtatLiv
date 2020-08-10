@@ -16,6 +16,7 @@ import {AuthenticationService} from "../services/authentification.service";
 import {ShareEcheanceService} from "../services/shareEcheance.service";
 import {NgxSpinnerService} from "ngx-spinner";
 import {ShareBlockedKeyService} from "../services/shareBlockedKey.service";
+import {Facture} from "../../model/model.facture";
 
 @Component({
   selector: 'app-view-factures',
@@ -35,6 +36,8 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   factureEcheances : Array<FactureEcheance>;
 
    allEcheances : Array<Echeance>;
+
+   echeancesFiltred : Array<Echeance>;
 
   @Input() numContrat : any;
 
@@ -71,6 +74,8 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   sortType:any=null;
 
   subscription :any;
+
+  affectation:any;
 
   constructor(private shareBlockedkey : ShareBlockedKeyService,private ref: ChangeDetectorRef,private spinner: NgxSpinnerService,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private contratService:ContratService,private modalService: BsModalService) {
 
@@ -168,20 +173,38 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
     console.log("edit Page echeance: "+this.currentPageFactureEcheances);
 
 
-    this.contratService.editFactureEcheance(this.numContrat,this.updatedFactureEcheance).subscribe((data: FactureEcheance) => {
+    if(this.affectation=='manuel'){
+      this.contratService.editFactureEcheance(this.numContrat,this.updatedFactureEcheance).subscribe((data: FactureEcheance) => {
 
-      this.shareEcheance.setEcheance(data.echeance);
+        this.shareEcheance.setEcheance(data.echeance);
 
-      console.log("current Page echeance"+this.currentPageFactureEcheances);
-      this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
+        console.log("current Page echeance"+this.currentPageFactureEcheances);
+        this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
 
-      this.editFactureEcheanceModalRef.hide();
+        this.editFactureEcheanceModalRef.hide();
 
-    }, err => {
-      console.log("ereur", err);
+      }, err => {
+        console.log("ereur", err);
+
+      });
+    }else{
+      this.contratService.genereateEcheanceAutomatique(this.numContrat,this.updatedFactureEcheance).subscribe((data: FactureEcheance) => {
+
+        this.shareEcheance.setEcheance(data.echeance);
+
+        console.log("current Page echeance"+this.currentPageFactureEcheances);
+        this.getFactureEcheance(this.numContrat,this.currentPageFactureEcheances,this.pageSizeFactureEcheances,this.sortBy,this.sortType);
+
+        this.editFactureEcheanceModalRef.hide();
+
+      }, err => {
+        console.log("ereur", err);
 
 
-    });
+      });
+    }
+
+
 
 
 
@@ -193,8 +216,12 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
     this.updatedFactureEcheance = new FactureEcheance();
     this.updatedFactureEcheance.id=factureEcheance.id;
     this.updatedFactureEcheance.facture=factureEcheance.facture;
+    this.updatedFactureEcheance.echeance=factureEcheance.echeance;
     this.updatedFactureEcheance.contrat=factureEcheance.contrat;
+    this.updatedFactureEcheance.montantHT = factureEcheance.facture.montantHT;
     this.updatedFactureEcheance.echeance=null;
+    this.affectation="manuel";
+    this.filteredEcheances(factureEcheance.facture);
 
     console.log(JSON.stringify(factureEcheance.echeance));
 
@@ -212,6 +239,7 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
   }
 
   closeEditFactureEcheanceModal(){
+    this.echeancesFiltred =new Array();
     this.editFactureEcheanceModalRef.hide();
   }
 
@@ -294,6 +322,34 @@ export class ViewFacturesComponent implements OnInit,OnChanges {
     this.shareBlockedkey.setBlockedKey(false);
   }
 
+
+  filteredEcheances(facture:Facture){
+    this.echeancesFiltred = new Array();
+    console.log(" Echeances "+ JSON.stringify (this.allEcheances));
+    console.log("length Echeance "+this.allEcheances.length);
+    for(var i=0;i<this.allEcheances.length;i++){
+
+          console.log("DEBUTPERIODE");
+          if(this.allEcheances[i].du!=null && facture.debutPeriode!=null){
+
+            if(this.allEcheances[i].au!=null ){
+              console.log("periode not null");
+              if(moment(this.allEcheances[i].du)<=moment(facture.debutPeriode) && moment(this.allEcheances[i].au)>=moment(facture.debutPeriode)){
+                console.log("here");
+                this.echeancesFiltred.push(this.allEcheances[i]);
+              }
+            }else{
+              if(moment(this.allEcheances[i].du)<=moment(facture.debutPeriode)){
+                console.log("here");
+              this.echeancesFiltred.push(this.allEcheances[i]);
+            }
+            }
+          }
+    }
+
+
+
+  }
 
 
 

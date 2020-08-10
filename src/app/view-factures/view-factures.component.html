@@ -114,6 +114,23 @@
     </div>
 
     <div class="row">
+      <div class="form-group col-sm-12" >
+        <label style="font-size: 13px;" for="numFacture"><i class="fa fa-file-text-o fa-lg"></i> Mode :</label>
+        <div>
+          <input id="manuel" type="radio" value="manuel" [(ngModel)]="affectation" name="affecation" >
+          <label for="manuel">Manuel</label>
+        </div>
+
+        <div *ngIf="updatedFactureEcheance.echeance==null">
+          <input id="automatique" type="radio" value="automatique" [(ngModel)]="affectation" name="affecation" >
+          <label for="automatique">Automatique</label>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="row">
       <div class="form-group col-sm-12">
         <label for="periode" style="font-size: 13px;"><i class="fa fa-calendar-check-o fa-lg"></i> Période de facturation  :  </label>
         <p style="font-size: 13px;
@@ -122,14 +139,23 @@
       </div>
     </div>
 
-
-
     <div class="row">
+      <div class="form-group col-sm-12">
+        <label for="montantHT" style="font-size: 13px;"><i class="fa fa-money fa-lg"></i> Montant HT  :  </label>
+        <p style="font-size: 13px;
+    color: black;
+    margin-left: 4px;" id="montantHT">{{updatedFactureEcheance.montantHT | currency:'DH':'symbol':undefined:'fr'}}</p>
+      </div>
+    </div>
+
+
+
+    <div class="row" *ngIf="affectation=='manuel'">
       <div class="form-group col-sm-12">
         <label style="font-size: 13px;" for="au1"><i class="fa fa-calendar-times-o fa-lg"></i> Echéance Au :</label>
         <select style="font-size: 13px;" id="au1" class="form-control" name="au1"  [(ngModel)]="updatedFactureEcheance.echeance"  >
           <option [ngValue]="null" selected>Aucune échéance </option>
-          <option *ngFor="let echeance of allEcheances"
+          <option *ngFor="let echeance of echeancesFiltred"
                   [ngValue]="echeance" [ngStyle]= "(echeance!=null && echeance.addedByUser) && {'color':'red'}" style="font-size: 14px;">
             <div *ngIf="echeance.montant"  >[ Du {{echeance.du | date:'dd/MM/yyyy'}} , Au {{echeance.au | date:'dd/MM/yyyy'}}, Montant : {{echeance.montant | currency:'DH':'symbol':undefined:'fr'}} - {{echeance.periodeFacturation}}  ]</div>
             <div *ngIf="echeance.montantPrevision"  >[ Du {{echeance.du | date:'dd/MM/yyyy'}} , Au {{echeance.au | date:'dd/MM/yyyy'}}, Montant Prévisionel : {{echeance.montantPrevision | currency:'DH':'symbol':undefined:'fr'}} - {{echeance.periodeFacturation}}  ]</div>

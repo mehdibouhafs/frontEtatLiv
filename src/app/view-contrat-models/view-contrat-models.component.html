@@ -1,6 +1,20 @@
 
 <div *ngIf="contratModels!=null">
 
+  <div class="row" style="padding-bottom: 10px;">
+    <div class="col-md-4">
+
+    </div>
+    <div class="col-md-4">
+
+    </div>
+
+    <div class="col-md-4">
+
+      <button class="btn btn-success btn-sm pull-right" style="margin-right: 5px" *ngIf="roleEditEcheance==true" (click)="showAddEcheanceModal(addEcheanceModal)"><i class="fa fa-bars" aria-hidden="true"></i> Nouveau modèle</button>
+
+    </div>
+  </div>
 
   <table mat-table  #contratModelTable
          (matSortChange)="sortChange($event)" [dataSource]="dataSourceContratModel" class="mat-elevation-z8" matSort>
@@ -46,6 +60,10 @@
       <td mat-cell *matCellDef="let element"  > {{element.montantPrevisionel | currency:'DH':'symbol':undefined:'fr'}}  </td>
     </ng-container>
 
+    <ng-container matColumnDef="option"  >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>  </th>
+      <td mat-cell *matCellDef="let element">  <a  *ngIf="roleEditEcheance==true" (click)="showDeleteModelModal(element,deleteModelModal)"><i class="fa fa-remove" aria-hidden="true"></i></a>  </td></ng-container>
+
 
     <tr mat-header-row *matHeaderRowDef="displayedColumnContratModel; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumnContratModel;" ></tr>
@@ -60,3 +78,147 @@
                  (page)="onPaginateChangeContratModel($event) ">
   </mat-paginator>
 </div>
+
+<ng-template #addEcheanceModal>
+  <div class="modal-header">
+    <p>Ajout d'un nouveau modèle </p>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="closeAddEcheanceModal()">
+      <span aria-hidden="true">X</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+    <div class="body-title-container">
+
+      <div class="row">
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+
+          <label for="nom"><i class="fa fa-flag fa-lg"></i> Nom :</label>
+
+          <input id="nom" name="nom"  type="text" class="form-control input-sm" [ngModel]="newEcheance.nomModele" (focusin)="blockedKey()" (focusout)="deBlockedKey()"  >
+
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+
+          <label for="du1"><i class="fa fa-calendar-times-o fa-lg"></i> Echéance du :</label>
+
+          <input id="du1" name="du"  type="date" class="form-control input-sm" [ngModel]="newEcheance.du | date:'yyyy-MM-dd'" (ngModelChange)="newEcheance.du = $event"
+                 [value]="newEcheance.du | date:'yyyy-MM-dd'" #BirthDate="ngModel" (change)="onChangeDate()" (focusin)="blockedKey()" (focusout)="deBlockedKey()"  >
+
+        </div>
+
+      </div>
+
+      <div class="row">
+
+
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+
+          <label for="au1"><i class="fa fa-calendar-times-o fa-lg"></i> Echéance Au :</label>
+
+          <input id="au1" name="au"  type="date" class="form-control input-sm" [ngModel]="newEcheance.au | date:'yyyy-MM-dd'" (ngModelChange)="newEcheance.au  = $event"
+                 [value]="newEcheance.au  | date:'yyyy-MM-dd'" #BirthDate="ngModel" min="{{newEcheance.du | date:'yyyy-MM-dd'}}" (change)="onChangeDate()"  (focusin)="blockedKey()" (focusout)="deBlockedKey()" >
+
+        </div>
+
+
+      </div>
+
+      <div class="row">
+
+
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+          <label for="periodeFacturation2"><i class="fa fa-flag-o fa-lg"></i> Période de facturation :</label>
+          <select id="periodeFacturation2" class="form-control" name="periodeFacturation" [(ngModel)]="newEcheance.periodeFacturation">
+            <option value="UNKNOWN" >Période non défini</option>
+            <option value="MENSUELLE" [disabled]="nbMonth<1">MENSUELLE</option>
+            <option value="TRIMESTRIELLE" [disabled]="nbMonth<3">TRIMESTRIELLE</option>
+            <option value="SEMESTRIELLE" [disabled]="nbMonth<5">SEMESTRIELLE</option>
+            <option value="ANNUELLE" [disabled]="nbMonth<11">ANNUELLE</option>
+
+          </select>
+
+        </div>
+      </div>
+
+
+      <div class="row">
+
+
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+          <label for="occurenceFacturation"><i class="fa fa-flag-o fa-lg"></i> Occurence de facturation :</label>
+          <select  id="occurenceFacturation" class="form-control" name="occurenceFacturation" [(ngModel)]="newEcheance.occurenceFacturation" >
+            <option value="DEBUTPERIODE">Début de période</option>
+            <option value="FINPERIODE" >Fin de période</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+          <label for="montant"><i class="fa fa-money"></i> Montant :</label>
+          <input class="form-control" style="width:150px" id="montant" type="number" min="0"  [(ngModel)]="newEcheance.montant" [disabled]="newEcheance.montantPrevision>0" (focusin)="blockedKey()" (focusout)="deBlockedKey()" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col-sm-2"></div>
+        <div class="form-group col-sm-8">
+          <label for="montantPrevisionnel"><i class="fa fa-money"></i> Montant prévisionnel :</label>
+          <input class="form-control" style="width:150px" id="montantPrevisionnel" type="number" min="0"  [(ngModel)]="newEcheance.montantPrevision" [disabled]="newEcheance.montant>0" (focusin)="blockedKey()" (focusout)="deBlockedKey()" />
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="addNewEcheance()">Créer modèle</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="closeAddEcheanceModal()">Annuler</button>
+
+
+  </div>
+</ng-template>
+
+<ng-template #deleteModelModal>
+  <div class="modal-header">
+    <h5>Suppression du modèle</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="annulationDeleteModel()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body rejection-body">
+
+    <div class="row">
+
+
+      <div class="form-group col-sm-2"></div>
+
+
+
+    </div>
+
+    <div class="body-title-container">
+      <h5 class="title-with-border d-inline" style="color: red">Etes-vous sure de vouloir supprimer le modele id :{{selectedModel.id}}, nom :{{selectedModel.name}}, période : [Du {{selectedModel.du | date:'dd/MM/yyyy'}} , Au {{selectedModel.au | date:'dd/MM/yyyy'}}] ?</h5>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success btn-sm" (click)="deleteModele()">Supprimer</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="annulationDeleteModel()">Annuler</button>
+  </div>
+</ng-template>
+

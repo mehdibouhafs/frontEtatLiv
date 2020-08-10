@@ -78,6 +78,10 @@ export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
 
   selectedDate : any;
 
+  modeleSelected : string;
+
+  modeles : Array<string>;
+
   constructor(private shareContratModel: ShareContratModelService,private shareBlockedkey : ShareBlockedKeyService, private spinner: NgxSpinnerService,private ref: ChangeDetectorRef,private shareEcheance : ShareEcheanceService,private authService: AuthenticationService,private modalService: BsModalService,private router:Router,private contratService : ContratService) {
 
   }
@@ -91,10 +95,10 @@ export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
   }
 
 
-  getEcheancesNotLinked(date:string,page :number,size:number,sortBy:any,sortType:any){
+  getEcheancesNotLinked(date:string,nameModele:string,page :number,size:number,sortBy:any,sortType:any){
 
 
-    this.contratService.getEcheancesNotLinked(date,page,size,sortBy,sortType).subscribe(
+    this.contratService.getEcheancesNotLinked(date,nameModele,page,size,sortBy,sortType).subscribe(
       (data : any)=>{
 
         this.echeances  = data.content;
@@ -309,7 +313,7 @@ export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
       date = moment(this.selectedDate).format("DD/MM/YYYY");
     }
 
-    this.getEcheancesNotLinked(date,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+    this.getEcheancesNotLinked(date,this.modeleSelected,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
 
 
   }
@@ -369,12 +373,18 @@ export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
 
   public checkExpiredEcheanceNotFacture( echeance : Echeance){
 
-    if(echeance!=null){
+    if(echeance!=null && (echeance.factures== null || echeance.factures=="" || echeance.factures=="[]") ){
 
-      if( echeance.factures== null || echeance.factures=="" || echeance.factures=="[]" && echeance.du!=null && echeance.occurenceFacturation == "DEBUTPERIODE" && moment(echeance.du) < moment()){
+      if( echeance.occurenceFacturation==null || echeance.occurenceFacturation == 'FINPERIODE'){
+
+        if(echeance.au!=null && moment(echeance.au) < moment()){
           return true;
+        }else{
+          return false;
+        }
+
       }else{
-        if( (echeance.factures== null || echeance.factures=="" || echeance.factures=="[]") && echeance.au!=null && moment(echeance.au) < moment() ){
+        if(echeance.du!=null && moment(echeance.du) < moment() ){
           return true;
         }else{
           return false;
@@ -383,6 +393,9 @@ export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
     }else{
       return false;
     }
+
+
+
 
   }
 
@@ -429,6 +442,19 @@ export class EcheancesComponent implements  OnInit,OnChanges,OnDestroy {
       document.body.appendChild(downloadLink);
       downloadLink.click();
     });
+  }
+
+  public getAllDistinctNameContratModeles(){
+    this.contratService.getAllDistinctNameContratModeles(this.numContrat).subscribe(
+      (data: Array<string>)=>{
+        this.modeles = data;
+        this.modeles.sort();
+      },error => {
+        //this.authService.logout();
+        //this.router.navigateByUrl('/login');
+        //console.log("error "  +JSON.stringify(error));
+      }
+    )
   }
 
 

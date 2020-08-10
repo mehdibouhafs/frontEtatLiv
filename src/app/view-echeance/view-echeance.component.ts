@@ -21,6 +21,7 @@ import * as moment from 'moment';
 import {ShareBlockedKeyService} from "../services/shareBlockedKey.service";
 import {ShareContratModelService} from "../services/shareContratModel.service";
 import {SelectionModel} from "@angular/cdk/collections";
+import {ContratModel} from "../../model/model.contratModel";
 
 
 @Component({
@@ -33,7 +34,7 @@ import {SelectionModel} from "@angular/cdk/collections";
 export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
 
-  displayedColumnsEcheance: string[] = ['select','du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
+  displayedColumnsEcheance: string[] = ['select','nomModele','du', 'au', 'montantPrevision','periodeFacturation','occurenceFacturation','factures','montantFacture','montantRestFacture','commentaire','option'];
   public dataSourceEcheance: MatTableDataSource<Echeance>;
   @ViewChild('echeanceTableSort', {static: true}) sortEcheance: MatSort;
   @ViewChild('echeanceTablePaginator', {static: true}) paginatorEcheance: MatPaginator;
@@ -76,6 +77,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   echeanceNotLinked : string;
 
+  modeleSelected : string;
+
+  modeles : Array<string>;
+
   public selection = new SelectionModel<Echeance>(true, []);
 
 
@@ -93,60 +98,9 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  getEcheances(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+  getEcheances(numContrat:number,nameModele:string,page :number,size:number,sortBy:any,sortType:any){
 
-    this.contratService.getEcheance(numContrat,page,size,sortBy,sortType).subscribe(
-      (data : any)=>{
-
-        this.echeances  = data.content;
-
-        this.lengthEcheances = data.totalElements;
-        this.currentPageEcheances = data.pageable.pageNumber+1;
-        this.totalPagesEcheances = data.totalPages;
-        this.offsetEcheances = data.pageable.offset;
-
-        for(var i=0;i<this.echeances.length;i++){
-          if(this.echeances[i].commentaire==null){
-            this.echeances[i].commentaire = new CommentaireEcheance();
-            this.echeances[i].commentaire.id=0;
-          }
-          if(this.echeances[i].factures!=null){
-            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
-            this.echeances[i].factures2=t.split(",");
-          }
-        }
-
-        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
-
-        this.dataSourceEcheance.data.forEach(row => {
-          this.selection.selected.forEach(echeance1 => {
-            if(row.id==echeance1.id){
-              this.selection.select(row);
-            }
-          })
-        });
-
-        if(this.deleteEcheanceModalRef){
-          this.deleteEcheanceModalRef.hide();
-        }
-
-        if(this.isAllSelected()){
-
-        }
-
-        this.ref.detectChanges();
-
-      },err=>{
-
-        console.log("error "  +JSON.stringify(err));
-      });
-
-  }
-
-  getEcheancesNotLinked(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
-
-
-    this.contratService.getEcheanceNotLinked(numContrat,page,size,sortBy,sortType).subscribe(
+    this.contratService.getEcheance(numContrat,nameModele,page,size,sortBy,sortType).subscribe(
       (data : any)=>{
 
         this.echeances  = data.content;
@@ -182,6 +136,103 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
         }
 
 
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
+  }
+
+  getEcheancesNotLinked(numContrat:number,nameModele:string,page :number,size:number,sortBy:any,sortType:any){
+
+
+    this.contratService.getEcheanceNotLinked(numContrat,nameModele,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.echeances  = data.content;
+
+        this.lengthEcheances = data.totalElements;
+        this.currentPageEcheances = data.pageable.pageNumber+1;
+        this.totalPagesEcheances = data.totalPages;
+        this.offsetEcheances = data.pageable.offset;
+
+        for(var i=0;i<this.echeances.length;i++){
+          if(this.echeances[i].commentaire==null){
+            this.echeances[i].commentaire = new CommentaireEcheance();
+            this.echeances[i].commentaire.id=0;
+          }
+          if(this.echeances[i].factures!=null){
+            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
+            this.echeances[i].factures2=t.split(",");
+          }
+        }
+
+        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+
+        this.dataSourceEcheance.data.forEach(row => {
+          this.selection.selected.forEach(echeance1 => {
+            if(row.id==echeance1.id){
+              this.selection.select(row);
+            }
+          })
+        });
+
+        if(this.deleteEcheanceModalRef){
+          this.deleteEcheanceModalRef.hide();
+        }
+
+
+
+        this.ref.detectChanges();
+
+      },err=>{
+
+        console.log("error "  +JSON.stringify(err));
+      });
+
+  }
+
+  getEcheancesNotLinkedDelay(numContrat:number,nameModele:string,page :number,size:number,sortBy:any,sortType:any){
+
+
+    this.contratService.getEcheanceNotLinkedDelay(numContrat,nameModele,page,size,sortBy,sortType).subscribe(
+      (data : any)=>{
+
+        this.echeances  = data.content;
+
+        this.lengthEcheances = data.totalElements;
+        this.currentPageEcheances = data.pageable.pageNumber+1;
+        this.totalPagesEcheances = data.totalPages;
+        this.offsetEcheances = data.pageable.offset;
+
+        for(var i=0;i<this.echeances.length;i++){
+          if(this.echeances[i].commentaire==null){
+            this.echeances[i].commentaire = new CommentaireEcheance();
+            this.echeances[i].commentaire.id=0;
+          }
+          if(this.echeances[i].factures!=null){
+            var t= this.echeances[i].factures.substring(1,this.echeances[i].factures.length-1);
+            this.echeances[i].factures2=t.split(",");
+          }
+        }
+
+        this.dataSourceEcheance = new MatTableDataSource(this.echeances);
+
+        this.dataSourceEcheance.data.forEach(row => {
+          this.selection.selected.forEach(echeance1 => {
+            if(row.id==echeance1.id){
+              this.selection.select(row);
+            }
+          })
+        });
+
+        if(this.deleteEcheanceModalRef){
+          this.deleteEcheanceModalRef.hide();
+        }
+
+
 
         this.ref.detectChanges();
 
@@ -193,11 +244,11 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
   }
 
 
-  getEcheancesLinked(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+  getEcheancesLinked(numContrat:number,nameModele:string,page :number,size:number,sortBy:any,sortType:any){
 
 
 
-    this.contratService.getEcheanceLinked(numContrat,page,size,sortBy,sortType).subscribe(
+    this.contratService.getEcheanceLinked(numContrat,nameModele,page,size,sortBy,sortType).subscribe(
       (data : any)=>{
 
         this.echeances  = data.content;
@@ -241,10 +292,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   }
 
-  getEcheancesByUserHideModal(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+  getEcheancesByUserHideModal(numContrat:number,nameModele:string,page :number,size:number,sortBy:any,sortType:any){
 
 
-    this.contratService.getEcheance(numContrat,page,size,sortBy,sortType).subscribe(
+    this.contratService.getEcheance(numContrat,nameModele,page,size,sortBy,sortType).subscribe(
       (data : any)=>{
 
         this.echeances  = data.content;
@@ -281,10 +332,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
   }
 
 
-  getEcheancesHidmodal(numContrat:number,page :number,size:number,sortBy:any,sortType:any){
+  getEcheancesHidmodal(numContrat:number,nameModele:string,page :number,size:number,sortBy:any,sortType:any){
 
 
-    this.contratService.getEcheance(numContrat,page,size,sortBy,sortType).subscribe(
+    this.contratService.getEcheance(numContrat,nameModele,page,size,sortBy,sortType).subscribe(
       (data : any)=>{
 
         this.echeances  = data.content;
@@ -328,6 +379,10 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
     console.log("ngOnInit");
 
+    this.modeleSelected=null;
+
+    this.getAllDistinctNameContratModeles();
+
     this.currentPageEcheances=1;
 
     this.pageSizeEcheances=10;
@@ -354,6 +409,7 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
     this.echeances=null;
     this.dataSourceEcheance=null;
     console.log("onChanges this.echeance not linked " + this.echeanceNotLinked );
+    this.modeleSelected=null;
     this.currentPageEcheances=1;
 
     this.pageSizeEcheances=10;
@@ -425,7 +481,7 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
         this.shareEcheance.setFactureEcheance(null);
         this.echeanceNotLinked="tous";
-        this.getEcheancesByUserHideModal(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+        this.getEcheancesByUserHideModal(this.numContrat,this.modeleSelected,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
       this.nbMonth =0;
 
     }, err => {
@@ -442,7 +498,7 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
         this.shareEcheance.setFactureEcheance(null);
         this.shareContratModel.setContratModel(null);
         this.echeanceNotLinked = "tous";
-        this.getEcheancesHidmodal(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+        this.getEcheancesHidmodal(this.numContrat,this.modeleSelected,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
         this.nbMonth =0;
       }else{
         console.log("error ");
@@ -498,6 +554,7 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
 
       this.shareEcheance.setFactureEcheance(null);
+      this.shareContratModel.setContratModel(null);
       this.currentPageEcheances=1;
       this.loadEcheances();
 
@@ -523,23 +580,25 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   loadEcheances(){
 
-    if(this.echeanceNotLinked=="tous"){
-      console.log("null");
-      this.getEcheances(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
-    }else{
 
-      if(this.echeanceNotLinked=="true"){
-        console.log("notL inked");
-        this.getEcheancesNotLinked(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+      if(this.echeanceNotLinked=="tous"){
+        console.log("null");
+        this.getEcheances(this.numContrat,this.modeleSelected,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
       }else{
-        console.log("Linked");
-        this.getEcheancesLinked(this.numContrat,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+
+        if(this.echeanceNotLinked=="true"){
+          console.log("notL inked");
+          this.getEcheancesNotLinked(this.numContrat,this.modeleSelected,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+        }else{
+
+          if(this.echeanceNotLinked=="delay"){
+            this.getEcheancesNotLinkedDelay(this.numContrat,this.modeleSelected,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+          }else{
+          console.log("Linked");
+          this.getEcheancesLinked(this.numContrat,this.modeleSelected,this.currentPageEcheances,this.pageSizeEcheances,this.sortBy,this.sortType);
+         }
+        }
       }
-    }
-
-
-
-
   }
 
   filtrerEcheances(){
@@ -553,17 +612,17 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
     this.loadEcheances();
   }
 
-  blockedKey(){
+  public blockedKey(){
     console.log("focus in blockedKey");
     this.shareBlockedkey.setBlockedKey(true);
   }
 
-  deBlockedKey(){
+  public deBlockedKey(){
     console.log("focus in deblockedKey");
     this.shareBlockedkey.setBlockedKey(false);
   }
 
-  composeEmail(){
+  public composeEmail(){
 
    // console.log("selectedEcheance " +  JSON.stringify(this.selection));
 
@@ -597,15 +656,29 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
 
   public checkExpiredEcheanceNotFacture( echeance : Echeance){
 
-    if(echeance!=null){
-      if( (echeance.factures== null || echeance.factures=="" || echeance.factures=="[]") && echeance.au!=null && moment(echeance.au) < moment() ){
-        return true;
+    if(echeance!=null && (echeance.factures== null || echeance.factures=="" || echeance.factures=="[]") ){
+
+      if( echeance.occurenceFacturation==null || echeance.occurenceFacturation == 'FINPERIODE'){
+
+        if(echeance.au!=null && moment(echeance.au) < moment()){
+          return true;
+        }else{
+          return false;
+        }
+
       }else{
-        return false;
+        if(echeance.du!=null && moment(echeance.du) < moment() ){
+          return true;
+        }else{
+          return false;
+        }
       }
     }else{
       return false;
     }
+
+
+
 
 }
 
@@ -620,6 +693,19 @@ export class ViewEcheanceComponent implements OnInit,OnChanges,OnDestroy {
     this.isAllSelected() ?
       this.selection.clear() :
       this.dataSourceEcheance.data.forEach(row => this.selection.select(row));
+  }
+
+  public getAllDistinctNameContratModeles(){
+    this.contratService.getAllDistinctNameContratModeles(this.numContrat).subscribe(
+      (data: Array<string>)=>{
+        this.modeles = data;
+        this.modeles.sort();
+      },error => {
+        //this.authService.logout();
+        //this.router.navigateByUrl('/login');
+        //console.log("error "  +JSON.stringify(error));
+      }
+    )
   }
 
 

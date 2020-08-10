@@ -86,7 +86,7 @@
     <button  id="echeancesRAF" style="color: white;
       background-color: #337ab7;font-size: 12px;width: 105px;
       padding: 4px;height: 27px;
-    margin-left: 4px;"  class="btn "   (click)="goToEcheances()" ><i class="fa fa-calendar" aria-hidden="true"> Echéances RAF</i>  </button>
+    margin-left: 4px;"  class="btn "   (click)="goToEcheancesRAF()" ><i class="fa fa-calendar" aria-hidden="true"> Echéances RAF</i>  </button>
 
   </div>
 
@@ -714,9 +714,9 @@
 
                         <div class="row">
                           <div class="col-md-12">
-                            <label for="info2"><i class="fa fa-truck  fa-lg"></i> Infos :</label>
+                            <label for="info2"><i class="fa fa-info  fa-lg"></i> Infos :</label>
 
-                            <textarea style="  margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentContrat.info" disabled  rows="15" (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                            <textarea style="  margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentContrat.info" disabled  rows="18" (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
                           </div>
 
                         </div>

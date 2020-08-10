@@ -4,12 +4,19 @@
     <div class="col-md-4">
       <select  id="echeanceNotLinked" style="max-width: 300px;font-size: 14px" class="form-control" name="echeanceNotLinked" [(ngModel)]="echeanceNotLinked" (change)="filtrerEcheances()">
         <option value="true" style="font-size: 14px;">Echéances non facturé</option>
+        <option value="delay" style="font-size: 14px;">Echéances non facturé (en retard)</option>
         <option value="false" style="font-size: 14px;" >Echéances facturé</option>
         <option value="tous" style="font-size: 14px;" >Toutes les écheances</option>
       </select>
+
+
     </div>
     <div class="col-md-4">
-
+      <select  id="modele" style="max-width: 300px;font-size: 14px" class="form-control" name="modele" [(ngModel)]="modeleSelected" (change)="filtrerEcheances()">
+        <option value="null" selected>Filtrer par modèle </option>
+        <option *ngFor="let modele of modeles"
+                [ngValue]="modele">{{modele}}</option>
+      </select>
      </div>
 
     <div class="col-md-4">
@@ -42,6 +49,11 @@
                     [checked]="selection.isSelected(row)">
       </mat-checkbox>
     </td>
+  </ng-container>
+
+  <ng-container matColumnDef="nomModele">
+    <th mat-header-cell *matHeaderCellDef  mat-sort-header> Modèle  </th>
+    <td mat-cell *matCellDef="let element"  > {{element.nomModele }} </td>
   </ng-container>
 
   <!-- Name Column -->
