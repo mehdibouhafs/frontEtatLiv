@@ -64,4 +64,8 @@ export class Produit {
 
   public updatedBy:User;
 
+  public color: string;
+
+  public type_magasin: string;
+
 }

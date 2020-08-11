@@ -1,3 +1,59 @@
+<style>
+  li {
+   display: block;
+   transition-duration: 0.5s;
+  }
+  
+  li:hover {
+    cursor: pointer;
+  }
+  
+  ul li ul.dropdown {
+    visibility: hidden;
+    width: 200px;
+    background: #337ab7;
+    padding: 0px;
+    opacity: 0;
+    position: absolute;
+    transition: all 0.5s ease;
+    margin-top: 1rem;
+    left: 0;
+    display: none;
+  }
+  
+  ul li:hover{
+    background: #5ed0b0;
+  
+  
+  }
+  
+  
+  li:hover{
+    background: #5ed0b0;
+  
+  }
+  
+  ul li.salesmenu:hover ul.dropdown{
+      margin-top: 0;
+        visibility: visible;
+    opacity: 1;
+    z-index: 99;
+    display: block;
+  }
+  
+  ul li ul li {
+    clear: both;
+    width: 100%;
+    line-height: 64px;
+    height: 40px;
+    padding: 13px 19px;
+  }
+
+  ul li ul li a{
+  line-height: 0.7;
+}
+  </style>
+
 <nav class="navbar navbar-inverse customNav">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -13,7 +69,14 @@ background-color: white" src="assets/logo.png" alt="Munisys">
     <ul class="nav navbar-nav">
       <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadProjectRs || roleReadProjectSi || roleReadAllRecouvrement "  [ngStyle]="{'background-color':notifNav==true ? '#5ed0b0' : '' }" routerLink="/notifications" ><a style="color: white" ><i class="fa fa-dashboard" aria-hidden="true"></i> Notifications </a></li>
       <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadProjectRs || roleReadProjectSi || roleBuCommercial " [ngStyle]="{'background-color':projetNav ? '#5ed0b0' : '' }" ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets</a></li>
-      <li *ngIf="roleReadMyRecouvrement || roleReadAllRecouvrement || roleReadMyProjects "><a style="color: white" [ngStyle]="{'background-color':recouvNav ? '#5ed0b0' : '' }" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
+<!--
+      <li class="salesmenu"><a style="color: white"><i class="fa fa-money" aria-hidden="true"></i>  Projets </a>
+        <ul class="dropdown">   
+      <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadProjectRs || roleReadProjectSi || roleBuCommercial " [ngStyle]="{'background-color':projetNav ? '#5ed0b0' : '' }" ><a style="color: white"  routerLink="/etatProjet"><i class="fa fa-building" aria-hidden="true"></i> Projets COM</a></li>
+      <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleReadProjectRs || roleReadProjectSi || roleBuCommercial " [ngStyle]="{'background-color':projetDepNav ? '#5ed0b0' : '' }" ><a style="color: white"  routerLink="/etatProjetDep"><i class="fa fa-building" aria-hidden="true"></i> Projets DEP</a></li>
+        </ul>
+      </li>-->
+        <li *ngIf="roleReadMyRecouvrement || roleReadAllRecouvrement || roleReadMyProjects "><a style="color: white" [ngStyle]="{'background-color':recouvNav ? '#5ed0b0' : '' }" routerLink="/etatRecouvrement"><i class="fa fa-university" aria-hidden="true"></i> Recouvrements</a></li>
       <li *ngIf="roleReadMyRecouvrement || roleReadAllRecouvrement || roleReadMyProjects "><a style="color: white" [ngStyle]="{'background-color':recouvBNav ? '#5ed0b0' : '' }" routerLink="/balanceAgee"><i class="fa fa-money" aria-hidden="true"></i> Balance Agée</a></li>
       <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleBuCommercial" [ngStyle]="{'background-color':stockNav ? '#5ed0b0' : '' }"><a style="color: white" routerLink="/etatStock"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Stock </a></li>
       <li *ngIf="roleReadAllProjects ||roleReadMyProjects || roleBuCommercial" [ngStyle]="{'background-color':stockPNav ? '#5ed0b0' : '' }"><a style="color: white" routerLink="/etatStockProjet"><i class="fa fa-table"></i> Stock / Projet </a></li>

@@ -1,3 +1,13 @@
+<style>
+.projet_table .mat-column-client {
+    width: 15% !important;
+}
+
+.projet_table .mat-column-projet {
+    width: 36% !important;
+}
+</style>
+
 <div [hidden]="authorized==false">
   <ngx-spinner
     bdColor="rgba(51,51,51,0.8)"
@@ -8,25 +18,8 @@
     <p style="font-size: 20px; color: white">Loading...</p>
   </ngx-spinner>
 
-  <app-navigation-bar [projetNav]="true"></app-navigation-bar>
+  <app-navigation-bar [projetDepNav]="true"></app-navigation-bar>
 
-<style>
-.multiselect-dropdown .dropdown-btn{
-    border: 1px solid #8b8080 !important;
-    width: 78% !important;
-    margin-left: 5px !important;
-    border-radius: 2px !important;
-    
-}
-
-.multiselect-dropdown .dropdown-btn .dropdown-down {
-    display: inline-block;
-    margin-top: 3px !important;
-    border-top: 6px solid #adadad !important;
-    border-left: 6px solid transparent !important;
-    border-right: 6px solid transparent !important;
-}
-</style>
 
 
   <div *ngIf="viewUpload" class="container" style="padding: 5px;">
@@ -55,8 +48,8 @@
   </div>
 
   <div class="row" *ngIf="statitics" style="margin-right: 2px;">
-
-    <div class="col-md-2">
+ <!--
+   <div class="col-md-2">
 
       <label style="font-size: 11px;">Total LNF : </label>
       <label style="color: #ff0824;
@@ -85,7 +78,7 @@
       <label style="color: #ff0824;
     font-size: 11px;padding-left: 5px;">{{statitics.totalLnfBeforeSevenMonth | currency:'DH':'symbol':undefined:'fr'}}</label>
 
-    </div>
+    </div>-->
     <div class="col-md-2">
       <div><button style="color: white;
     background-color: #337ab7;font-size: 12px;
@@ -118,12 +111,7 @@
         </select>
       </div>
 
-
-
       <div style="margin-top: 8px;margin-left:5px;">
-
-
-
         <button style="color: white;
       background-color: #337ab7;font-size: 12px;width: 175px;
       padding: 4px;"  class="btn btn-danger" *ngIf="!this.projetCloture"  (click)="getProjetCloture()" ><i class="fa fa-filter" aria-hidden="true"></i> Projets clôturés</button>
@@ -139,31 +127,16 @@
 
       <label style="margin-left: 8px;" for="chefProjet">Chef de Projet :</label>
       <br/>
-      <select style="margin-left: 5px;width: 175px;height: 34px;margin-bottom: 8px;" id="chefProjet" class="browser-default custom-select" name="chefProjet"  [(ngModel)]="selectedChefProjet" (change)="selectFiltre()" >
+      <select style="margin-left: 5px;width: 175px;height: 34px;" id="chefProjet" class="browser-default custom-select" name="chefProjet"  [(ngModel)]="selectedChefProjet" (change)="selectFiltre()" >
         <option value="undefined" selected>Filtrer par chef de projet </option>
         <option *ngFor="let chefProjet of chefProjets"
                 [ngValue]="chefProjet">{{chefProjet}}</option>
       </select>
       <br/>
-
-        <button style="color: white;
+      <button style="color: white;
       background-color: #337ab7;font-size: 12px;width: 55px;
       padding: 4px;margin-top: 8px;
     margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i> </button>
-<!--     <ng-multiselect-dropdown
-      name="typep"
-      [placeholder]="'Select Type'"
-      [data]="typep"
-      [disabled]="disabled"
-      [settings]="dropdownSettings"
-      [(ngModel)]="selectedType"
-      (onSelect)="selectFiltre()"
-      (onSelectAll)="selectFiltre()"
-      (onDeSelect)="selectFiltre()"
-      (onDeSelectALL)="selectFiltre()"
-      >
-      </ng-multiselect-dropdown>--> 
-
 
 
     </div>
@@ -179,8 +152,7 @@
         <option value="Complet">Complet</option>
         <option value="Incomplet">Incomplet</option>
       </select>
-      <br/>
-    
+
     </div>
 
 
@@ -253,7 +225,7 @@
   </mat-form-field>
 
 
-  <table mat-table (matSortChange)="sortChange($event)" [dataSource]="dataSource" class="mat-elevation-z8"  matSort>
+  <table mat-table (matSortChange)="sortChange($event)" [dataSource]="dataSource" class="mat-elevation-z8 projet_table"  matSort>
 
     <!--- Note that these columns can be defined in any order.
           The actual rendered columns are set as a property on the row definition" -->
@@ -261,36 +233,36 @@
 
     <ng-container matColumnDef="option"  >
       <th mat-header-cell *matHeaderCellDef >  &nbsp; </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}" > <a style="  cursor:pointer;"  (click)="selectProjet(element,template)"><i class="fa fa-eye" aria-hidden="true" [ngStyle]="{'color' : checkDateFinInCurrentMonth(element.dateFinProjet) ? 'rgb(255, 0, 0)': ''}"></i>
+      <td mat-cell *matCellDef="let element" > <a style="  cursor:pointer;"  (click)="selectProjet(element,template)"><i class="fa fa-eye" aria-hidden="true" [ngStyle]="{'color' : checkDateFinInCurrentMonth(element.dateFinProjet) ? 'rgb(255, 0, 0)': ''}"></i>
       </a> </td>
     </ng-container>
 
     <!-- Name Column -->
     <ng-container matColumnDef="client" >
       <th mat-header-cell *matHeaderCellDef  mat-sort-header> Client Facturé </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}" style="cursor: pointer;text-decoration : underline;"  (click)="showEtatRecouvrement('codeClient',element.codeClient)"  > {{element.client}} </td>
+      <td mat-cell *matCellDef="let element" style="cursor: pointer;text-decoration : underline;"  (click)="showEtatRecouvrement('codeClient',element.codeClient)"  > {{element.client}} </td>
     </ng-container>
 
     <ng-container matColumnDef="bu"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> BU </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}"> {{element.bu}}   </td>
+      <td mat-cell *matCellDef="let element"> {{element.bu}}   </td>
     </ng-container>
 
     <!-- Position Column -->
     <ng-container matColumnDef="codeProjet">
       <th mat-header-cell *matHeaderCellDef  mat-sort-header> Code Projet  </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}" style="cursor: pointer;text-decoration : underline;"  (click)="showEtatRecouvrement('codeProjet',element.codeProjet)"> {{element.codeProjet}}  </td>
+      <td mat-cell *matCellDef="let element" style="cursor: pointer;text-decoration : underline;"  (click)="showEtatRecouvrement('codeProjet',element.codeProjet.split('DEP-',2)[1].replace(',',' '))"> {{ element.codeProjet.split('DEP-',2)[1].replace(","," ") }}  </td>
     </ng-container>
 
     <ng-container matColumnDef="projet">
       <th mat-header-cell *matHeaderCellDef  mat-sort-header> Projet  </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}"> {{element.projet}}  </td>
+      <td mat-cell *matCellDef="let element"> {{element.projet}}  </td>
     </ng-container>
 
     <!-- Symbol Column -->
     <ng-container matColumnDef="age"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Age (Mois) </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}"> <div *ngIf="element.age <= 6"><span class="filled-circle2">{{element.age}}</span></div>  <div *ngIf="element.age > 6"><span class="filled-circle">{{element.age}}</span></div>  </td>
+      <td mat-cell *matCellDef="let element"> <div *ngIf="element.age <= 6"><span class="filled-circle2">{{element.age}}</span></div>  <div *ngIf="element.age > 6"><span class="filled-circle">{{element.age}}</span></div>  </td>
     </ng-container>
 
 
@@ -304,7 +276,7 @@
           </mat-form-field>
         </div>-->
       </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}" style="cursor: pointer;text-decoration : underline;"  (click)="showEtatRecouvrement('codeCommercial',element.codeCommercial)"  > {{element.commercial}} </td>
+      <td mat-cell *matCellDef="let element" style="cursor: pointer;text-decoration : underline;"  (click)="showEtatRecouvrement('codeCommercial',element.codeCommercial)"  > {{element.commercial}} </td>
     </ng-container>
 
     <!-- Symbol Column -->
@@ -315,38 +287,15 @@
             <input matInput class="form-field" [formControl]="chefProjetFilter" placeholder="Name Filter">
           </mat-form-field>
         </div>--></th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}" style="cursor: pointer;text-decoration : underline;" (click)="showEtatRecouvrement('chefProjet',element.chefProjet)"> {{element.chefProjet}} </td>
+      <td mat-cell *matCellDef="let element" style="cursor: pointer;text-decoration : underline;" (click)="showEtatRecouvrement('chefProjet',element.chefProjet)"> {{element.chefProjet}} </td>
     </ng-container>
 
     <!-- Symbol Column -->
-    <ng-container matColumnDef="montantCmd"  >
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> Mnt CMD </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}"> {{element.montantCmd | currency:'DH':'symbol':undefined:'fr'}}   </td>
-    </ng-container>
-
-    <!-- Symbol Column -->
-    <ng-container matColumnDef="restAlivrer"  >
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> RAL </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}"> {{element.restAlivrer | currency:'DH':'symbol':undefined:'fr'}}   </td>
-    </ng-container>
-
-
-    <!-- Symbol Column -->
-    <ng-container matColumnDef="livrerNonFacture"  >
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> LNF </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}"> {{element.livrerNonFacture | currency:'DH':'symbol':undefined:'fr'}}   </td>
-    </ng-container>
-
-    <!-- Symbol Column -->
-    <ng-container matColumnDef="livreFacturePayer"  >
-      <th mat-header-cell *matHeaderCellDef mat-sort-header> LFP </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}"> {{element.livreFacturePayer | currency:'DH':'symbol':undefined:'fr'}}   </td>
-    </ng-container>
 
     <ng-container matColumnDef="montantStock"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Mnt Stock </th>
-      <td mat-cell *matCellDef="let element" [ngStyle]="{'background-color' : element.flag == 'Green' ? '#4da43747' : 'white'}" > <a target="_blank" [routerLink]="['/etatStockCodeProjetDep/',element.codeProjet]" style="text-decoration: underline;cursor: pointer;font-size:11px"  >{{element.montantStock | currency:'DH':'symbol':undefined:'fr'}}</a>   </td>
-    </ng-container>
+      <td mat-cell *matCellDef="let element"  > <a target="_blank" [routerLink]="['/etatStockCodeProjetDep/',element.codeProjet.split('DEP-',2)[1].replace(',',' '),'Déploiement']" style="text-decoration: underline;cursor: pointer;font-size:11px"  >{{element.montantStock | currency:'DH':'symbol':undefined:'fr'}}</a>   </td>
+    </ng-container>     
 
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
@@ -371,7 +320,7 @@
           </button>
           <p class="heading"> <i class="fa fa-eye fa-lg"></i> Détail du projet :
             <strong style="font-size: 13px;
-    color: #337ab7;">{{currentProjet.codeProjet}} / {{currentProjet.projet}} </strong>
+    color: #337ab7;">{{currentProjet.codeProjet.split('DEP-',2)[1].replace(","," ")}} / {{currentProjet.projet}} </strong>
           </p>
 
         </div>
@@ -429,17 +378,19 @@
 
 
 
-                              <div class="form-group col-sm-4">
-                                <label> <i class="fa fa-money fa-lg"></i> Mnt CMD :</label>
-                                <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal"> {{currentProjet.montantCmd | currency:'DH':'symbol':undefined:'fr'}}</span>
-                              </div>
+      
 
                               <div class="form-group col-sm-4">
                                 <label> <i class="fa fa-money fa-lg"></i> Montant Stock :</label>
 
                                 <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal"> <a target="_blank" [routerLink]="['/etatStockCodeProjetDep/',currentProjet.codeProjet]" style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{currentProjet.montantStock | currency:'DH':'symbol':undefined:'fr'}}</a> </span>
+                                      class="labelModal"><a target="_blank" [routerLink]="['/etatStockCodeProjetDep/',currentProjet.codeProjet.split('DEP-',2)[1].replace(',',' '),'Déploiement']" style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{currentProjet.montantStock | currency:'DH':'symbol':undefined:'fr'}}</a> </span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label><i class="fa fa-flag fa-lg"></i> Statut :</label>
+                                <span style="max-width: 130px;"
+                                      class="labelModal"> {{currentProjet.statut}}</span>
                               </div>
 
                             </div>
@@ -452,18 +403,21 @@
                                       class="labelModal">{{currentProjet.chefProjet}}</span>
                               </div>
 
-                              <div class="form-group col-sm-4">
-                                <label style="width: 65px"> <i class="fa fa fa-money fa-lg"></i> LIV :</label>
-                                <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal">{{currentProjet.livrer | currency:'DH':'symbol':undefined:'fr'}}</span>
-                              </div>
-
 
 
                               <div class="form-group col-sm-4">
                                 <label><i class="fa fa-user fa-lg"></i> Réf.CMD :</label>
                                 <span style="max-width: 130px;"
                                       class="labelModal"> {{currentProjet.refCom}}</span>
+                              </div>
+
+                              <div class="form-group col-sm-4">
+                                <label><i class="fa fa-calendar fa-lg"></i> Age :</label>
+
+                                <span class="filled-circle2" style="margin-left: 2px" *ngIf="currentProjet.age <= 6">{{currentProjet.age}}</span>
+
+                                <span  *ngIf="currentProjet.age > 6" style="margin-left: 2px" class="filled-circle">{{currentProjet.age}}</span>
+
                               </div>
 
 
@@ -477,101 +431,19 @@
                                 <span style="max-width: 130px;"
                                       class="labelModal">  {{currentProjet.bu}}</span>
                               </div>
-
-
-
-
                               <div class="form-group col-sm-4">
-                                <label style="width: 65px"> <i class="fa fa-money fa-lg"></i> RAL :</label>
-                                <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal"> {{currentProjet.restAlivrer | currency:'DH':'symbol':undefined:'fr' }}</span>
-
-                              </div>
-
-                              <div class="form-group col-sm-4">
-                                <label> <i class="fa fa-file-text-o fa-lg"></i> Facturation :</label>
-                                <span style="max-width: 130px;"
-                                      class="labelModal">{{currentProjet.facturation | number : '1.2-2'}} %</span>
-                              </div>
-
-                            </div>
-
-                            <div class="row">
-
-                              <div class="form-group col-sm-4">
-                                <label> <i class="fa fa-calendar-times-o fa-lg"></i> Date CMD :</label>
+                                <label> <i class="fa fa-calendar-times-o fa-lg"></i> Date DEP :</label>
                                 <span style="max-width: 130px;"
                                       class="labelModal">{{currentProjet.dateCmd | date:'dd/MM/yyyy'}}</span>
                               </div>
 
-                              <div class="form-group col-sm-4">
-                                <label style="width: 65px"> <i class="fa fa-money fa-lg"></i> LNF :</label>
-                                <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal">{{currentProjet.livrerNonFacture | currency:'DH':'symbol':undefined:'fr'}}</span>
-                              </div>
 
-                              <div class="form-group col-sm-4">
-                                <label><i class="fa fa-calendar fa-lg"></i>  Prestation Commandé (jrs) :</label>
-                                <span style="max-width: 130px;"
-                                      class="labelModal"> {{currentProjet.prestationCommande}} </span>
-                              </div>
                             </div>
 
-                            <div class="row">
-                              <div class="form-group col-sm-4">
-                                <label><i class="fa fa-flag fa-lg"></i> Statut :</label>
-                                <span style="max-width: 130px;"
-                                      class="labelModal"> {{currentProjet.statut}}</span>
-                              </div>
-
-                              <div class="form-group col-sm-4">
-                                <label style="width: 65px"> <i class="fa fa fa-money fa-lg"></i> LFP :</label>
-                                <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal">  {{currentProjet.livreFacturePayer | currency:'DH':'symbol':undefined:'fr'}}</span>
-                              </div>
-
-                              <div class="form-group col-sm-4">
-                                <label><i class="fa fa-money fa-lg"></i>  RAL Prestation (jrs) :</label>
-                                <span style="max-width: 130px;"
-                                      class="labelModal">{{currentProjet.ralJrsPrestCalc}}</span>
-                              </div>
-                            </div>
 
 
                             <div class="row">
 
-                              <div class="form-group col-sm-4">
-                                <label><i class="fa fa-calendar fa-lg"></i> Age :</label>
-
-                                <span class="filled-circle2" style="margin-left: 2px" *ngIf="currentProjet.age <= 6">{{currentProjet.age}}</span>
-
-                                <span  *ngIf="currentProjet.age > 6" style="margin-left: 2px" class="filled-circle">{{currentProjet.age}}</span>
-
-                              </div>
-
-                              <div class="form-group col-sm-4">
-                                <label> <i class="fa fa fa-money fa-lg"></i> Mnt payé :</label>
-                                <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal"> {{currentProjet.montantPayer | currency:'DH':'symbol':undefined:'fr'}}</span>
-                              </div>
-
-                              <div class="form-group col-sm-4">
-                                <label><i class="fa fa-bookmark fa-lg"></i> Fac. En cours :</label>
-                                <span style="max-width: 130px;"
-                                      class="labelModal"> {{currentProjet.factEncours}}</span>
-                              </div>
-
-
-
-                            </div>
-
-                            <div class="row">
-
-                              <div class="form-group col-sm-4">
-                                <label> <i class="fa fa fa-money fa-lg"></i> Mnt Rest a Rcpt :</label>
-                                <span style="max-width: 130px;min-width: 82px;"
-                                      class="labelModal"> {{currentProjet.montantResteAReceptionnner | currency:'DH':'symbol':undefined:'fr'}}</span>
-                              </div>
 
                               <div class="form-group col-sm-8">
 
@@ -761,16 +633,8 @@
 
 
 
-
                               <div class="form-group col-sm-4">
-                                <button style="color: white;
-                                      background-color: #337ab7;font-size: 12px;
-                                       padding: 4px;" class="btn"
-                                        (click)="exportDetailRdv($event,currentProjet.codeProjet)" id="btnXlsRptDetailRDV"><i class="fa fa-download" aria-hidden="true"></i> Exporter détail RDV</button>
-
-
                               </div>
-
 
                             </div>
 
@@ -916,7 +780,7 @@
                             <div class="col-md-12">
                               <label for="info2"><i class="fa fa-truck  fa-lg"></i> Info Fournisseurs :</label>
 
-                              <textarea style="  margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentProjet.infoFournisseur" disabled  rows="10" (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
+                              <textarea style="    margin-bottom: 30px;" id="info2" name ="info2" class="form-control input-sm" [(ngModel)]="currentProjet.infoFournisseur" disabled  rows="7" (change)="updated($event)" (focusin)="blockedKey()" (focusout)="deBlockedKey()" ></textarea>
                             </div>
                           </div>
 

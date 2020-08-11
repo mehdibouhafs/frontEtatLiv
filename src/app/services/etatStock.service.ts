@@ -30,9 +30,15 @@ export class EtatStockService {
 
   }
 
+  getDistinctType(){
+    return this.http.get(this.host+"/getDistinctType",{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
 
-  getAllStockByFiltre(nature:string, sousNature:string, domaine:string, sousDomaine:string, numLot:string, client:string, nomMagasin:string){
-    return this.http.get(this.host+"/getAllStockByFiltre?nature="+nature+"&sousNature="+sousNature+"&domaine="+domaine+"&sousDomaine="+sousDomaine+"&numLot="+numLot+"&client="+client+"&nomMagasin="+nomMagasin,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+  }
+
+
+
+  getAllStockByFiltre(nature:string, sousNature:string, domaine:string, sousDomaine:string, numLot:string, client:string, nomMagasin:string,type:string){
+    return this.http.get(this.host+"/getAllStockByFiltre?nature="+nature+"&sousNature="+sousNature+"&domaine="+domaine+"&sousDomaine="+sousDomaine+"&numLot="+numLot+"&client="+client+"&nomMagasin="+nomMagasin+"&type="+type,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
   exportEtatProduit(produits : Array<Produit>) {
@@ -73,9 +79,9 @@ export class EtatStockService {
   }
 
 
-  getAllStockProjetByFiltre(annee:string,numLot:string, client:string,magasin:string,comm:string,cp:string){
+  getAllStockProjetByFiltre(annee:string,numLot:string, client:string,magasin:string,comm:string,cp:string,type:string){
     console.log("TEST MAG "+magasin);
-    return this.http.get(this.host+"/getAllStockProjetByFiltre?numLot="+numLot+"&client="+client+"&annee="+annee+"&magasin="+magasin+"&com="+comm+"&cp="+cp,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
+    return this.http.get(this.host+"/getAllStockProjetByFiltre?numLot="+numLot+"&client="+client+"&annee="+annee+"&magasin="+magasin+"&com="+comm+"&cp="+cp+"&type="+type,{headers: new HttpHeaders({'Authorization': this.authenticationService.getToken()})});
   }
 
 
