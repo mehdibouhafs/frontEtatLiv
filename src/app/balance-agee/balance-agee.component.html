@@ -10,7 +10,7 @@
     line-height: 2 !important;
 }
 
-    
+
     .balance_table .mat-column-client {
     width: 30% !important;
 }
@@ -42,8 +42,8 @@
 .balance_table .mat-column-total {
     width: 7%;
 }
-    
-  
+
+
  </style>
   <ngx-spinner
     bdColor="rgba(51,51,51,0.8)"
@@ -54,13 +54,13 @@
     <p style="font-size: 20px; color: white">Loading...</p>
   </ngx-spinner>
     <app-navigation-bar [recouvBNav]="true"></app-navigation-bar>
-  
+
   <div class="row" *ngIf="statitics" style="margin-right: 2px;">
-  
+
     <div class="col-md-3">
-  
-  
-      
+
+
+
       <label style="font-size: 11px;">Total 3 Mois : </label>
       <label style="color: #ff0824;
       font-size: 11px;padding-left: 5px;">{{statitics.totalTrois| currency:'DH':'symbol':undefined:'fr'}}</label>
@@ -70,34 +70,34 @@
 font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symbol':undefined:'fr'}}</label>
 
 
-  
+
     </div>
-  
+
     <div class="col-md-3">
       <label style="font-size: 11px;">Total 6 Mois : </label>
       <label style="color: #ff0824;
       font-size: 11px;padding-left: 5px;">{{statitics.totalSix | currency:'DH':'symbol':undefined:'fr'}}</label>
-      
+
 
   <br/>
-    
+
       <label style="font-size: 11px;">Total Sup. 12 Mois : </label>
       <label style="color: #ff0824;
       font-size: 11px;padding-left: 5px;">{{statitics.totalSupDouze | currency:'DH':'symbol':undefined:'fr'}}</label>
       <br/>
-  
-  
+
+
     </div>
     <div class="col-md-1"></div>
-  
-  
+
+
     <div class="col-md-2">
       <label style="font-size: 11px;">Total : </label>
       <label style="color: #ff0824;
       font-size: 11px;padding-left: 5px;">{{statitics.totalBalance | currency:'DH':'symbol':undefined:'fr'}}</label>
-  
-  
-      <div >Last update {{updatedDate | date:'dd/MM/yyyy HH:mm'}} </div>  
+
+
+      <div >Last update {{updatedDate | date:'dd/MM/yyyy HH:mm'}} </div>
       <div>
         <button style="color: white;
       background-color: #337ab7;font-size: 12px;
@@ -105,14 +105,14 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
       </div>
     </div>
   </div>
-  
-  
+
+
   <div class="row" style="    margin-bottom: 32px;
   margin-top: 14px;
   margin-left: 5px;">
-    
+
     <div class="col-md-2">
-  
+
       <label for="com">Client :</label>
       <br/>
       <ng-select id="clients"
@@ -124,14 +124,14 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
       (change)="selectFiltre()"
       class="custom"
   >
-  
+
   </ng-select>
-  
-  
+
+
     </div>
 
     <div class="col-md-2">
-  
+
       <label for="com">Chargé de recouvrement :</label>
       <br/>
       <ng-select id="cr"
@@ -143,26 +143,26 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
       (change)="selectFiltre()"
       class="custom"
   >
-  
+
   </ng-select>
-  
-  
+
+
     </div>
 
     <div class="col-md-2">
-  
+
         <label for="com">Commercial :</label>
         <br/>
         <select style="margin-left: 5px;width: 215px;height: 36px;border: 1px solid #aaacaa;border-radius: 4px;" id="com" class="browser-default custom-select" name="com"  [(ngModel)]="selectedAM" (change)="selectFiltreAM()" >
         <option value="undefined" selected>Filtrer par AM </option>
-        <option *ngFor="let c of com" 
+        <option *ngFor="let c of com"
                 [ngValue]="c">{{c}}</option>
       </select>
-    
+
       </div>
 
     <div class="col-md-2">
-  
+
         <label for="com">Age :</label>
         <br/>
         <ng-select id="age"
@@ -174,29 +174,27 @@ font-size: 11px;padding-left: 5px;">{{statitics.totalDouze | currency:'DH':'symb
         (change)="selectFiltre()"
         class="custom"
     >
-    
+
     </ng-select>
-    
-    
+
+
       </div>
-  
+
       <div class="col-md-2">
 
         <label for="filtrerStatut">Statut :</label>
         <br/>
-    
+
 
     <ng-multiselect-dropdown
 name="status"
 [placeholder]="'Select Statut'"
 [data]="status"
-[disabled]="disabled"
-[settings]="dropdownSettings"
 [(ngModel)]="selectedStatut"
 (onSelect)="selectFiltreStatus()"
 (onFilterChange)="selectFiltreStatus()">
 </ng-multiselect-dropdown>
-    
+
       </div>
 
 
@@ -205,41 +203,41 @@ name="status"
         background-color: #337ab7;font-size: 12px;width: 55px;
         padding: 4px;margin-top: 8px;
       margin-left: 4px;"  class="btn "   (click)="initFilter()" ><i class="fa fa-eraser" aria-hidden="true"></i> </button>
-  
-  
-  
+
+
+
     </div>
-  
-  
-  
-  
-  
+
+
+
+
+
   </div>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
+
+
+
+
+
  <mat-form-field >
 
   <input style="margin-top: 10px"  matInput [(ngModel)]="currentFilter" (keyup)="applyFilter($event.target.value)" placeholder="Filtrer">
-   
+
   </mat-form-field>
-  
-  
+
+
   <table mat-table (matSortChange)="sortChange($event)" [dataSource]="dataSource" class="mat-elevation-z8 balance_table" matSort>
-  
+
     <!--- Note that these columns can be defined in any order.
           The actual rendered columns are set as a property on the row definition" -->
-          
-    
+
+
     <!-- Symbol Column -->
     <ng-container matColumnDef="client"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Client
@@ -248,20 +246,20 @@ name="status"
       <ng-container matColumnDef="chargee_recouv">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Chargé de recouvrement
         <td mat-cell *matCellDef="let element"> {{element.chargee_recouv}}  </td></ng-container>
-  
-        
+
+
           <!-- Symbol Column -->
     <ng-container matColumnDef="sup_douze_mois"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Sup. 12 Mois
         <td mat-cell *matCellDef="let element"><a *ngIf="element.sup_douze_mois  != 0" target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClientAge/Sup. 12M',element.client]"
           style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{checkValue(element.sup_douze_mois) | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.sup_douze_mois == 0">{{element.sup_douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
-           
+
           <!-- Symbol Column -->
             <ng-container matColumnDef="douze_mois">
               <th mat-header-cell *matHeaderCellDef mat-sort-header> A 12 Mois
               <td mat-cell *matCellDef="let element"><a *ngIf="element.douze_mois != 0" target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClientAge/A12M',element.client]"
                 style="text-decoration: underline;cursor: pointer;font-size:10px"  > {{checkValue(element.douze_mois) | currency:'DH':'symbol':undefined:'fr'}}  </a> <span *ngIf="element.douze_mois == 0">{{element.douze_mois | currency:'DH':'symbol':undefined:'fr'}} </span></td></ng-container>
-    
+
       <!-- Symbol Column -->
       <ng-container matColumnDef="six_mois"  >
         <th mat-header-cell *matHeaderCellDef mat-sort-header> 6 Mois
@@ -274,36 +272,35 @@ name="status"
       <th mat-header-cell *matHeaderCellDef  mat-sort-header> 3 Mois</th>
       <td mat-cell *matCellDef="let element"><a *ngIf="element.tois_mois != 0" target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClientAge/3M',element.client]"
         style="text-decoration: underline;cursor: pointer;font-size:10px"  >{{checkValue(element.tois_mois) | currency:'DH':'symbol':undefined:'fr'}} </a> <span *ngIf="element.tois_mois == 0">{{element.tois_mois | currency:'DH':'symbol':undefined:'fr'}} </span> </td>
-  
+
       </ng-container>
-  
-  
-  
-  
+
+
+
+
     <ng-container matColumnDef="total"  >
       <th mat-header-cell *matHeaderCellDef mat-sort-header> Total </th>
       <td mat-cell *matCellDef="let element"><a target="_blank" (click)="test(element.id_balance)" [routerLink]="['/etatRecouvrementClient/',element.client]"
         style="text-decoration: underline;cursor: pointer;font-size:10px"> {{element.total | currency:'DH':'symbol':undefined:'fr'}}</a></td>
     </ng-container>
-  
-  
-  
-  
-  
+
+
+
+
+
     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;" [ngClass]="{'highlight': row.id_balance == idB }"></tr>
-  
-  
+
+
   </table>
   <mat-paginator [pageSizeOptions]="[10, 15, 20, 30]"></mat-paginator>
-  
-  
+
+
 
 
   </div>
-  
+
   <div [hidden]="authorized==true">
 
     <p> Erreur 403 vous n'etes pas autorisé à acceder à cette page</p>
   </div>
-  

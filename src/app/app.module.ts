@@ -47,8 +47,11 @@ import { ContratsComponent } from './contrats/contrats.component';
 import { ViewContratModelsComponent } from './view-contrat-models/view-contrat-models.component';
 import { EcheancesComponent } from './echeances/echeances.component';
 import { EcheancesRafComponent } from './echeances-raf/echeances-raf.component';
+import {NgMultiSelectDropDownModule} from "ng-multiselect-dropdown";
 
-import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+
+
+
 
 
 registerLocaleData(localeFr, 'fr');
